@@ -39,11 +39,12 @@ public class Crossref implements Comparable<Crossref>{
 		return 0;
 	}
 	*/
-	@Override
+	
 	/*
 	 * This function compares two crossrefs according to their value. It is
 	 * called by qsort.
 	 */
+	 @Override
 	public int compareTo(Crossref arg0) {
 		if (this.value > arg0.value)
 			return -1;

@@ -28,6 +28,7 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -161,6 +162,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 	
 	private void sortLists(){
+		
 		Collections.sort(result, new Comparator<Lines>() {
 
 			@Override
