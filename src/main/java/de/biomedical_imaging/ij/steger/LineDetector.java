@@ -1,8 +1,12 @@
 package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableLong;
+
+import com.sun.tools.internal.xjc.reader.gbind.ConnectedComponent;
 
 import ij.IJ;
 import ij.process.FloatProcessor;
@@ -54,6 +58,7 @@ public class LineDetector {
 				ip.getWidth(), ip, junctions);
 		fixContours();
 		fixJunctions();
+		splitLineAtJunctionPoint();
 		return lines;
 	}
 
@@ -63,6 +68,59 @@ public class LineDetector {
 
 	public Junctions getJunctions() {
 		return junctions;
+	}
+	
+	private void splitLineAtJunctionPoint(){
+		Set<Integer> alreadyProcessed = new HashSet<Integer>();
+		for(int i = 0; i < junctions.size(); i++){
+			Junction junction = junctions.get(i);
+			if(!alreadyProcessed.contains(i)){
+				
+				/*
+				 * Find Junctions with the same position
+				 */
+				Junctions junctionsWithTheSamePosition = new Junctions(junctions.getFrame());
+				alreadyProcessed.add(i);
+				junctionsWithTheSamePosition.add(junction);
+				for(int j = i+1; j < junctions.size(); j++){
+					if(!alreadyProcessed.contains(j)){
+						Junction junc2 = junctions.get(j);
+						if(Math.abs(junc2.x-junction.x) < 0.01 && Math.abs(junc2.y-junction.y) < 0.01){
+							alreadyProcessed.add(j);
+							junctionsWithTheSamePosition.add(junc2);
+						}
+					}
+				}
+				
+				/*
+				 * Connect all lines which are connected with the processed line also with each other (new junctions point)
+				 */
+				ArrayList<Line> connectedWithProcessedLine = new ArrayList<Line>();
+				ArrayList<Long> connectedWithProcessedIndex = new ArrayList<Long>();
+				for (Junction junc : junctionsWithTheSamePosition) {
+					connectedWithProcessedLine.add(junc.getLine2());
+					connectedWithProcessedIndex.add(junc.cont2);
+				}
+				for(int j = 0; j < connectedWithProcessedLine.size(); j++){
+					for(int k = j+1; k < connectedWithProcessedLine.size(); k++){
+						Line l1 = connectedWithProcessedLine.get(j);
+						Line l2 = connectedWithProcessedLine.get(k);
+						Junction junc = new Junction();
+						junc.lineCont1 = l1;
+						junc.lineCont2 = l2;
+						junc.x = junction.x;
+						junc.y = junction.y;
+						junc.cont1 = connectedWithProcessedIndex.get(j);
+						junc.cont2 = connectedWithProcessedIndex.get(k);
+						junctions.add(junc); 
+						alreadyProcessed.add(junctions.size()-1);
+						
+						
+					}
+				}
+				
+			}
+		}
 	}
 
 	private void fixJunctions() {
