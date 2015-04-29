@@ -1,7 +1,9 @@
 package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableLong;
@@ -58,8 +60,17 @@ public class LineDetector {
 				ip.getWidth(), ip, junctions);
 		fixContours();
 		fixJunctions();
-		splitLineAtJunctionPoint();
+		assignLinesToJunctions();
+		addAdditionalJunctionPointsAndLines();
+		Collections.sort(junctions);
 		return lines;
+	}
+	
+	private void assignLinesToJunctions(){
+		for (Junction j : junctions) {
+			j.lineCont1 = lines.get((int) j.cont1);
+			j.lineCont2 = lines.get((int) j.cont2);
+		}
 	}
 
 	public Options getUsedParamters() {
@@ -70,10 +81,10 @@ public class LineDetector {
 		return junctions;
 	}
 	
-	private void splitLineAtJunctionPoint(){
+	private void addAdditionalJunctionPointsAndLines(){
 		Set<Integer> alreadyProcessed = new HashSet<Integer>();
 		for(int i = 0; i < junctions.size(); i++){
-			Junction junction = junctions.get(i);
+			Junction splitPoint = junctions.get(i); //Split point!
 			if(!alreadyProcessed.contains(i)){
 				
 				/*
@@ -81,11 +92,11 @@ public class LineDetector {
 				 */
 				Junctions junctionsWithTheSamePosition = new Junctions(junctions.getFrame());
 				alreadyProcessed.add(i);
-				junctionsWithTheSamePosition.add(junction);
+				junctionsWithTheSamePosition.add(splitPoint);
 				for(int j = i+1; j < junctions.size(); j++){
 					if(!alreadyProcessed.contains(j)){
 						Junction junc2 = junctions.get(j);
-						if(Math.abs(junc2.x-junction.x) < 0.01 && Math.abs(junc2.y-junction.y) < 0.01){
+						if(Math.abs(junc2.x-splitPoint.x) < 0.01 && Math.abs(junc2.y-splitPoint.y) < 0.01){
 							alreadyProcessed.add(j);
 							junctionsWithTheSamePosition.add(junc2);
 						}
@@ -108,16 +119,155 @@ public class LineDetector {
 						Junction junc = new Junction();
 						junc.lineCont1 = l1;
 						junc.lineCont2 = l2;
-						junc.x = junction.x;
-						junc.y = junction.y;
+						junc.x = splitPoint.x;
+						junc.y = splitPoint.y;
 						junc.cont1 = connectedWithProcessedIndex.get(j);
 						junc.cont2 = connectedWithProcessedIndex.get(k);
 						junctions.add(junc); 
 						alreadyProcessed.add(junctions.size()-1);
-						
-						
 					}
 				}
+				
+				/*
+				 * Go along the processed line and cut the line in two parts at every junction point on that line.
+				 */
+				Line l1 = splitPoint.getLine1();
+				int pos = (int) splitPoint.pos;
+				
+				if(pos!=0 && pos != (l1.getNumber()-1)){
+					//All data up to pos (included)
+					int keepLength = pos+1;
+					
+				
+					float[] keepAsymmetry = new float[keepLength];
+					float[] keepIntensity = new float[keepLength];
+						
+					float[] keepAngle = new float[keepLength];
+					float[] keepWidth_l = new float[keepLength];
+					float[] keepWidth_r = new float[keepLength];
+				
+					
+					float[] keepCol = new float[keepLength];
+					float[] keepRow = new float[keepLength];
+					float[] keepResponse = new float[keepLength];
+					
+					
+					
+					//All data from pos (included)
+					int splitSize = (int) (l1.num-pos);
+
+					
+					float[] splitAsymmetry = new float[splitSize];
+					float[] splitIntensity = new float[splitSize];
+					
+					float[] splitAngle = new float[splitSize];
+					float[] splitWidth_l = new float[splitSize];
+					float[] splitWidth_r = new float[splitSize];
+					
+					float[] splitCol = new float[splitSize];
+					float[] splitRow = new float[splitSize];
+					float[] splitResponse = new float[splitSize];
+					
+					
+					//Copy data
+					if(doEstimateWidth){
+						if(doCorrectPosition){
+							System.arraycopy(l1.asymmetry, 0, keepAsymmetry, 0, keepLength);
+							System.arraycopy(l1.asymmetry, pos, splitAsymmetry, 0, splitSize);
+						
+							System.arraycopy(l1.intensity, 0, keepIntensity, 0, keepLength);
+							System.arraycopy(l1.intensity, pos, splitIntensity, 0, splitSize);
+						}
+						
+						System.arraycopy(l1.angle, 0, keepAngle, 0, keepLength);
+						System.arraycopy(l1.angle, pos, splitAngle, 0, splitSize);
+						
+						System.arraycopy(l1.width_l, 0, keepWidth_l, 0, keepLength);
+						System.arraycopy(l1.width_l, pos, splitWidth_l, 0, splitSize);
+						
+						System.arraycopy(l1.width_r, 0, keepWidth_r, 0, keepLength);
+						System.arraycopy(l1.width_r, pos, splitWidth_r, 0, splitSize);
+					}
+					
+					System.arraycopy(l1.col, 0, keepCol, 0, keepLength);
+					System.arraycopy(l1.col, pos, splitCol, 0, splitSize);
+					
+					System.arraycopy(l1.row, 0, keepRow, 0, keepLength);
+					System.arraycopy(l1.row, pos, splitRow, 0, splitSize);
+					
+					System.arraycopy(l1.response, 0, keepResponse, 0, keepLength);
+					System.arraycopy(l1.response, pos, splitResponse, 0, splitSize);
+					
+					
+					
+					
+					
+					//Overwrite line data
+					l1.angle = keepAngle;
+					l1.asymmetry = keepAsymmetry;
+					l1.col = keepCol;
+					l1.row = keepRow;
+					l1.response = keepResponse;
+					l1.intensity = keepIntensity;
+					l1.width_l = keepWidth_l;
+					l1.width_r = keepWidth_r;
+					l1.num = keepLength;
+					
+					//Generate new line
+					Line lNew = new Line();
+					lNew.angle = splitAngle;
+					lNew.asymmetry = splitAsymmetry;
+					lNew.col = splitCol;
+					lNew.row = splitRow;
+					lNew.response = splitResponse;
+					lNew.intensity = splitIntensity;
+					lNew.width_l = splitWidth_l;
+					lNew.width_r = splitWidth_r;
+					lNew.num = splitSize;
+					lNew.cont_class = l1.cont_class;
+					lNew.setFrame(l1.getFrame());
+					lines.add(lNew);
+					int newID = lNew.getID();
+					
+					//Update junctions
+					
+					//Add additional junction points for the split point
+					Set<Integer> lineIds = new HashSet<Integer>(); //All IDs which are connected at this junction point
+					for (Junction junc : junctionsWithTheSamePosition) {
+						lineIds.add(junc.getLine1().getID());
+						lineIds.add(junc.getLine2().getID());
+					}
+					Iterator<Integer> idIt = lineIds.iterator();
+					while (idIt.hasNext()) {
+						int id = idIt.next();
+						int connectWithLineID =  lines.getIndexByID(id);
+						Line connectWith = lines.get(connectWithLineID);
+						Junction j = new Junction();
+						j.cont1 = connectWithLineID;
+						j.cont2 = lines.size()-1;
+						j.lineCont1 = connectWith;
+						j.lineCont2 = lNew;
+						j.x = splitPoint.x;
+						j.y = splitPoint.y;
+						junctions.add(j);
+						alreadyProcessed.add(junctions.size()-1);
+					}
+
+					//Update following junctions point
+					for(int j = 0; j < junctions.size(); j++){
+						Junction junc2 = junctions.get(j);
+						if(junc2.cont1 == splitPoint.cont1 && junc2.pos>splitPoint.pos){
+							//Junctionspoint which appear later on that line
+							if(junc2.cont1 == splitPoint.cont1){
+								junc2.cont1 = lines.getIndexByID(newID);
+								junc2.lineCont1 = lNew;
+								junc2.pos = junc2.pos-splitPoint.pos;
+							}
+						}
+					}
+					
+				}
+				
 				
 			}
 		}

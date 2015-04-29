@@ -109,7 +109,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	public int setup(String arg, ImagePlus imp) {
 		if (arg.equals("final")) {
 			sortLists();
-			assignLinesToJunctions();
+			//assignLinesToJunctions();
 			displayContours();
 			if(displayResults){
 				createResultsTable(true);
@@ -358,20 +358,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				polyRoiMitte.setPosition(position);
 				ovpoly.add(polyRoiMitte);
 				
-				//Show IDs
-				if(showIDs){
-					int posx = (int) polyMitte.xpoints[0];
-					int posy = (int) polyMitte.ypoints[0];
-					if(cont.cont_class == contour_class.cont_start_junc){
-						posx = (int) polyMitte.xpoints[polyMitte.npoints-1];
-						posy = (int) polyMitte.ypoints[polyMitte.npoints-1];
-					}
-					TextRoi tr = new TextRoi(posx , posy, ""+cont.getID());
-					tr.setCurrentFont(new Font(Font.SANS_SERIF, Font.PLAIN, 9));
-					tr.setIgnoreClipRect(true);
-					tr.setStrokeColor(Color.yellow);
-					ovpoly.add(tr);
-				}
+				
 				
 				
 				if (doEstimateWidth) {
@@ -392,6 +379,24 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 						polyRoiRand2.setPosition(position);
 						ovpoly.add(polyRoiRand2);
 					}
+				}
+				
+				//Show IDs
+				if(showIDs){/*
+					int posx = (int) polyMitte.xpoints[0];
+					int posy = (int) polyMitte.ypoints[0];
+					if(cont.cont_class == contour_class.cont_start_junc){
+						posx = (int) polyMitte.xpoints[polyMitte.npoints-1];
+						posy = (int) polyMitte.ypoints[polyMitte.npoints-1];
+					}
+					*/
+					int posx = (int) polyMitte.xpoints[polyMitte.npoints/2];
+					int posy = (int) polyMitte.ypoints[polyMitte.npoints/2];
+					TextRoi tr = new TextRoi(posx , posy, ""+cont.getID());
+					tr.setCurrentFont(new Font(Font.SANS_SERIF, Font.PLAIN, 9));
+					tr.setIgnoreClipRect(true);
+					tr.setStrokeColor(Color.orange);
+					ovpoly.add(tr);
 				}
 			}
 		}
@@ -419,7 +424,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			imp.setOverlay(ovpoly);
 		}
 	}
-
+	
+	
 	@Override
 	public void setNPasses(int nPasses) {
 		IJ.showProgress(nPasses, imp.getNSlices());

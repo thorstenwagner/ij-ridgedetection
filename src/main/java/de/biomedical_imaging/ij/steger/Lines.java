@@ -44,5 +44,15 @@ public class Lines extends ArrayList<Line> {
 	public int getFrame(){
 		return frame;
 	}
+	
+	public int getIndexByID(int id){
+		for(int i = 0; i < this.size(); i++){
+			if(this.get(i).getID()==id){
+				return i;
+			}
+		}
+		return -1;
+	}
+
 
 }
