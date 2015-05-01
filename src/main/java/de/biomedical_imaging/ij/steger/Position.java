@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -23,7 +23,7 @@
 package de.biomedical_imaging.ij.steger;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.lang3.mutable.MutableLong;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 
 
@@ -37,7 +37,7 @@ public class Position {
 	
 	/** Solve the linear equation a*x+b=0 and return the result in t and the number
 	   of solutions in num. **/
-	public void solve_linear(double a,double b, MutableDouble t, MutableLong num)
+	public void solve_linear(double a,double b, MutableDouble t, MutableInt num)
 	{
 		
 		if (a==0.0) { //
@@ -113,30 +113,30 @@ public class Position {
 	}
 	
     @SuppressWarnings("unused")
-	private void print_ascii2(byte[] image, long width, long height)
+	private void print_ascii2(byte[] image, int width, int height)
     {
 		int i = 0;
 		int j = 0;
-		long k = 0;
+		int k = 0;
 		for(i=0; i < height; i++){
 			for(j=0; j < width;j++){
 				k=LinesUtil.LINCOOR(i,j,width);
-				System.out.print(""+image[(int) k]+" ");
+				System.out.print(""+image[ k]+" ");
 			}
 			System.out.print("\n");
 		}
 	}
     
     @SuppressWarnings("unused")
-	private void print_ascii2(float[] image, long width, long height)
+	private void print_ascii2(float[] image, int width, int height)
     {
 		int i = 0;
 		int j = 0;
-		long k = 0;
+		int k = 0;
 		for(i=0; i < height; i++){
 			for(j=0; j < width;j++){
 				k=LinesUtil.LINCOOR(i,j,width);
-				System.out.print(""+(int)image[(int) k]+" \t");
+				System.out.print(""+image[ k]+" \t");
 			}
 			System.out.print("\n");
 		}
@@ -150,15 +150,15 @@ public class Position {
 	   The parameter mode determines whether maxima (dark lines points) or minima
 	   (bright line points) should be selected.  The partial derivatives of the
 	   image are input as ku[]. */
-	private void compute_line_points(float[][] ku, byte[] ismax, float[] ev,float[] nx, float[] ny,float[] px, float[] py, long width, long height, double low,double high, long mode)
+	private void compute_line_points(float[][] ku, byte[] ismax, float[] ev,float[] nx, float[] ny,float[] px, float[] py, int width, int height, double low,double high, int mode)
 	{
-	  long    r, c, l;
+	  int    r, c, l;
 	  double[]  k = new double[5];
 	  double[]  eigval = new double[2];
 	  double[][]  eigvec = new double[2][2];
 	  double  a, b;
 	  MutableDouble t = new MutableDouble();
-	  MutableLong  num = new MutableLong();
+	  MutableInt  num = new MutableInt();
 	  double  n1, n2;
 	  double  p1, p2;
 	  double  val;
@@ -166,21 +166,22 @@ public class Position {
 	  for (r=0; r<height; r++) {
 	    for (c=0; c<width; c++) {
 	      l = LinesUtil.LINCOOR(r,c,width);
-	      k[0] = ku[0][(int) l];
-	      k[1] = ku[1][(int) l];
-	      k[2] = ku[2][(int) l];
-	      k[3] = ku[3][(int) l];
-	      k[4] = ku[4][(int) l];
-	      ev[(int) l] = (float) 0.0;
-	      nx[(int) l] = (float) 0.0;
-	      ny[(int) l] = (float) 0.0;
+	      
+	      k[0] = ku[0][l];
+	      k[1] = ku[1][l];
+	      k[2] = ku[2][l];
+	      k[3] = ku[3][l];
+	      k[4] = ku[4][l];
+	      ev[l] = (float) 0.0;
+	      nx[l] = (float) 0.0;
+	      ny[l] = (float) 0.0;
 	      compute_eigenvals(k[2],k[3],k[4],eigval,eigvec);
 	      if (mode == LinesUtil.MODE_LIGHT)
 	        val = -eigval[0];
 	      else
 	        val = eigval[0];
 	      if (val > 0.0) {
-	        ev[(int) l] = (float) val;
+	        ev[ l] = (float) val;
 	        n1 = eigvec[0][0];
 	        n2 = eigvec[0][1];
 	        a = k[2]*n1*n1+2.0*k[3]*n1*n2+k[4]*n2*n2;
@@ -192,14 +193,14 @@ public class Position {
 	          if (Math.abs(p1) <= PIXEL_BOUNDARY && Math.abs(p2) <= PIXEL_BOUNDARY) {
 	            if (val >= low) {
 	              if (val >= high)
-	                ismax[(int) l] = 2;
+	                ismax[l] = 2;
 	              else
-	                ismax[(int) l] = 1;
+	                ismax[l] = 1;
 	            }
-	            nx[(int) l] = (float) n1;
-	            ny[(int) l] = (float) n2;
-	            px[(int) l] = (float) (r+p1);
-	            py[(int) l] = (float) (c+p2);
+	            nx[l] = (float) n1;
+	            ny[l] = (float) n2;
+	            px[l] = (float) (r+p1);
+	            py[l] = (float) (c+p2);
 	          }
 	        }
 	      }
@@ -215,11 +216,11 @@ public class Position {
 	   be selected.  The parameter compute_width determines whether the line width
 	   should be extracted, while correct_pos determines whether the line width
 	   and position correction should be applied. */
-	public void detect_lines(float[] image,long width, long height, Lines contours, MutableLong num_result, double sigma, double low, double high, long mode, boolean compute_width, boolean correct_pos,boolean extend_lines, Junctions junctions)
+	public void detect_lines(float[] image,int width, int height, Lines contours, MutableInt num_result, double sigma, double low, double high, int mode, boolean compute_width, boolean correct_pos,boolean extend_lines, Junctions junctions)
 	{
 	  byte[] ismax;
 	  float[] ev, n1, n2, p1, p2;
-	  float[][] k = new float[5][(int) (width*height)];
+	  float[][] k = new float[5][ (width*height)];
 	  
 	//  for (i=0;i<5;i++)
 	//    k[i] = xcalloc(width*height,sizeof(float));
@@ -231,12 +232,12 @@ public class Position {
 	  
 	  convol.convolve_gauss(image,k[4],width,height,sigma,LinesUtil.DERIV_CC);
 	
-	  ismax = new byte[(int) (width*height)];
-	  ev = new float[(int) (width*height)];
-	  n1 = new float[(int) (width*height)];
-	  n2 = new float[(int) (width*height)];
-	  p1 = new float[(int) (width*height)];
-	  p2 = new float[(int) (width*height)];
+	  ismax = new byte[ (width*height)];
+	  ev = new float[ (width*height)];
+	  n1 = new float[ (width*height)];
+	  n2 = new float[ (width*height)];
+	  p1 = new float[ (width*height)];
+	  p2 = new float[ (width*height)];
 	  /*
 	   * The C library function void *memset(void *str, int c, size_t n) 
 	   * copies the character c (an unsigned char) to the first n characters 
@@ -253,7 +254,7 @@ public class Position {
 	  
 	  Link l = new Link();
 	  l.compute_contours(ismax,ev,n1,n2,p1,p2,k[0],k[1],contours,num_result,sigma,
-	                   extend_lines,(int)mode,low,high,width,height,junctions);
+	                   extend_lines,mode,low,high,width,height,junctions);
 	  Width w = new Width();
 	  if (compute_width)
 	    w.compute_line_width(k[0],k[1],width,height,sigma,mode,correct_pos,contours,

@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -139,9 +139,9 @@ public class Convol {
 	   result k.  At the border of the image the gray values are mirrored. */
 
 	/* Convolve the rows of an image with the derivatives of a Gaussian. */
-	private void convolve_rows_gauss(float[] image, double[] mask, long n, float[] h,long width,long height)
+	private void convolve_rows_gauss(float[] image, double[] mask, int n, float[] h,int width,int height)
 	{
-	  long      j, r, c, l;
+	  int      j, r, c, l;
 	  double    sum;
 
 	  /* Inner region */
@@ -150,8 +150,8 @@ public class Convol {
 	      l = LinesUtil.LINCOOR(r,c,width);
 	      sum = 0.0;
 	      for (j=-n;j<=n;j++)
-	        sum += (double)(image[(int)(l+j*width)])*mask[(int)(j+n)];
-	      h[(int) l] = (float) sum;
+	        sum += (double)(image[(l+j*width)])*mask[(j+n)];
+	      h[ l] = (float) sum;
 	    }
 	  }
 	  /* Border regions */
@@ -160,8 +160,8 @@ public class Convol {
 	      l = LinesUtil.LINCOOR(r,c,width);
 	      sum = 0.0;
 	      for (j=-n;j<=n;j++)
-	        sum += (double)(image[(int) LinesUtil.LINCOOR(LinesUtil.BR(r+j,height),c,width)])*mask[(int)(j+n)];
-	      h[(int) l] = (float) sum;
+	        sum += (double)(image[ LinesUtil.LINCOOR(LinesUtil.BR(r+j,height),c,width)])*mask[(j+n)];
+	      h[ l] = (float) sum;
 	    }
 	  }
 	  for (r=height-n; r<height; r++) {
@@ -169,16 +169,16 @@ public class Convol {
 	      l = LinesUtil.LINCOOR(r,c,width);
 	      sum = 0.0;
 	      for (j=-n;j<=n;j++)
-	        sum += (double)(image[(int) LinesUtil.LINCOOR(LinesUtil.BR(r+j,height),c,width)])*mask[(int)(j+n)];
-	      h[(int) l] = (float) sum;
+	        sum += (double)(image[ LinesUtil.LINCOOR(LinesUtil.BR(r+j,height),c,width)])*mask[(j+n)];
+	      h[ l] = (float) sum;
 	    }
 	  }
 	}
 	
 	/* Convolve the columns of an image with the derivatives of a Gaussian. */
-	private void convolve_cols_gauss(float[] h, double[] mask,long n, float[] k, long width, long height)
+	private void convolve_cols_gauss(float[] h, double[] mask,int n, float[] k, int width, int height)
 	{
-	  long      j, r, c, l;
+	  int      j, r, c, l;
 	  double    sum;
 
 	  /* Inner region */
@@ -187,8 +187,8 @@ public class Convol {
 	      l = LinesUtil.LINCOOR(r,c,width);
 	      sum = 0.0;
 	      for (j=-n;j<=n;j++)
-	        sum += h[(int) (l+j)]*mask[(int)(j+n)];
-	      k[(int) l] = (float)sum;
+	        sum += h[ (l+j)]*mask[(j+n)];
+	      k[ l] = (float)sum;
 	    }
 	  }
 	  /* Border regions */
@@ -197,8 +197,8 @@ public class Convol {
 	      l = LinesUtil.LINCOOR(r,c,width);
 	      sum = 0.0;
 	      for (j=-n;j<=n;j++)
-	        sum += h[(int) LinesUtil.LINCOOR(r,LinesUtil.BC(c+j,width),width)]*mask[(int)(j+n)];
-	      k[(int) l] = (float)sum;
+	        sum += h[ LinesUtil.LINCOOR(r,LinesUtil.BC(c+j,width),width)]*mask[(j+n)];
+	      k[ l] = (float)sum;
 	    }
 	  }
 	  for (r=0; r<height; r++) {
@@ -206,23 +206,23 @@ public class Convol {
 	      l = LinesUtil.LINCOOR(r,c,width);
 	      sum = 0.0;
 	      for (j=-n;j<=n;j++)
-	        sum += h[(int) LinesUtil.LINCOOR(r,LinesUtil.BC(c+j,width),width)]*mask[(int)(j+n)];
-	      k[(int) l] = (float)sum;
+	        sum += h[ LinesUtil.LINCOOR(r,LinesUtil.BC(c+j,width),width)]*mask[(j+n)];
+	      k[ l] = (float)sum;
 	    }
 	  }
 	}
 	
 	/* Convolve an image with a derivative of the Gaussian. */
-	public void convolve_gauss(float[] image,float[] k,long width,long height,double sigma,long deriv_type)
+	public void convolve_gauss(float[] image,float[] k,int width,int height,double sigma,int deriv_type)
 	{
 	  double[]  hr = null, hc = null;
 	  double[]  maskr, maskc;
 	  MutableLong    nr = new MutableLong(), nc= new MutableLong();
 	  float[]   h;
 
-	  h = new float[(int) (width*height)];
+	  h = new float[ (width*height)];
 
-	  switch ((int)deriv_type) {
+	  switch (deriv_type) {
 	    case LinesUtil.DERIV_R:
 	      hr = compute_gauss_mask_1(nr,sigma);
 	      hc = compute_gauss_mask_0(nc,sigma);
@@ -248,8 +248,8 @@ public class Convol {
 	  maskr = hr;// + nr; Wird ersetzt in den eigentlichen Funktionen, indem ich z.B. in convolve_rows_gauss immer beim Zugriff auf mask n dazuaddiere
 	  maskc = hc;// + nc;
 
-	  convolve_rows_gauss(image,maskr,nr.longValue(),h,width,height);
-	  convolve_cols_gauss(h,maskc,nc.longValue(),k,width,height);
+	  convolve_rows_gauss(image,maskr,nr.intValue(),h,width,height);
+	  convolve_cols_gauss(h,maskc,nc.intValue(),k,width,height);
 
 	}
 

@@ -155,8 +155,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		for (Junctions js : resultJunction) {
 			Lines c = getContoursByFrame(js.getFrame());
 			for (Junction j : js) {
-				j.lineCont1 = c.get((int) j.cont1);
-				j.lineCont2 = c.get((int) j.cont2);
+				j.lineCont1 = c.get( j.cont1);
+				j.lineCont2 = c.get( j.cont2);
 			}
 		}
 	}
@@ -289,7 +289,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				for (Junction j : junctions) {
 					rt2.incrementCounter();
 					rt2.addValue("Frame", junctions.getFrame());
-					rt2.addValue("Contour ID 1", j.getLine1().getID());//c.get((int) j.cont1)
+					rt2.addValue("Contour ID 1", j.getLine1().getID());//c.get( j.cont1)
 					rt2.addValue("Contour ID 2", j.getLine2().getID());
 					rt2.addValue("X", j.x);
 					rt2.addValue("Y", j.y);
@@ -314,7 +314,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				FloatPolygon polyR = new FloatPolygon();
 				FloatPolygon polyL = new FloatPolygon();
 				Line cont = result.get(k).get(i);
-				int num_points = (int) cont.num;
+				int num_points =  cont.num;
 				last_w_r = 0;
 				last_w_l = 0;
 			
@@ -355,6 +355,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				if(!doStack || isPreview){
 					position = imp.getCurrentSlice();
 				}
+			
 				polyRoiMitte.setPosition(position);
 				ovpoly.add(polyRoiMitte);
 				
@@ -383,19 +384,21 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				
 				//Show IDs
 				if(showIDs){/*
-					int posx = (int) polyMitte.xpoints[0];
-					int posy = (int) polyMitte.ypoints[0];
+					int posx =  polyMitte.xpoints[0];
+					int posy =  polyMitte.ypoints[0];
 					if(cont.cont_class == contour_class.cont_start_junc){
-						posx = (int) polyMitte.xpoints[polyMitte.npoints-1];
-						posy = (int) polyMitte.ypoints[polyMitte.npoints-1];
+						posx =  polyMitte.xpoints[polyMitte.npoints-1];
+						posy =  polyMitte.ypoints[polyMitte.npoints-1];
 					}
 					*/
-					int posx = (int) polyMitte.xpoints[polyMitte.npoints/2];
-					int posy = (int) polyMitte.ypoints[polyMitte.npoints/2];
+					
+					int posx =  (int)polyMitte.xpoints[polyMitte.npoints/2];
+					int posy =  (int)polyMitte.ypoints[polyMitte.npoints/2];
 					TextRoi tr = new TextRoi(posx , posy, ""+cont.getID());
 					tr.setCurrentFont(new Font(Font.SANS_SERIF, Font.PLAIN, 9));
 					tr.setIgnoreClipRect(true);
 					tr.setStrokeColor(Color.orange);
+					tr.setPosition(resultJunction.get(k).getFrame());
 					ovpoly.add(tr);
 				}
 			}
@@ -477,6 +480,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		if(lwChanged || contHighChanged || contLowChanged){
 			contrastOrLineWidthChangedOnce=true;
 		}
+	
 		if (lwChanged || contHighChanged || contLowChanged || (darklineChanged&&contrastOrLineWidthChangedOnce)) {
 			double estimatedSigma = lineWidth / (2 * Math.sqrt(3)) + 0.5;
 			TextField textSigma = (TextField) gd.getNumericFields().get(3);
@@ -516,7 +520,6 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				|| sigma < 0.4
 				|| Double.isNaN(sigma + lowerThresh + upperThresh
 						)) {
-			IJ.log("" + sigma + " " + lowerThresh + " " + upperThresh);
 			return false;
 		}
 		

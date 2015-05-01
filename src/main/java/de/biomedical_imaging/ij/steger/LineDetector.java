@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableLong;
 
 import com.sun.tools.internal.xjc.reader.gbind.ConnectedComponent;
@@ -22,6 +23,8 @@ public class LineDetector {
 	private Options opts = null;
 	private Junctions junctions;
 	private Lines lines;
+	private ImageProcessor ip;
+	Set<Integer> alreadyProcessedJunctionPoints;
 
 	/**
 	 * 
@@ -51,6 +54,7 @@ public class LineDetector {
 			double upperThresh, double lowerThresh, boolean isDarkLine,
 			boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine) {
+		this.ip = ip;
 		this.isDarkLine = isDarkLine;
 		this.doCorrectPosition = doCorrectPosition;
 		this.doEstimateWidth = doEstimateWidth;
@@ -59,6 +63,11 @@ public class LineDetector {
 		lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
 				ip.getWidth(), ip, junctions);
 		fixContours();
+		alreadyProcessedJunctionPoints = new HashSet<Integer>();
+		
+		//Reconstruct solution from junction points. This have to be done, because in raw cases
+		//the algorithm corrups the results. However, I was not able to find that bug so I decided
+		//to reconstruct the solution from the information which were not corrupted.
 		fixJunctions();
 		assignLinesToJunctions();
 		addAdditionalJunctionPointsAndLines();
@@ -68,8 +77,8 @@ public class LineDetector {
 	
 	private void assignLinesToJunctions(){
 		for (Junction j : junctions) {
-			j.lineCont1 = lines.get((int) j.cont1);
-			j.lineCont2 = lines.get((int) j.cont2);
+			j.lineCont1 = lines.get(j.cont1);
+			j.lineCont2 = lines.get(j.cont2);
 		}
 	}
 
@@ -82,22 +91,27 @@ public class LineDetector {
 	}
 	
 	private void addAdditionalJunctionPointsAndLines(){
-		Set<Integer> alreadyProcessed = new HashSet<Integer>();
+		
 		for(int i = 0; i < junctions.size(); i++){
 			Junction splitPoint = junctions.get(i); //Split point!
-			if(!alreadyProcessed.contains(i)){
+			if(!alreadyProcessedJunctionPoints.contains(i)){
+				if(splitPoint.pos>=lines.get(splitPoint.cont1).num){
+					alreadyProcessedJunctionPoints.add(i);
+					continue;
+				}
+			
 				
 				/*
 				 * Find Junctions with the same position
 				 */
 				Junctions junctionsWithTheSamePosition = new Junctions(junctions.getFrame());
-				alreadyProcessed.add(i);
+				alreadyProcessedJunctionPoints.add(i);
 				junctionsWithTheSamePosition.add(splitPoint);
 				for(int j = i+1; j < junctions.size(); j++){
-					if(!alreadyProcessed.contains(j)){
+					if(!alreadyProcessedJunctionPoints.contains(j)){
 						Junction junc2 = junctions.get(j);
 						if(Math.abs(junc2.x-splitPoint.x) < 0.01 && Math.abs(junc2.y-splitPoint.y) < 0.01){
-							alreadyProcessed.add(j);
+							alreadyProcessedJunctionPoints.add(j);
 							junctionsWithTheSamePosition.add(junc2);
 						}
 					}
@@ -106,8 +120,9 @@ public class LineDetector {
 				/*
 				 * Connect all lines which are connected with the processed line also with each other (new junctions point)
 				 */
+				
 				ArrayList<Line> connectedWithProcessedLine = new ArrayList<Line>();
-				ArrayList<Long> connectedWithProcessedIndex = new ArrayList<Long>();
+				ArrayList<Integer> connectedWithProcessedIndex = new ArrayList<Integer>();
 				for (Junction junc : junctionsWithTheSamePosition) {
 					connectedWithProcessedLine.add(junc.getLine2());
 					connectedWithProcessedIndex.add(junc.cont2);
@@ -123,18 +138,19 @@ public class LineDetector {
 						junc.y = splitPoint.y;
 						junc.cont1 = connectedWithProcessedIndex.get(j);
 						junc.cont2 = connectedWithProcessedIndex.get(k);
+						junc.pos = l1.getIndexOfPosition(junc.x, junc.y);
 						junctions.add(junc); 
-						alreadyProcessed.add(junctions.size()-1);
+						alreadyProcessedJunctionPoints.add(junctions.size()-1);
 					}
 				}
 				
 				/*
-				 * Go along the processed line and cut the line in two parts at every junction point on that line.
+				 * Split the line in two line at the split point 
 				 */
 				Line l1 = splitPoint.getLine1();
-				int pos = (int) splitPoint.pos;
+				int pos = splitPoint.pos;
 				
-				if(pos!=0 && pos != (l1.getNumber()-1)){
+				if(pos!=0 && pos != (l1.num-1)){
 					//All data up to pos (included)
 					int keepLength = pos+1;
 					
@@ -155,7 +171,6 @@ public class LineDetector {
 					
 					//All data from pos (included)
 					int splitSize = (int) (l1.num-pos);
-
 					
 					float[] splitAsymmetry = new float[splitSize];
 					float[] splitIntensity = new float[splitSize];
@@ -243,28 +258,31 @@ public class LineDetector {
 						int connectWithLineID =  lines.getIndexByID(id);
 						Line connectWith = lines.get(connectWithLineID);
 						Junction j = new Junction();
-						j.cont1 = connectWithLineID;
-						j.cont2 = lines.size()-1;
-						j.lineCont1 = connectWith;
-						j.lineCont2 = lNew;
+						j.cont1 = lines.size()-1;
+						j.cont2 = connectWithLineID;
+						j.lineCont1 = lNew;
+						j.lineCont2 = connectWith;
 						j.x = splitPoint.x;
 						j.y = splitPoint.y;
+						j.pos = lNew.getIndexOfPosition(splitPoint.x, splitPoint.y);
 						junctions.add(j);
-						alreadyProcessed.add(junctions.size()-1);
+						alreadyProcessedJunctionPoints.add(junctions.size()-1);
 					}
 
 					//Update following junctions point
 					for(int j = 0; j < junctions.size(); j++){
 						Junction junc2 = junctions.get(j);
 						if(junc2.cont1 == splitPoint.cont1 && junc2.pos>splitPoint.pos){
-							//Junctionspoint which appear later on that line
-							if(junc2.cont1 == splitPoint.cont1){
-								junc2.cont1 = lines.getIndexByID(newID);
-								junc2.lineCont1 = lNew;
-								junc2.pos = junc2.pos-splitPoint.pos;
-							}
+							junc2.cont1 = lines.getIndexByID(newID);
+							junc2.lineCont1 = lNew;
+							junc2.pos = junc2.pos-splitPoint.pos;
 						}
 					}
+					
+					//Update position of splitpoint
+					splitPoint.pos = l1.getIndexOfPosition(splitPoint.x, splitPoint.y);
+					lines.set(splitPoint.cont1, l1);
+					
 					
 				}
 				
@@ -282,8 +300,102 @@ public class LineDetector {
 			junction.x = junction.y;
 			junction.y = help;
 		}
+		
+		Junctions newJunctions = new Junctions(junctions.getFrame());
+		int[][] processed = new int[ip.getWidth()][ip.getHeight()];
+		for(int i = 0; i < junctions.size(); i++){
+			Junction junc = junctions.get(i);
+			Line mainLine = null;
+			int mainLineIndex = -1;
+			int mainLinePos = -1;
+			ArrayList<Line> secondaryLines = new ArrayList<Line>();
+			ArrayList<Integer> secondaryLineIndex = new ArrayList<Integer>();
+			ArrayList<Integer> secondaryLinePos = new ArrayList<Integer>();
+			if(processed[(int)junc.x][(int)junc.y]==0){
+				processed[(int)junc.x][(int)junc.y]=1;
+				for(int j = 0; j < lines.size(); j++) {
+					Line l = lines.get(j);
+				
+					double[] mindist = minDistance(l, junc.x, junc.y);
+					if(mindist[0]==0){
+						if(mindist[1]==0 || mindist[1]==(l.num-1)){
+							secondaryLines.add(l);
+							secondaryLineIndex.add(j);
+							secondaryLinePos.add((int)mindist[1]);
+						}else {
+			
+							if(mainLine!=null){
+								if(mainLine.getID()==l.getID()){
+									continue;
+								}
+								IJ.error("Äh, zwei Hauptlininen geht nich..." + mainLine.getID() + " x " + junc.x + " y " + junc.y);
+							}
+							mainLine = l;
+							mainLineIndex = j;
+							mainLinePos = (int) mindist[1];
+							
+						}
+					}
+				}
+				if(mainLine!=null){
+					for (int j = 0; j < secondaryLines.size(); j++) {
+						Junction newJunc = new Junction();
+						newJunc.cont1 = mainLineIndex;
+						newJunc.cont2 = secondaryLineIndex.get(j);
+						newJunc.x = junc.x;
+						newJunc.y = junc.y;
+						newJunc.pos = mainLinePos;
+						newJunctions.add(newJunc);
+						
+					}
+				}else{
+					//In manchen Fällen gibt es keine Hauptlinie... (bug im Algorithmus, ich bin aber nicht fähig ihn zu finden.
+					HashSet<Integer> uniqueIDs = new HashSet<Integer>();
+					ArrayList<Line> uniqueLines = new ArrayList<Line>();
+					ArrayList<Integer> uniqueLineIndex = new ArrayList<Integer>();
+					ArrayList<Integer> uniqueLinePos = new ArrayList<Integer>();
+					for (int j = 0; j < secondaryLines.size(); j++) {
+						if(!uniqueIDs.contains(secondaryLines.get(j).getID())){
+							uniqueIDs.add(secondaryLines.get(j).getID());
+							uniqueLines.add(secondaryLines.get(j));
+							uniqueLineIndex.add(secondaryLineIndex.get(j));
+							uniqueLinePos.add(secondaryLinePos.get(j));
+						}
+						
+					}
+					for(int j = 0; j < uniqueLines.size(); j++){
+						for(int k = j+1; k < uniqueLines.size(); k++){
+							Junction newJunc = new Junction();
+							newJunc.cont1 = secondaryLineIndex.get(j);
+							newJunc.cont2 = secondaryLineIndex.get(k);
+							newJunc.x = junc.x;
+							newJunc.y = junc.y;
+							newJunc.pos = uniqueLinePos.get(j);
+							newJunctions.add(newJunc);
+							alreadyProcessedJunctionPoints.add(newJunctions.size()-1);
+						}
+					}
+				}
+			
+			}
+		}
+		junctions = newJunctions;
+		
 	}
 
+	private double[] minDistance(Line l, float x, float y){
+		double min = Double.MAX_VALUE;
+		double index = -1;
+		for(int i = 0; i < l.num; i++){
+			double d = Math.sqrt(Math.pow(l.col[i]-x, 2)+Math.pow(l.row[i]-y, 2));
+			if(d< min){
+				min =d;
+				index = i;
+			}
+		}
+		double[] ret =  {min,index};
+		return ret;
+	}
 	private void deleteContour(Line c) {
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
@@ -315,8 +427,12 @@ public class LineDetector {
 		// For some reason the first and the last element are the same. Delete
 		// it!
 		if (lines.size() >= 2) {
-			lines.remove(lines.size() - 1);
+			if(lines.get(0).getID() == lines.get(lines.size()-1).getID()){
+				lines.remove(lines.size() - 1);	
+			}
 		}
+		
+		
 
 	}
 
@@ -324,7 +440,7 @@ public class LineDetector {
 			int cols, ImageProcessor in_img, Junctions resultJunction) {
 		FloatProcessor image;
 		Lines contours = new Lines(in_img.getSliceNumber());
-		long num_cont = 0;
+		int num_cont = 0;
 		opts = new Options(-1.0, -1.0, -1.0, isDarkLine ? LinesUtil.MODE_DARK
 				: LinesUtil.MODE_LIGHT, doCorrectPosition, doEstimateWidth,
 				doExtendLine, false, false, false);
@@ -341,7 +457,7 @@ public class LineDetector {
 			for (j2 = 0; j2 < cols; j2++)
 				imgpxls[i2 * cols + j2] = in_img.getf(j2, i2);
 		image = new FloatProcessor(cols, rows, imgpxls);
-		MutableLong hnum_cont = new MutableLong(num_cont);
+		MutableInt hnum_cont = new MutableInt(num_cont);
 		float[] imgpxls2 = (float[]) image.getPixels();
 		Position p = new Position();
 		p.detect_lines(imgpxls2, cols, rows, contours, hnum_cont, opts.sigma,
@@ -353,8 +469,8 @@ public class LineDetector {
 
 	}
 
-	private void check_sigma(double sigma, long width, long height) {
-		long min_dim;
+	private void check_sigma(double sigma, int width, int height) {
+		int min_dim;
 		min_dim = width < height ? width : height;
 		if (sigma < 0.4)
 			IJ.error(LinesUtil.ERR_SOR, "< 0.4");

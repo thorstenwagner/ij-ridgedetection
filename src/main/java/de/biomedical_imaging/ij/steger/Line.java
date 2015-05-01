@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -21,6 +21,8 @@
 /*	Translated into an ImageJ java plugin by Thorsten Wagner (Dez. 2014) */
 
 package de.biomedical_imaging.ij.steger;
+
+import ij.IJ;
 
 /** This class holds one extracted line.  The field num contains the number of
    points in the line.  The coordinates of the line points are given in the
@@ -42,7 +44,7 @@ package de.biomedical_imaging.ij.steger;
    on the left side it is set to a negative value. */
 public class Line {
 	/** number of points */
-	long  num;         
+	int  num;         
 	
 	/** row coordinates of the line points */
 	float[] row;   
@@ -148,7 +150,7 @@ public class Line {
 	 * @return Return the number of points
 	 */
 	public int getNumber(){
-		return (int) num;
+		return  num;
 	}
 	
 	/**
@@ -163,6 +165,11 @@ public class Line {
 		return cont_class;
 	}
 
+	public int getIndexOfPosition(float x, float y){
+		double distStart = Math.sqrt( Math.pow(col[0]-x, 2)+Math.pow(row[0]-y, 2));
+		double distEnd = Math.sqrt( Math.pow(col[ (this.num-1)]-x, 2)+Math.pow(row[ (this.num-1)]-y, 2));
+		return  (distStart < distEnd ? 0:this.num-1);
+	}
 	
 	/**
 	 * 
@@ -183,61 +190,5 @@ public class Line {
 	
 	static void resetCounter(){
 		idCounter = 0;
-	}
-	
-	void resizeRow(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < row.length; i++){
-				newArr[i] = row[i];
-		}
-		row = newArr;
-	}
-	
-	void resizeCol(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < col.length; i++){
-				newArr[i] = col[i];
-		}
-		col = newArr;
-	}
-	
-	void resizeAngle(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < angle.length; i++){
-				newArr[i] = angle[i];
-		}
-		angle = newArr;
-	}
-	
-	void resizeWidth_l(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < width_l.length; i++){
-				newArr[i] = width_l[i];
-		}
-		width_l = newArr;
-	}
-	
-	void resizeWidth_r(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < width_r.length; i++){
-				newArr[i] = width_r[i];
-		}
-		width_r = newArr;
-	}
-	
-	void resizeContrast(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < intensity.length; i++){
-				newArr[i] = intensity[i];
-		}
-		intensity = newArr;
-	}
-	
-	void resizeAsymmetry(int newsize){
-		float[] newArr = new float[newsize];
-		for(int i = 0; i < asymmetry.length; i++){
-				newArr[i] = asymmetry[i];
-		}
-		asymmetry = newArr;
 	}
 }

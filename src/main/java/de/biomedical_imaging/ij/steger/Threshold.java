@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -24,18 +24,17 @@ package de.biomedical_imaging.ij.steger;
 
 public class Threshold {
 	
-	static void threshold(byte[] image, long min,long width,long height,Region out)
-
+	static void threshold(byte[] image, int min,int width,int height,Region out)
 	{
-	  long   grey;
-	  long   r,c,l,num,num_max;
+	  int   grey;
+	  int   r,c,l,num,num_max;
 	  boolean   inside;
 	  Chord[] rl;
 
 	  inside = false;
 	  num = 0;
 	  num_max = LinesUtil.INITIAL_SIZE;
-	  rl =new Chord[(int) num_max]; 
+	  rl =new Chord[ num_max]; 
 	  for(int i = 0; i < num_max; i++){
 		  rl[i] = new Chord();
 	  }
@@ -45,21 +44,21 @@ public class Threshold {
 	  for (r=0; r<height; r++) {
 	    for (c=0; c<width; c++) {
 	      l = LinesUtil.LINCOOR(r,c,width);
-	      grey = image[(int) l];
+	      grey = image[ l];
 	      if (grey >= min) {
 	        if (!inside) {
 	          inside = true;
-	          rl[(int) num].r = (short) r;
-	          rl[(int) num].cb = (short) c;
+	          rl[ num].r = (short) r;
+	          rl[ num].cb = (short) c;
 	        }
 	      } else {
 	        if (inside) {
 	          inside = false;
-	          rl[(int) num].ce = (short) (c - 1);
+	          rl[ num].ce = (short) (c - 1);
 	          num++;
 	          if (num >= num_max) {
-	            num_max = (long) Math.floor((double)(num_max*LinesUtil.REALLOC_FACTOR));
-	            Chord[] rlh = new Chord[(int) num_max];
+	            num_max =  (int)Math.floor((double)(num_max*LinesUtil.REALLOC_FACTOR));
+	            Chord[] rlh = new Chord[ num_max];
 	            for(int i = 0; i < rlh.length; i++){
 	            	if(i < rl.length)
 		        		rlh[i] = rl[i];
@@ -73,11 +72,11 @@ public class Threshold {
 	    }
 	    if (inside) {
 	      inside = false;
-	      rl[(int) num].ce = (short) (width-1);
+	      rl[ num].ce = (short) (width-1);
 	      num++;
 	      if (num >= num_max) {
-	        num_max = (long) Math.floor((double)(num_max*LinesUtil.REALLOC_FACTOR));
-	        Chord[] rlh = new Chord[(int) num_max];
+	        num_max =  (int)Math.floor((double)(num_max*LinesUtil.REALLOC_FACTOR));
+	        Chord[] rlh = new Chord[ num_max];
 	        for(int i = 0; i < rlh.length; i++){
 	        	if(i < rl.length)
 	        		rlh[i] = rl[i];
@@ -88,8 +87,8 @@ public class Threshold {
 	      }
 	    }
 	  }
-	  out.rl = new Chord[(int) num];
-	  for(int i = 0; i < (int)num; i++){
+	  out.rl = new Chord[ num];
+	  for(int i = 0; i < num; i++){
 		  out.rl[i] = rl[i];
 	  }
 	  out.num = num;
