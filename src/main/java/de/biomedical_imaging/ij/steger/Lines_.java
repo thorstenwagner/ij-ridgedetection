@@ -444,20 +444,20 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		
 		double lwCand = gd.getNextNumber();
 		double diff = Math.abs(lwCand-lineWidth);
-		if (Double.isNaN(diff) || diff>0.0001) {
+		if (diff>0.0001) {
 			lineWidth = lwCand;
 			lwChanged = true;
 		}
 		double conCand = gd.getNextNumber();
 		diff = Math.abs(conCand-contrastHigh);
-		if (Double.isNaN(diff) || diff > 0.0001) {
+		if ( diff > 0.0001) {
 			contrastHigh = conCand;
 			contHighChanged = true;
 		}
 
 		conCand = gd.getNextNumber();
 		diff = Math.abs(conCand-contrastLow);
-		if (Double.isNaN(diff) || diff>0.0001) {
+		if (diff>0.0001) {
 			contrastLow = conCand;
 			contLowChanged = true;
 		}

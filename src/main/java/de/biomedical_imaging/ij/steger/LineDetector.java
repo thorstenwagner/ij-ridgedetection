@@ -66,8 +66,8 @@ public class LineDetector {
 		alreadyProcessedJunctionPoints = new HashSet<Integer>();
 		
 		//Reconstruct solution from junction points. This have to be done, because in raw cases
-		//the algorithm corrups the results. However, I was not able to find that bug so I decided
-		//to reconstruct the solution from the information which were not corrupted.
+		//the algorithm corrupts the results. However, I was not able to find that bug so I decided
+		//to reconstruct the solution from the information which were not be corrupted.
 		fixJunctions();
 		assignLinesToJunctions();
 		addAdditionalJunctionPointsAndLines();
