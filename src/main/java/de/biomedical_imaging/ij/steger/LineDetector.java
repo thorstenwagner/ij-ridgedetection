@@ -140,6 +140,8 @@ public class LineDetector {
 						junc.cont2 = connectedWithProcessedIndex.get(k);
 						junc.pos = l1.getIndexOfPosition(junc.x, junc.y);
 						junctions.add(junc); 
+						l1.cont_class = reconstructContourClass(l1, l1.getIndexOfPosition(junc.x, junc.y));
+						l2.cont_class = reconstructContourClass(l2, l2.getIndexOfPosition(junc.x, junc.y));
 						alreadyProcessedJunctionPoints.add(junctions.size()-1);
 					}
 				}
@@ -149,8 +151,14 @@ public class LineDetector {
 				 */
 				Line l1 = splitPoint.getLine1();
 				int pos = splitPoint.pos;
+				boolean isClosedContour = l1.col[0] == l1.col[l1.num-1] && l1.row[0] == l1.row[l1.num-1];
 				
-				if(pos!=0 && pos != (l1.num-1)){
+				if(isClosedContour){
+					l1.cont_class = LinesUtil.contour_class.cont_closed;
+					l1.cont_class = reconstructContourClass(l1, l1.getIndexOfPosition(splitPoint.x, splitPoint.y));
+				}
+				
+				if(pos!=0 && pos != (l1.num-1) && !isClosedContour){
 					//All data up to pos (included)
 					int keepLength = pos+1;
 					
@@ -265,6 +273,8 @@ public class LineDetector {
 						j.x = splitPoint.x;
 						j.y = splitPoint.y;
 						j.pos = lNew.getIndexOfPosition(splitPoint.x, splitPoint.y);
+						lNew.cont_class = reconstructContourClass(lNew, j.pos);
+						connectWith.cont_class = reconstructContourClass(connectWith, connectWith.getIndexOfPosition(splitPoint.x, splitPoint.y));
 						junctions.add(j);
 						alreadyProcessedJunctionPoints.add(junctions.size()-1);
 					}
@@ -345,11 +355,13 @@ public class LineDetector {
 						newJunc.x = junc.x;
 						newJunc.y = junc.y;
 						newJunc.pos = mainLinePos;
+						lines.get(newJunc.cont1).cont_class = reconstructContourClass(lines.get(newJunc.cont1), mainLinePos);
+						lines.get(newJunc.cont2).cont_class = reconstructContourClass(lines.get(newJunc.cont2), secondaryLinePos.get(j));
 						newJunctions.add(newJunc);
 						
 					}
 				}else{
-					//In manchen Fällen gibt es keine Hauptlinie... (bug im Algorithmus, ich bin aber nicht fähig ihn zu finden.
+					//In manchen Fällen gibt es keine Hauptlinie... (bug im Algorithmus, ich bin aber nicht fähig ihn zu finden=.
 					HashSet<Integer> uniqueIDs = new HashSet<Integer>();
 					ArrayList<Line> uniqueLines = new ArrayList<Line>();
 					ArrayList<Integer> uniqueLineIndex = new ArrayList<Integer>();
@@ -366,13 +378,16 @@ public class LineDetector {
 					for(int j = 0; j < uniqueLines.size(); j++){
 						for(int k = j+1; k < uniqueLines.size(); k++){
 							Junction newJunc = new Junction();
-							newJunc.cont1 = secondaryLineIndex.get(j);
-							newJunc.cont2 = secondaryLineIndex.get(k);
+							newJunc.cont1 = uniqueLineIndex.get(j);
+							newJunc.cont2 = uniqueLineIndex.get(k);
 							newJunc.x = junc.x;
 							newJunc.y = junc.y;
 							newJunc.pos = uniqueLinePos.get(j);
 							newJunctions.add(newJunc);
+							lines.get(newJunc.cont1).cont_class = reconstructContourClass(lines.get(newJunc.cont1), uniqueLinePos.get(j));
+							lines.get(newJunc.cont2).cont_class = reconstructContourClass(lines.get(newJunc.cont2), uniqueLinePos.get(k));
 							alreadyProcessedJunctionPoints.add(newJunctions.size()-1);
+							
 						}
 					}
 				}
@@ -380,6 +395,36 @@ public class LineDetector {
 			}
 		}
 		junctions = newJunctions;
+		
+	}
+	
+	private LinesUtil.contour_class reconstructContourClass(Line l, int pos){
+		LinesUtil.contour_class currentClass = l.getLineClass();
+		
+		boolean hasJunctionAtStartpoint = pos==0?true:false;
+		boolean hasJunctionAtEndpoint = pos==(l.num-1)?true:false;
+		
+		if(currentClass == LinesUtil.contour_class.cont_no_junc && hasJunctionAtStartpoint){
+			return LinesUtil.contour_class.cont_start_junc;
+		}
+		
+		if(currentClass == LinesUtil.contour_class.cont_no_junc && hasJunctionAtEndpoint){
+			return LinesUtil.contour_class.cont_end_junc;
+		}
+		
+		if(currentClass == LinesUtil.contour_class.cont_start_junc && hasJunctionAtEndpoint){
+			return LinesUtil.contour_class.cont_both_junc;
+		}
+		
+		if(currentClass == LinesUtil.contour_class.cont_end_junc && hasJunctionAtStartpoint){
+			return LinesUtil.contour_class.cont_both_junc;
+		}
+		
+		if(currentClass == LinesUtil.contour_class.cont_closed && (hasJunctionAtEndpoint || hasJunctionAtStartpoint)){
+			return LinesUtil.contour_class.cont_both_junc;
+		}
+		
+		return currentClass;
 		
 	}
 
@@ -420,8 +465,10 @@ public class LineDetector {
 		for (Line contour : lines) {
 			if (contour.num == 1) {
 				deleteContour(contour);
-
+				continue;
 			}
+			//If the results are corrupted, this informationen has to be reconstructed in fixJunctions
+			contour.cont_class = LinesUtil.contour_class.cont_no_junc;
 		}
 
 		// For some reason the first and the last element are the same. Delete
