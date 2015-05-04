@@ -473,11 +473,13 @@ public class LineDetector {
 
 		// For some reason the first and the last element are the same. Delete
 		// it!
+		
 		if (lines.size() >= 2) {
 			if(lines.get(0).getID() == lines.get(lines.size()-1).getID()){
 				lines.remove(lines.size() - 1);	
 			}
 		}
+		
 		
 		
 
