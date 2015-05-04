@@ -54,6 +54,7 @@ public class LineDetector {
 				ip.getWidth(), ip, junctions);
 		fixContours();
 		fixJunctions();
+		
 		return lines;
 	}
 
