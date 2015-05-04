@@ -522,16 +522,19 @@ public class Link {
 							newArr[o] = row[o];
 						}
 						row = newArr;
+						
 						newArr = new float[(int) size_pnt];
 						for (int o = 0; o < col.length; o++) {
 							newArr[o] = col[o];
 						}
 						col = newArr;
+						
 						newArr = new float[(int) size_pnt];
 						for (int o = 0; o < angle.length; o++) {
 							newArr[o] = angle[o];
 						}
 						angle = newArr;
+						
 						newArr = new float[(int) size_pnt];
 						for (int o = 0; o < resp.length; o++) {
 							resp[o] = resp[o];
@@ -1164,16 +1167,13 @@ public class Link {
 						size_cont = (long) Math
 								.floor((double) (size_cont * LinesUtil.REALLOC_FACTOR));
 						Line[] conth = new Line[(int) size_cont];
-						for (int o = 0; o < conth.length; o++) {
-							if (o < cont.length)
+						for (int o = 0; o < cont.length; o++) {
 								conth[o] = cont[o];
-							// else
-							// conth[o] = new contour();
 						}
 						cont = conth;
 					}
 					cont[(int) num_cont] = new Line();
-
+					
 					cont[(int) num_cont].row = new float[(int) num_pnt];
 					cont[(int) num_cont].col = new float[(int) num_pnt];
 					cont[(int) num_cont].angle = new float[(int) num_pnt];
