@@ -62,20 +62,12 @@ public class LineDetector {
 		junctions = new Junctions(ip.getSliceNumber());
 		lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
 				ip.getWidth(), ip, junctions);
-		fixContours();
-		alreadyProcessedJunctionPoints = new HashSet<Integer>();
 		
-		//Reconstruct solution from junction points. This have to be done, because in raw cases
-		//the algorithm corrupts the results. However, I was not able to find that bug so I decided
-		//to reconstruct the solution from the information which were not be corrupted.
-		fixJunctions();
-		assignLinesToJunctions();
-		addAdditionalJunctionPointsAndLines();
-		Collections.sort(junctions);
 		return lines;
 	}
 	
-	private void assignLinesToJunctions(){
+	
+	private void assignLinesToJunctions(Lines lines, Junctions junctions){
 		for (Junction j : junctions) {
 			j.lineCont1 = lines.get(j.cont1);
 			j.lineCont2 = lines.get(j.cont2);
@@ -90,7 +82,7 @@ public class LineDetector {
 		return junctions;
 	}
 	
-	private void addAdditionalJunctionPointsAndLines(){
+	private void addAdditionalJunctionPointsAndLines(Lines lines, Junctions junctions){
 		
 		for(int i = 0; i < junctions.size(); i++){
 			Junction splitPoint = junctions.get(i); //Split point!
@@ -301,7 +293,7 @@ public class LineDetector {
 		}
 	}
 
-	private void fixJunctions() {
+	private void fixJunctions(Lines lines, Junctions junctions) {
 		/*
 		 * For some reason, the x and y coordinates are permuted
 		 */
@@ -339,6 +331,7 @@ public class LineDetector {
 									continue;
 								}
 								IJ.error("Äh, zwei Hauptlininen geht nich..." + mainLine.getID() + " x " + junc.x + " y " + junc.y);
+								IJ.error("Äh, zwei Hauptlininen geht nich..." + l.getID() + " x " + junc.x + " y " + junc.y);
 							}
 							mainLine = l;
 							mainLineIndex = j;
@@ -441,13 +434,13 @@ public class LineDetector {
 		double[] ret =  {min,index};
 		return ret;
 	}
-	private void deleteContour(Line c) {
+	private void deleteContour(Lines contours, Junctions junctions, Line c) {
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
 		for (Junction junction : junctions) {
 
-			if (lines.get((int) junction.cont1).getID() == c.getID()
-					|| lines.get((int) junction.cont2).getID() == c.getID()) {
+			if (contours.get((int) junction.cont1).getID() == c.getID()
+					|| contours.get((int) junction.cont2).getID() == c.getID()) {
 				remove.add(junction);
 			}
 
@@ -456,15 +449,15 @@ public class LineDetector {
 			junctions.remove(junction);
 		}
 
-		lines.remove(c);
+		contours.remove(c);
 	}
 
-	private void fixContours() {
+	private void fixContours(Lines contours, Junctions junctions) {
 
 		// Contours with only a single position cant be valid.
-		for (Line contour : lines) {
+		for (Line contour : contours) {
 			if (contour.num == 1) {
-				deleteContour(contour);
+				deleteContour(contours,junctions,contour);
 				continue;
 			}
 			//If the results are corrupted, this informationen has to be reconstructed in fixJunctions
@@ -474,15 +467,11 @@ public class LineDetector {
 		// For some reason the first and the last element are the same. Delete
 		// it!
 		
-		if (lines.size() >= 2) {
-			if(lines.get(0).getID() == lines.get(lines.size()-1).getID()){
-				lines.remove(lines.size() - 1);	
+		if (contours.size() >= 2) {
+			if(contours.get(0).getID() == contours.get(contours.size()-1).getID()){
+				contours.remove(contours.size() - 1);	
 			}
 		}
-		
-		
-		
-
 	}
 
 	private Lines get_lines(double sigma, double high, double low, int rows,
@@ -513,7 +502,17 @@ public class LineDetector {
 				opts.low, opts.high, opts.mode, opts.width, opts.correct,
 				opts.extend, resultJunction);
 		num_cont = hnum_cont.getValue();
-
+		
+	//	lines = contours;
+		fixContours(contours,resultJunction);
+		alreadyProcessedJunctionPoints = new HashSet<Integer>();
+		//Reconstruct solution from junction points. This have to be done, because in raw cases
+		//the algorithm corrupts the results. However, I was not able to find that bug so I decided
+		//to reconstruct the solution from the information which were not be corrupted.
+		fixJunctions(contours,resultJunction);
+		assignLinesToJunctions(contours,resultJunction);
+		addAdditionalJunctionPointsAndLines(contours,resultJunction);
+		Collections.sort(resultJunction);
 		return contours;
 
 	}
