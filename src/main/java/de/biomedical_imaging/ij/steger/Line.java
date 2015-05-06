@@ -165,7 +165,7 @@ public class Line {
 		return cont_class;
 	}
 
-	public int getIndexOfPosition(float x, float y){
+	public int getStartOrdEndPosition(float x, float y){
 		double distStart = Math.sqrt( Math.pow(col[0]-x, 2)+Math.pow(row[0]-y, 2));
 		double distEnd = Math.sqrt( Math.pow(col[ (this.num-1)]-x, 2)+Math.pow(row[ (this.num-1)]-y, 2));
 		return  (distStart < distEnd ? 0:this.num-1);

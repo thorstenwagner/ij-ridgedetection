@@ -25,6 +25,7 @@ public class LineDetector {
 	private Lines lines;
 	private ImageProcessor ip;
 	Set<Integer> alreadyProcessedJunctionPoints;
+	boolean bechatty = false;
 
 	/**
 	 * 
@@ -62,14 +63,19 @@ public class LineDetector {
 		junctions = new Junctions(ip.getSliceNumber());
 		lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
 				ip.getWidth(), ip, junctions);
-		
 		return lines;
 	}
 	
 	
 	private void assignLinesToJunctions(Lines lines, Junctions junctions){
 		for (Junction j : junctions) {
+			if(lines.get(j.cont1)==null){
+				IJ.log("aaaaaaaah " + j.cont1);
+			}
 			j.lineCont1 = lines.get(j.cont1);
+			if(lines.get(j.cont2)==null){
+				IJ.log("aaaaaaaah " + j.cont1);
+			}
 			j.lineCont2 = lines.get(j.cont2);
 		}
 	}
@@ -86,15 +92,14 @@ public class LineDetector {
 		
 		for(int i = 0; i < junctions.size(); i++){
 			Junction splitPoint = junctions.get(i); //Split point!
+		
+			log("Process Splitpoint " + splitPoint.getLine1().getID() +"-"+splitPoint.getLine2().getID() + " Pos: " + splitPoint.pos);
+		//splitPoint.pos!=0&&splitPoint.pos!=(splitPoint.getLine1().num-1)
 			if(!alreadyProcessedJunctionPoints.contains(i)){
-				if(splitPoint.pos>=lines.get(splitPoint.cont1).num){
-					alreadyProcessedJunctionPoints.add(i);
-					continue;
-				}
 			
 				
 				/*
-				 * Find Junctions with the same position
+				 * Find Junctions with the same position as the split point
 				 */
 				Junctions junctionsWithTheSamePosition = new Junctions(junctions.getFrame());
 				alreadyProcessedJunctionPoints.add(i);
@@ -130,16 +135,17 @@ public class LineDetector {
 						junc.y = splitPoint.y;
 						junc.cont1 = connectedWithProcessedIndex.get(j);
 						junc.cont2 = connectedWithProcessedIndex.get(k);
-						junc.pos = l1.getIndexOfPosition(junc.x, junc.y);
+						junc.pos = l1.getStartOrdEndPosition(junc.x, junc.y);
 						junctions.add(junc); 
-						l1.cont_class = reconstructContourClass(l1, l1.getIndexOfPosition(junc.x, junc.y));
-						l2.cont_class = reconstructContourClass(l2, l2.getIndexOfPosition(junc.x, junc.y));
+						log("Connect " + junc.getLine1().getID() +"-"+junc.getLine2().getID() + " Pos: " + junc.pos);
+						l1.cont_class = reconstructContourClass(l1, l1.getStartOrdEndPosition(junc.x, junc.y));
+						l2.cont_class = reconstructContourClass(l2, l2.getStartOrdEndPosition(junc.x, junc.y));
 						alreadyProcessedJunctionPoints.add(junctions.size()-1);
 					}
 				}
 				
 				/*
-				 * Split the line in two line at the split point 
+				 * Split the line in two line at the split point if it is not at the end or beginning of the line
 				 */
 				Line l1 = splitPoint.getLine1();
 				int pos = splitPoint.pos;
@@ -147,9 +153,9 @@ public class LineDetector {
 				
 				if(isClosedContour){
 					l1.cont_class = LinesUtil.contour_class.cont_closed;
-					l1.cont_class = reconstructContourClass(l1, l1.getIndexOfPosition(splitPoint.x, splitPoint.y));
+					l1.cont_class = reconstructContourClass(l1, l1.getStartOrdEndPosition(splitPoint.x, splitPoint.y));
 				}
-				
+				log("Pos: " + pos + " num: " + l1.num);
 				if(pos!=0 && pos != (l1.num-1) && !isClosedContour){
 					//All data up to pos (included)
 					int keepLength = pos+1;
@@ -217,16 +223,7 @@ public class LineDetector {
 					
 					
 					
-					//Overwrite line data
-					l1.angle = keepAngle;
-					l1.asymmetry = keepAsymmetry;
-					l1.col = keepCol;
-					l1.row = keepRow;
-					l1.response = keepResponse;
-					l1.intensity = keepIntensity;
-					l1.width_l = keepWidth_l;
-					l1.width_r = keepWidth_r;
-					l1.num = keepLength;
+					
 					
 					//Generate new line
 					Line lNew = new Line();
@@ -264,10 +261,11 @@ public class LineDetector {
 						j.lineCont2 = connectWith;
 						j.x = splitPoint.x;
 						j.y = splitPoint.y;
-						j.pos = lNew.getIndexOfPosition(splitPoint.x, splitPoint.y);
+						j.pos = lNew.getStartOrdEndPosition(splitPoint.x, splitPoint.y);
 						lNew.cont_class = reconstructContourClass(lNew, j.pos);
-						connectWith.cont_class = reconstructContourClass(connectWith, connectWith.getIndexOfPosition(splitPoint.x, splitPoint.y));
+						connectWith.cont_class = reconstructContourClass(connectWith, connectWith.getStartOrdEndPosition(splitPoint.x, splitPoint.y));
 						junctions.add(j);
+						log("Connect " + j.getLine1().getID() +"-"+j.getLine2().getID() + " Pos: " + j.pos);
 						alreadyProcessedJunctionPoints.add(junctions.size()-1);
 					}
 
@@ -275,15 +273,45 @@ public class LineDetector {
 					for(int j = 0; j < junctions.size(); j++){
 						Junction junc2 = junctions.get(j);
 						if(junc2.cont1 == splitPoint.cont1 && junc2.pos>splitPoint.pos){
+							log("Update From " + junc2.getLine1().getID() +"-"+junc2.getLine2().getID() + " Pos: " + junc2.pos);
 							junc2.cont1 = lines.getIndexByID(newID);
 							junc2.lineCont1 = lNew;
 							junc2.pos = junc2.pos-splitPoint.pos;
+							log("Update To " + junc2.getLine1().getID() +"-"+junc2.getLine2().getID() + " Pos: " + junc2.pos);
 						}
+						if(junc2.getLine1().getID()==103 && junc2.getLine2().getID()==101){
+							log("POS: " + minDistance(junc2.getLine2(), junc2.x, junc2.y)[1]);
+						}
+						
+						double[] min = minDistance(junc2.getLine2(), junc2.x, junc2.y);
+						
+						if(junc2.cont2 == splitPoint.cont1 && ((int)min[1])>splitPoint.pos){
+							junc2.cont2 = lines.getIndexByID(newID);
+							junc2.lineCont2 = lNew;
+						}
+						
+						
+						
 					}
 					
+					//Update Line 1
+					//Overwrite line data
+					l1.angle = keepAngle;
+					l1.asymmetry = keepAsymmetry;
+					l1.col = keepCol;
+					l1.row = keepRow;
+					l1.response = keepResponse;
+					l1.intensity = keepIntensity;
+					l1.width_l = keepWidth_l;
+					l1.width_r = keepWidth_r;
+					l1.num = keepLength;
+					
 					//Update position of splitpoint
-					splitPoint.pos = l1.getIndexOfPosition(splitPoint.x, splitPoint.y);
+					log("Set Splitpoint Position from " + splitPoint.pos);
+					splitPoint.pos = l1.getStartOrdEndPosition(splitPoint.x, splitPoint.y);
+					log("Set Splitpoint Position to " + splitPoint.pos);
 					lines.set(splitPoint.cont1, l1);
+					
 					
 					
 				}
@@ -293,7 +321,7 @@ public class LineDetector {
 		}
 	}
 
-	private void fixJunctions(Lines lines, Junctions junctions) {
+	private Junctions fixJunctions(Lines lines, Junctions junctions) {
 		/*
 		 * For some reason, the x and y coordinates are permuted
 		 */
@@ -313,8 +341,14 @@ public class LineDetector {
 			ArrayList<Line> secondaryLines = new ArrayList<Line>();
 			ArrayList<Integer> secondaryLineIndex = new ArrayList<Integer>();
 			ArrayList<Integer> secondaryLinePos = new ArrayList<Integer>();
+			
+			//Verarbeite jede Junction-Position nur einmal.
 			if(processed[(int)junc.x][(int)junc.y]==0){
 				processed[(int)junc.x][(int)junc.y]=1;
+				
+				/*
+				 * Finde die Sekundärlinien und Hauptlinien
+				 */
 				for(int j = 0; j < lines.size(); j++) {
 					Line l = lines.get(j);
 				
@@ -324,7 +358,7 @@ public class LineDetector {
 							secondaryLines.add(l);
 							secondaryLineIndex.add(j);
 							secondaryLinePos.add((int)mindist[1]);
-						}else {
+						} else {
 			
 							if(mainLine!=null){
 								if(mainLine.getID()==l.getID()){
@@ -336,6 +370,7 @@ public class LineDetector {
 							mainLine = l;
 							mainLineIndex = j;
 							mainLinePos = (int) mindist[1];
+							
 							
 						}
 					}
@@ -351,6 +386,7 @@ public class LineDetector {
 						lines.get(newJunc.cont1).cont_class = reconstructContourClass(lines.get(newJunc.cont1), mainLinePos);
 						lines.get(newJunc.cont2).cont_class = reconstructContourClass(lines.get(newJunc.cont2), secondaryLinePos.get(j));
 						newJunctions.add(newJunc);
+						log("NewJunc Mainline: " + lines.get(newJunc.cont1).getID() + "-" + lines.get(newJunc.cont2).getID() + " pos " + newJunc.pos + " num " + lines.get(newJunc.cont1).num);
 						
 					}
 				}else{
@@ -365,6 +401,7 @@ public class LineDetector {
 							uniqueLines.add(secondaryLines.get(j));
 							uniqueLineIndex.add(secondaryLineIndex.get(j));
 							uniqueLinePos.add(secondaryLinePos.get(j));
+							
 						}
 						
 					}
@@ -377,9 +414,12 @@ public class LineDetector {
 							newJunc.y = junc.y;
 							newJunc.pos = uniqueLinePos.get(j);
 							newJunctions.add(newJunc);
+							log("NewJunc Second: " + lines.get(newJunc.cont1).getID() + "-" + lines.get(newJunc.cont2).getID() + " pos " + newJunc.pos + " num " + lines.get(newJunc.cont1).num);
+
 							lines.get(newJunc.cont1).cont_class = reconstructContourClass(lines.get(newJunc.cont1), uniqueLinePos.get(j));
 							lines.get(newJunc.cont2).cont_class = reconstructContourClass(lines.get(newJunc.cont2), uniqueLinePos.get(k));
 							alreadyProcessedJunctionPoints.add(newJunctions.size()-1);
+					
 							
 						}
 					}
@@ -387,7 +427,7 @@ public class LineDetector {
 			
 			}
 		}
-		junctions = newJunctions;
+		return newJunctions;
 		
 	}
 	
@@ -420,7 +460,13 @@ public class LineDetector {
 		return currentClass;
 		
 	}
-
+	/**
+	 * 
+	 * @param l Line
+	 * @param x x-Position
+	 * @param y y-Position
+	 * @return Double Array [0] minimal distance [1] position of minimal distance
+	 */
 	private double[] minDistance(Line l, float x, float y){
 		double min = Double.MAX_VALUE;
 		double index = -1;
@@ -509,14 +555,25 @@ public class LineDetector {
 		//Reconstruct solution from junction points. This have to be done, because in raw cases
 		//the algorithm corrupts the results. However, I was not able to find that bug so I decided
 		//to reconstruct the solution from the information which were not be corrupted.
-		fixJunctions(contours,resultJunction);
+		resultJunction = fixJunctions(contours,resultJunction);
 		assignLinesToJunctions(contours,resultJunction);
+		log("#######FOUND JUNCTIONS###########");
+		for(int i = 0; i < resultJunction.size(); i++){
+			Junction j = resultJunction.get(i);
+			log("ID Line1 " + j.getLine1().getID() + " with " + j.getLine2().getID() + " Pos: " + j.pos + " Num: " + j.getLine1().num);
+		}
+		
 		addAdditionalJunctionPointsAndLines(contours,resultJunction);
 		Collections.sort(resultJunction);
+		junctions = resultJunction;
 		return contours;
 
 	}
-
+	private void log(String s){
+		if(bechatty){
+			IJ.log(s);
+		}
+	}
 	private void check_sigma(double sigma, int width, int height) {
 		int min_dim;
 		min_dim = width < height ? width : height;
