@@ -3,7 +3,14 @@
 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
- 
+	
+ 	<parent>
+		<groupId>net.imagej</groupId>
+		<artifactId>pom-imagej</artifactId>
+		<version>7.0.0</version>
+		<relativePath />
+	</parent>
+	
 	<groupId>de.biomedical-imaging.imagej</groupId>
 	<artifactId>ij_ridge_detect</artifactId>
 	<version>1.0.6-SNAPSHOT</version>
@@ -11,6 +18,12 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
  
 	<name>Ridge Detection Plugin for ImageJ</name>
 	<url>https://github.com/jumpfunky/ij-ridgedetection</url>
+	
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/thorstenwagner/ij-ridgedetection/issues</url>
+	</issueManagement>
+	
  	<dependencies>
 		<dependency>
    	 		<groupId>net.imagej</groupId>
@@ -23,15 +36,21 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
    			<version>3.4</version>
 		</dependency>
 	</dependencies>
+	
 	<developers>
 		<developer>
 			<id>twagner</id>
 			<name>Thorsten Wagner</name>
 			<email>wagner@biomedical-imaging.de</email>
+			<organization>University of Applied Sciences and Arts Dortmund</organization>
+			<organizationUrl>www.biomedical-imaging.de</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
 			<properties>
 				<active>true</active>
 			</properties>
 		</developer>
 	</developers>
-
+	
 </project>
