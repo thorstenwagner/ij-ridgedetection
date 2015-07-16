@@ -64,7 +64,6 @@ public class LineDetector {
 		junctions = new Junctions(ip.getSliceNumber());
 		lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
 				ip.getWidth(), ip, junctions);
-		
 		return lines;
 	}
 	
@@ -517,8 +516,11 @@ public class LineDetector {
 
 		// For some reason the first and the last element are the same. Delete
 		// it!
-		if(lines.get(0).getID() == lines.get(lines.size()-1).getID()){
-			lines.remove(lines.size() - 1);	
+		
+		if (contours.size() >= 2) {
+			if(contours.get(0).getID() == contours.get(contours.size()-1).getID()){
+				contours.remove(contours.size() - 1);	
+			}
 		}
 	}
 

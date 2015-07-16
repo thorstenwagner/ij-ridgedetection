@@ -21,21 +21,13 @@
 package de.biomedical_imaging.ij.steger;
 
 import java.awt.AWTEvent;
-import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Polygon;
 import java.awt.TextField;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.apache.commons.lang3.mutable.*;
-
-import de.biomedical_imaging.ij.steger.LinesUtil.contour_class;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.DialogListener;
@@ -298,7 +290,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			}
 		}
 		rm.setVisible(true);
-		IJ.run("Labels...", "color=white font=12 show use draw");
+		rm.runCommand("UseNames", "true");
 		
 	}
 
