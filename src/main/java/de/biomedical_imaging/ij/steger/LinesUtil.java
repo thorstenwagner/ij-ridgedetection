@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -30,8 +30,8 @@ public class LinesUtil {
 	public static final int DERIV_RC = 4;  /* Second derivative in row and column direction */
 	public static final int DERIV_CC = 5;  /* Second derivative in column direction */
 
-	public static final long MODE_LIGHT = 1;  /* Extract bright lines */
-	public static final long MODE_DARK  = 2 ; /* Extract dark lines */
+	public static final int MODE_LIGHT = 1;  /* Extract bright lines */
+	public static final int MODE_DARK  = 2 ; /* Extract dark lines */
 
 	public static final int INITIAL_SIZE  = 100;
 	public static final int REALLOC_FACTOR = 2; 
@@ -40,8 +40,8 @@ public class LinesUtil {
 	public static final double MAX_SIZE_MASK_1 = 3.46087178201605;   /* Size for 1st derivative mask */
 	public static final double MAX_SIZE_MASK_2 = 3.82922419517181;    /* Size for 2nd derivative mask */
 
-	public static long MASK_SIZE(double MAX, double sigma) {
-		return (long)Math.ceil(MAX*sigma); /* Maximum mask index */
+	public static int MASK_SIZE(double MAX, double sigma) {
+		return (int)Math.ceil(MAX*sigma); /* Maximum mask index */
 	}
 	
 	public static final String ERR_NOMEM = "Out of memory";
@@ -62,21 +62,22 @@ public class LinesUtil {
 	
 	/* Translate row and column coordinates of an image into an index into its
 	   one-dimensional array. */
-	public static long LINCOOR(long row, long col, long width) {
+	public static int LINCOOR(int row, int col, int width) {
 		return row*width+col;
 	}
 	
 	/* Mirror the row coordinate at the borders of the image; height must be a
 	   defined variable in the calling function containing the image height. */
-	public static long BR(long row, long height) {
+	public static int BR(int row, int height) {
 		return ((row) < 0 ? -(row) : (row) >= height ? height - (row) + height - 2 : (row));
 	}
 	
 	/* Mirror the column coordinate at the borders of the image; width must be a
 	   defined variable in the calling function containing the image width. */
-	public static long BC(long col, long width) { 
+	public static int BC(int col, int width) { 
 		return ((col) < 0 ? -(col) :  (col) >= width ? width - (col) + width - 2 : (col));
 	}
+	
 	               
 	public enum contour_class {
 		  cont_no_junc,    /* no end point is a junction */

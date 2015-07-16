@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -25,7 +25,7 @@ package de.biomedical_imaging.ij.steger;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.lang3.mutable.MutableLong;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 
 public class Width {
@@ -50,9 +50,9 @@ public class Width {
 	
 	/* Modified Bresenham algorithm.  It returns in line all pixels that are
 	   intersected by a half line less than length away from the point (px,py)
-	   along the direction (nx,ny).  The point (px,py) must lie within the pixel
+	   aint the direction (nx,ny).  The point (px,py) must lie within the pixel
 	   of the origin, i.e., fabs(px) <= 0.5 and fabs(py) <= 0.5. */
-	public void bresenham(double nx, double ny, double px, double py, double length, Offset[] line, MutableLong num_points)
+	public void bresenham(double nx, double ny, double px, double py, double length, Offset[] line, MutableInt num_points)
 	{
 	  int i, n, x, y, s1, s2, xchg, maxit;
 	  double e, dx, dy, t;
@@ -61,8 +61,8 @@ public class Width {
 	  y = 0;
 	  dx = Math.abs(nx);
 	  dy = Math.abs(ny);
-	  s1 = (int) Math.signum(nx);
-	  s2 = (int) Math.signum(ny);
+	  s1 =  (int)Math.signum(nx);
+	  s2 =  (int)Math.signum(ny);
 	  px *= s1;
 	  py *= s2;
 	  if (dy > dx) {
@@ -76,7 +76,7 @@ public class Width {
 	  } else {
 	    xchg = 0;
 	  }
-	  maxit = (int) Math.ceil(length*dx);
+	  maxit =  (int)Math.ceil(length*dx);
 	  e = (0.5-px)*dy/dx-(0.5-py);
 	  n = 0;
 	  for (i=0; i<=maxit; i++) {
@@ -108,15 +108,15 @@ public class Width {
 	   at each line point.  The arrays slave1 and slave2 can be NULL. */
 	private void fill_gaps(double[] master, double[] slave1, double[] slave2, Line cont)
 	{
-	  long    i, j, k, s, e;
-	  long    num_points;
+	  int    i, j, k, s, e;
+	  int    num_points;
 	  double  m_s, m_e, s1_s, s1_e, s2_s, s2_e, d_r, d_c, arc_len, len;
 
 	  num_points = cont.num;
 	  for (i=0; i<num_points; i++) {
-	    if (master[(int) i] == 0) {
+	    if (master[ i] == 0) {
 	      for (j=i+1; j<num_points; j++) {
-	        if (master[(int) j] > 0)
+	        if (master[ j] > 0)
 	          break;
 	      }
 	      m_s = 0;
@@ -128,78 +128,78 @@ public class Width {
 	      if (i > 0 && j < num_points-1) {
 	        s = i;
 	        e = j-1;
-	        m_s = master[(int) (s-1)];
-	        m_e = master[(int) (e+1)];
+	        m_s = master[ (s-1)];
+	        m_e = master[ (e+1)];
 	        if (slave1 != null) {
-	          s1_s = slave1[(int) (s-1)];
-	          s1_e = slave1[(int) (e+1)];
+	          s1_s = slave1[ (s-1)];
+	          s1_e = slave1[ (e+1)];
 	        }
 	        if (slave2 != null) {
-	          s2_s = slave2[(int) (s-1)];
-	          s2_e = slave2[(int) (e+1)];
+	          s2_s = slave2[ (s-1)];
+	          s2_e = slave2[ (e+1)];
 	        }
 	      } else if (i > 0) {
 	        s = i;
 	        e = num_points-2;
-	        m_s = master[(int) (s-1)];
-	        m_e = master[(int) (s-1)];
-	        master[(int) (e+1)] = m_e;
+	        m_s = master[ (s-1)];
+	        m_e = master[ (s-1)];
+	        master[ (e+1)] = m_e;
 	        if (slave1 != null) {
-	          s1_s = slave1[(int) (s-1)];
-	          s1_e = slave1[(int) (s-1)];
-	          slave1[(int) (e+1)] = s1_e;
+	          s1_s = slave1[ (s-1)];
+	          s1_e = slave1[ (s-1)];
+	          slave1[ (e+1)] = s1_e;
 	        }
 	        if (slave2 != null) {
-	          s2_s = slave2[(int) (s-1)];
-	          s2_e = slave2[(int) (s-1)];
-	          slave2[(int) (e+1)] = s2_e;
+	          s2_s = slave2[ (s-1)];
+	          s2_e = slave2[ (s-1)];
+	          slave2[ (e+1)] = s2_e;
 	        }
 	      } else if (j < num_points-1) {
 	        s = 1;
 	        e = j-1;
-	        m_s = master[(int) (e+1)];
-	        m_e = master[(int) (e+1)];
-	        master[(int) (s-1)] = m_s;
+	        m_s = master[ (e+1)];
+	        m_e = master[ (e+1)];
+	        master[ (s-1)] = m_s;
 	        if (slave1 != null) {
-	          s1_s = slave1[(int) (e+1)];
-	          s1_e = slave1[(int) (e+1)];
-	          slave1[(int) (s-1)] = s1_s;
+	          s1_s = slave1[ (e+1)];
+	          s1_e = slave1[ (e+1)];
+	          slave1[ (s-1)] = s1_s;
 	        }
 	        if (slave2 != null) {
-	          s2_s = slave2[(int) (e+1)];
-	          s2_e = slave2[(int) (e+1)];
-	          slave2[(int) (s-1)] = s2_s;
+	          s2_s = slave2[ (e+1)];
+	          s2_e = slave2[ (e+1)];
+	          slave2[ (s-1)] = s2_s;
 	        }
 	      } else {
 	        s = 1;
 	        e = num_points-2;
-	        m_s = master[(int) (s-1)];
-	        m_e = master[(int) (e+1)];
+	        m_s = master[ (s-1)];
+	        m_e = master[ (e+1)];
 	        if (slave1 != null) {
-	          s1_s = slave1[(int) (s-1)];
-	          s1_e = slave1[(int) (e+1)];
+	          s1_s = slave1[ (s-1)];
+	          s1_e = slave1[ (e+1)];
 	        }
 	        if (slave2 != null) {
-	          s2_s = slave2[(int) (s-1)];
-	          s2_e = slave2[(int) (e+1)];
+	          s2_s = slave2[ (s-1)];
+	          s2_e = slave2[ (e+1)];
 	        }
 	      }
 	      arc_len = 0;
 	      for (k=s; k<=e+1; k++) {
-	        d_r = cont.row[(int) k]-cont.row[(int) (k-1)];
-	        d_c = cont.col[(int) k]-cont.col[(int) (k-1)];
+	        d_r = cont.row[ k]-cont.row[ (k-1)];
+	        d_c = cont.col[ k]-cont.col[ (k-1)];
 	        arc_len += Math.sqrt(d_r*d_r+d_c*d_c);
 	      }
 	      len = 0;
 	      for (k=s; k<=e; k++) {
-	        d_r = cont.row[(int) k]-cont.row[(int) (k-1)];
-	        d_c = cont.col[(int) k]-cont.col[(int) (k-1)];
+	        d_r = cont.row[ k]-cont.row[ (k-1)];
+	        d_c = cont.col[ k]-cont.col[ (k-1)];
 	        len += Math.sqrt(d_r*d_r+d_c*d_c);
-	        master[(int) k] = (arc_len-len)/arc_len*m_s+len/arc_len*m_e;
+	        master[ k] = (arc_len-len)/arc_len*m_s+len/arc_len*m_e;
 	        if (slave1 != null)
-	          slave1[(int) k] = (arc_len-len)/arc_len*s1_s+len/arc_len*s1_e;
+	          slave1[ k] = (arc_len-len)/arc_len*s1_s+len/arc_len*s1_e;
 	        if (slave2 != null)
-	          slave2[(int) k] = (arc_len-len)/arc_len*s2_s+len/arc_len*s2_e;
+	          slave2[ k] = (arc_len-len)/arc_len*s2_s+len/arc_len*s2_e;
 	      }
 	      i = j;
 	    }
@@ -214,10 +214,10 @@ public class Width {
 	   closed.  Finally, the position correction is applied if correct_pos is set.
 	   The results are returned in width_l, width_r, and cont. */
 	private void fix_locations(double[] width_l,double[] width_r, double[] grad_l,double[] grad_r, double[] pos_x, double[] pos_y,
-	                          double[] correction,double[] contr, double[] asymm, double sigma, long mode, boolean correct_pos, Line cont)
+	                          double[] correction,double[] contr, double[] asymm, double sigma, int mode, boolean correct_pos, Line cont)
 	{
-	  long    i;
-	  long    num_points;
+	  int    i;
+	  int    num_points;
 	  double  px, py;
 	  double  nx, ny;
 	  double  w_est, r_est;
@@ -248,76 +248,76 @@ public class Width {
 	    correct_end = ((cont.cont_class == LinesUtil.contour_class.cont_no_junc ||
 	                    cont.cont_class == LinesUtil.contour_class.cont_start_junc ||
 	                    cont.cont_class == LinesUtil.contour_class.cont_closed) &&
-	                   (width_r[(int) (num_points-1)] > 0 && width_l[(int) (num_points-1)] > 0));
+	                   (width_r[ (num_points-1)] > 0 && width_l[ (num_points-1)] > 0));
 	    /* Calculate the true width and assymetry, and its corresponding
 	       correction for each line point. */
 	    for (i=0; i<num_points; i++) {
-	      if (width_r[(int) i] > 0 && width_l[(int) i] > 0) {
-	        w_est = (width_r[(int) i]+width_l[(int) i])*LINE_WIDTH_COMPENSATION;
-	        if (grad_r[(int) i] <= grad_l[(int) i]) {
-	          r_est = grad_r[(int) i]/grad_l[(int) i];
+	      if (width_r[ i] > 0 && width_l[ i] > 0) {
+	        w_est = (width_r[ i]+width_l[ i])*LINE_WIDTH_COMPENSATION;
+	        if (grad_r[ i] <= grad_l[ i]) {
+	          r_est = grad_r[ i]/grad_l[ i];
 	          weak_is_r = true;
 	        } else {
-	          r_est = grad_l[(int) i]/grad_r[(int) i];
+	          r_est = grad_l[ i]/grad_r[ i];
 	          weak_is_r = false;
 	        }
 	        Correct.line_corrections(sigma,w_est,r_est,w_real,h_real,corr,
 	                         w_strong,w_weak);
 	        w_real.setValue(w_real.getValue()/LINE_WIDTH_COMPENSATION);
 	        corr.setValue(corr.getValue()/LINE_WIDTH_COMPENSATION);
-	        width_r[(int) i] = w_real.getValue();
-	        width_l[(int) i] = w_real.getValue();
+	        width_r[ i] = w_real.getValue();
+	        width_l[ i] = w_real.getValue();
 	        if (weak_is_r) {
-	          asymm[(int) i] = h_real.getValue();
-	          correction[(int) i] = -corr.getValue();
+	          asymm[ i] = h_real.getValue();
+	          correction[ i] = -corr.getValue();
 	        } else {
-	          asymm[(int) i] = -h_real.getValue();
-	          correction[(int) i] = corr.getValue();
+	          asymm[ i] = -h_real.getValue();
+	          correction[ i] = corr.getValue();
 	        }
 	      }
 	    }
 
 	    fill_gaps(width_l,correction,asymm,cont);
 	    for (i=0; i<num_points; i++)
-	      width_r[(int) i] = width_l[(int) i];
+	      width_r[ i] = width_l[ i];
 
 	    /* Adapt the correction for junction points if necessary. */
 	    if (!correct_start)
 	      correction[0] = 0;
 	    if (!correct_end)
-	      correction[(int) (num_points-1)] = 0;
+	      correction[ (num_points-1)] = 0;
 
 	    for (i=0; i<num_points; i++) {
-	      px = pos_x[(int) i];
-	      py = pos_y[(int) i];
-	      nx = Math.cos(cont.angle[(int) i]);
-	      ny = Math.sin(cont.angle[(int) i]);
-	      px = px+correction[(int) i]*nx;
-	      py = py+correction[(int) i]*ny;
-	      pos_x[(int) i] = px;
-	      pos_y[(int) i] = py;
+	      px = pos_x[ i];
+	      py = pos_y[ i];
+	      nx = Math.cos(cont.angle[ i]);
+	      ny = Math.sin(cont.angle[ i]);
+	      px = px+correction[ i]*nx;
+	      py = py+correction[ i]*ny;
+	      pos_x[ i] = px;
+	      pos_y[ i] = py;
 	    }
 	  }
 
 	  /* Update the position of a line and add the extracted width. */
-	  cont.width_l = new float[(int)num_points];
-	  cont.width_r = new float[(int)num_points];
+	  cont.width_l = new float[num_points];
+	  cont.width_r = new float[num_points];
 	  for (i=0; i<num_points; i++) {
-	    cont.width_l[(int) i] = (float) width_l[(int) i];
-	    cont.width_r[(int) i] = (float) width_r[(int) i];
-	    cont.row[(int) i] = (float) pos_x[(int) i];
-	    cont.col[(int) i] = (float) pos_y[(int) i];
+	    cont.width_l[ i] = (float) width_l[ i];
+	    cont.width_r[ i] = (float) width_r[ i];
+	    cont.row[ i] = (float) pos_x[ i];
+	    cont.col[ i] = (float) pos_y[ i];
 	  }
 
 	  /* Now calculate the true contrast. */
 	  if (correct_pos) {
-	    cont.asymmetry = new float[(int)num_points];
-	    cont.intensity = new float[(int)num_points];
+	    cont.asymmetry = new float[num_points];
+	    cont.intensity = new float[num_points];
 	    for (i=0; i<num_points; i++) {
-	      response = cont.response[(int) i];
-	      asymmetry = Math.abs(asymm[(int) i]);
-	      correct = Math.abs(correction[(int) i]);
-	      width = cont.width_l[(int) i];
+	      response = cont.response[ i];
+	      asymmetry = Math.abs(asymm[ i]);
+	      correct = Math.abs(correction[ i]);
+	      width = cont.width_l[ i];
 	      if (width < MIN_LINE_WIDTH)
 	        contrast = 0;
 	      else
@@ -327,33 +327,33 @@ public class Width {
 	      
 	      if (contrast > MAX_CONTRAST)
 	        contrast = 0;
-	      contr[(int) i] = contrast;
+	      contr[ i] = contrast;
 	    }
 	    fill_gaps(contr,null,null,cont);
 	    for (i=0; i<num_points; i++) {
-	      cont.asymmetry[(int) i] = (float) asymm[(int) i];
+	      cont.asymmetry[ i] = (float) asymm[ i];
 	      if (mode == LinesUtil.MODE_LIGHT)
-	        cont.intensity[(int) i] = (float) contr[(int) i];
+	        cont.intensity[ i] = (float) contr[ i];
 	      else
-	        cont.intensity[(int) i] = (float) -contr[(int) i];
+	        cont.intensity[ i] = (float) -contr[ i];
 	    }
 	  }
 	}
 	
 	/* Extract the line width by using a facet model line detector on an image of
 	   the absolute value of the gradient. */
-	public void compute_line_width(float[] dx, float[] dy, long width, long height, double sigma,long mode,boolean correct_pos, ArrayList<Line> contours,
-	                        MutableLong num_contours)
+	public void compute_line_width(float[] dx, float[] dy, int width, int height, double sigma,int mode,boolean correct_pos, ArrayList<Line> contours,
+	                        MutableInt num_contours)
 	{
 	  float[] grad;
-	  long    i, j, k;
-	  long    r, c, l;
-	  long    x, y, dir;
+	  int    i, j, k;
+	  int    r, c, l;
+	  int    x, y, dir;
 	  Offset[]  line;
-	  long    max_line, num_line=0;
+	  int    max_line, num_line=0;
 	  double  length;
 	  Line cont;
-	  long    num_points, max_num_points;
+	  int    num_points, max_num_points;
 	  double[]  width_r, width_l;
 	  double[]  grad_r, grad_l;
 	  double[]  pos_x, pos_y, correct, asymm, contrast;
@@ -363,7 +363,7 @@ public class Width {
 	  double[]  eigval = new double[2];
 	  double[][]  eigvec = new double[2][2];
 	  double  a, b, t=0;
-	  long    num = 0;
+	  int    num = 0;
 	  double  nx, ny;
 	  double  n1, n2;
 	  double  p1, p2;
@@ -372,26 +372,26 @@ public class Width {
 	  Position p = new Position();
 	  max_num_points = 0;
 	  for (i=0; i<num_contours.getValue(); i++) {
-	    num_points = contours.get((int)i).num;
+	    num_points = contours.get(i).num;
 	    if (num_points > max_num_points)
 	      max_num_points = num_points;
 	  }
 
-	  width_l = new double[(int) max_num_points];
-	  width_r = new double[(int) max_num_points];
-	  grad_l = new double[(int) max_num_points];
-	  grad_r = new double[(int) max_num_points];
-	  pos_x = new double[(int) max_num_points];
-	  pos_y = new double[(int) max_num_points];
-	  correct = new double[(int) max_num_points];
-	  contrast = new double[(int) max_num_points];
-	  asymm = new double[(int) max_num_points];
+	  width_l = new double[max_num_points];
+	  width_r = new double[ max_num_points];
+	  grad_l = new double[ max_num_points];
+	  grad_r = new double[ max_num_points];
+	  pos_x = new double[ max_num_points];
+	  pos_y = new double[ max_num_points];
+	  correct = new double[ max_num_points];
+	  contrast = new double[ max_num_points];
+	  asymm = new double[ max_num_points];
 
-	  grad = new float[(int) (width*height)];
+	  grad = new float[ (width*height)];
 
 	  length = 2.5*sigma;
-	  max_line = (long) Math.ceil(length*3);
-	  line = new Offset[(int) max_line];
+	  max_line =  (int)Math.ceil(length*3);
+	  line = new Offset[ max_line];
 	  for(int o = 0; o < line.length; o++){
 		  line[o] = new Offset();
 	  }
@@ -400,41 +400,41 @@ public class Width {
 	  for (r=0; r<height; r++) {
 	    for (c=0; c<width; c++) {
 	      l = LinesUtil.LINCOOR(r,c,width);
-	      grad[(int) l] = (float) Math.sqrt(dx[(int) l]*dx[(int) l]+dy[(int) l]*dy[(int) l]);
+	      grad[ l] = (float) Math.sqrt(dx[ l]*dx[ l]+dy[ l]*dy[ l]);
 	    }
 	  }
 
 	  for (i=0; i<num_contours.getValue(); i++) {
-	    cont = contours.get((int)i);
+	    cont = contours.get(i);
 	    num_points = cont.num;
 	    for (j=0; j<num_points; j++) {
-	      px = cont.row[(int) j];
-	      py = cont.col[(int) j];
-	      pos_x[(int) j] = px;
-	      pos_y[(int) j] = py;
-	      r = (long) Math.floor(px+0.5);
-	      c = (long) Math.floor(py+0.5);
-	      nx = Math.cos(cont.angle[(int) j]);
-	      ny = Math.sin(cont.angle[(int) j]);
+	      px = cont.row[ j];
+	      py = cont.col[ j];
+	      pos_x[ j] = px;
+	      pos_y[ j] = py;
+	      r =  (int)Math.floor(px+0.5);
+	      c =  (int)Math.floor(py+0.5);
+	      nx = Math.cos(cont.angle[ j]);
+	      ny = Math.sin(cont.angle[ j]);
 	      /* Compute the search line. */
-	      MutableLong num_lineh = new MutableLong(num_line);
+	      MutableInt num_lineh = new MutableInt(num_line);
 	      bresenham(nx,ny,0.0,0.0,length,line,num_lineh);
-	      num_line = num_lineh.longValue();
-	      width_r[(int) j] = width_l[(int) j] = 0;
+	      num_line = num_lineh.intValue();
+	      width_r[ j] = width_l[ j] = 0;
 	      /* Look on both sides of the line. */
 	      for (dir=-1; dir<=1; dir+=2) {
 	        for (k=0; k<num_line; k++) {
-	          x = LinesUtil.BR(r+dir*line[(int) k].x,height);
-	          y = LinesUtil.BC(c+dir*line[(int) k].y,width);
-	          i1 = grad[(int) LinesUtil.LINCOOR(LinesUtil.BR(x-1,height),LinesUtil.BC(y-1,width),width)];
-	          i2 = grad[(int) LinesUtil.LINCOOR(LinesUtil.BR(x-1,height),y,width)];
-	          i3 = grad[(int) LinesUtil.LINCOOR(LinesUtil.BR(x-1,height),LinesUtil.BC(y+1,width),width)];
-	          i4 = grad[(int) LinesUtil.LINCOOR(x,LinesUtil.BC(y-1,width),width)];
-	          i5 = grad[(int) LinesUtil.LINCOOR(x,y,width)];
-	          i6 = grad[(int) LinesUtil.LINCOOR(x,LinesUtil.BC(y+1,width),width)];
-	          i7 = grad[(int) LinesUtil.LINCOOR(LinesUtil.BR(x+1,height),LinesUtil.BC(y-1,width),width)];
-	          i8 = grad[(int) LinesUtil.LINCOOR(LinesUtil.BR(x+1,height),y,width)];
-	          i9 = grad[(int) LinesUtil.LINCOOR(LinesUtil.BR(x+1,height),LinesUtil.BC(y+1,width),width)];
+	          x = LinesUtil.BR(r+dir*line[ k].x,height);
+	          y = LinesUtil.BC(c+dir*line[ k].y,width);
+	          i1 = grad[ LinesUtil.LINCOOR(LinesUtil.BR(x-1,height),LinesUtil.BC(y-1,width),width)];
+	          i2 = grad[ LinesUtil.LINCOOR(LinesUtil.BR(x-1,height),y,width)];
+	          i3 = grad[ LinesUtil.LINCOOR(LinesUtil.BR(x-1,height),LinesUtil.BC(y+1,width),width)];
+	          i4 = grad[ LinesUtil.LINCOOR(x,LinesUtil.BC(y-1,width),width)];
+	          i5 = grad[ LinesUtil.LINCOOR(x,y,width)];
+	          i6 = grad[ LinesUtil.LINCOOR(x,LinesUtil.BC(y+1,width),width)];
+	          i7 = grad[ LinesUtil.LINCOOR(LinesUtil.BR(x+1,height),LinesUtil.BC(y-1,width),width)];
+	          i8 = grad[ LinesUtil.LINCOOR(LinesUtil.BR(x+1,height),y,width)];
+	          i9 = grad[ LinesUtil.LINCOOR(LinesUtil.BR(x+1,height),LinesUtil.BC(y+1,width),width)];
 	          t1 = i1+i2+i3;
 	          t2 = i4+i5+i6;
 	          t3 = i7+i8+i9;
@@ -454,7 +454,7 @@ public class Width {
 	            a = 2.0*(drr*n1*n1+drc*n1*n2+dcc*n2*n2);
 	            b = dr*n1+dc*n2;
 	            MutableDouble th = new MutableDouble(t);
-	            MutableLong numh = new MutableLong(num);
+	            MutableInt numh = new MutableInt(num);
 	            p.solve_linear(a,b,th,numh);
 	            t = th.getValue();
 	            num = numh.getValue();
@@ -465,19 +465,19 @@ public class Width {
 	                /* Project the maximum point position perpendicularly onto the
 	                   search line. */
 	                a = 1;
-	                b = nx*(px-(r+dir*line[(int) k].x+p1))+ny*(py-(c+dir*line[(int) k].y+p2));
+	                b = nx*(px-(r+dir*line[ k].x+p1))+ny*(py-(c+dir*line[ k].y+p2));
 	                th = new MutableDouble(t);
-		            numh = new MutableLong(num);
+		            numh = new MutableInt(num);
 		            p.solve_linear(a,b,th,numh);
 		            t = th.getValue();
 		            num = numh.getValue();
 	                d = (-i1+2*i2-i3+2*i4+5*i5+2*i6-i7+2*i8-i9)/9;
 	                if (dir == 1) {
-	                  grad_r[(int) j] = d+p1*dr+p2*dc+p1*p1*drr+p1*p2*drc+p2*p2*dcc;
-	                  width_r[(int) j] = Math.abs(t);
+	                  grad_r[ j] = d+p1*dr+p2*dc+p1*p1*drr+p1*p2*drc+p2*p2*dcc;
+	                  width_r[ j] = Math.abs(t);
 	                } else {
-	                  grad_l[(int) j] = d+p1*dr+p2*dc+p1*p1*drr+p1*p2*drc+p2*p2*dcc;
-	                  width_l[(int) j] = Math.abs(t);
+	                  grad_l[ j] = d+p1*dr+p2*dc+p1*p1*drr+p1*p2*drc+p2*p2*dcc;
+	                  width_l[ j] = Math.abs(t);
 	                }
 	                break;
 	              }

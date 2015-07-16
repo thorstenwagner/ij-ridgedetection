@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -26,7 +26,7 @@ public class Options {
 	  double sigma;
 	  double low;
 	  double high;
-	  long   mode;
+	  int   mode;
 	  boolean   correct;
 	  boolean   width;
 	  boolean   extend;
@@ -34,7 +34,7 @@ public class Options {
 	  boolean   encapsulated;
 	  boolean   image;
 	  
-	  public Options(double sigma, double low, double high, long mode, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image) {
+	  public Options(double sigma, double low, double high, int mode, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image) {
 		// TODO Auto-generated constructor stub
 		  this.sigma = sigma;
 		  this.low = low;
@@ -72,11 +72,11 @@ public class Options {
 		this.high = high;
 	}
 
-	public long getMode() {
+	public int getMode() {
 		return mode;
 	}
 
-	public void setMode(long mode) {
+	public void setMode(int mode) {
 		this.mode = mode;
 	}
 

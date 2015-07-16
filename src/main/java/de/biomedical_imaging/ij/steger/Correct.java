@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -998,7 +998,7 @@ public class Correct {
 	   bilinear interpolation from the table ctable. */
 	static boolean line_corrections(double sigma, double w_est, double r_est, MutableDouble w, MutableDouble h, MutableDouble correct, MutableDouble w_strong, MutableDouble w_weak)
 	{
-	  long   i_we,i_re;
+	  int   i_we,i_re;
 	  boolean   is_valid;
 	  double a,b;
 
@@ -1011,22 +1011,22 @@ public class Correct {
 	    w_weak.setValue(0);
 	    return true;
 	  }
-	  i_we = (long) Math.floor((w_est-2)*10);
-	  i_re = (long) Math.floor(r_est*20);
+	  i_we = (int)Math.floor((w_est-2)*10);
+	  i_re = (int)Math.floor(r_est*20);
 	  if (i_we == 40)
 	    i_we = 39;
 	  if (i_re == 20)
 	    i_re = 19;
-	  is_valid = getCTable((int)i_re, (int)i_we).is_valid && getCTable((int)i_re,(int)(i_we+1)).is_valid &&
-			  getCTable((int) (i_re+1),(int) i_we).is_valid && getCTable((int) (i_re+1),(int) (i_we+1)).is_valid;
+	  is_valid = getCTable(i_re, i_we).is_valid && getCTable(i_re,(i_we+1)).is_valid &&
+			  getCTable( (i_re+1), i_we).is_valid && getCTable( (i_re+1), (i_we+1)).is_valid;
 	  a = (w_est-2)*10-i_we;
 	  b = r_est*20-i_re;
 	  
-	  w.setValue(BILINEAR(a, b, (int)i_re, (int)i_we, 0)*sigma);
-	  h.setValue(BILINEAR(a, b, (int)i_re, (int)i_we, 1));
-	  correct.setValue(BILINEAR(a, b, (int)i_re, (int)i_we, 2)*sigma);
-	  w_strong.setValue(BILINEAR(a, b, (int)i_re, (int)i_we, 3)*sigma);
-	  w_weak.setValue(BILINEAR(a, b, (int)i_re, (int)i_we, 4)*sigma);
+	  w.setValue(BILINEAR(a, b, i_re, i_we, 0)*sigma);
+	  h.setValue(BILINEAR(a, b, i_re, i_we, 1));
+	  correct.setValue(BILINEAR(a, b, i_re, i_we, 2)*sigma);
+	  w_strong.setValue(BILINEAR(a, b, i_re, i_we, 3)*sigma);
+	  w_weak.setValue(BILINEAR(a, b, i_re, i_we, 4)*sigma);
 	  
 	  return !is_valid;
 	}

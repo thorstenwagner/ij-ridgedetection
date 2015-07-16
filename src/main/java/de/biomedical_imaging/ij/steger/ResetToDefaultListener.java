@@ -16,6 +16,7 @@ public class ResetToDefaultListener implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		
 		//Set settings to default
+		
 		TextField textLineWidth = (TextField) gd.getNumericFields().get(0);
 		textLineWidth.setText("" + IJ.d2s(Lines_.lineWidthDefault, 2));
 		textLineWidth.setEditable(true);

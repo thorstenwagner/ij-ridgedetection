@@ -23,6 +23,6 @@
 package de.biomedical_imaging.ij.steger;
 
 public class Region {
-	long  num;      /* number of chords */     
+	int  num;      /* number of chords */     
 	Chord[] rl;      /* array of chords */
 }

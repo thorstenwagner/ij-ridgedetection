@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    aint with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 /* 	Changes Made by R. Balasubramanian for incorporating the the detect lines code to incorporate
@@ -25,11 +25,11 @@ package de.biomedical_imaging.ij.steger;
    needed to split lines at junction points. */
 public class Junction implements Comparable<Junction> {
 	 /** Index of line that is already processed */
-	 long  cont1; 
+	 int  cont1; 
 	 /** Index of line tnat runs into cont1 */
-	 long  cont2; 
+	 int  cont2; 
 	 /** Index of the junction point in cont1 */
-	 long  pos; 
+	 int  pos; 
 	 /** x-(row-)coordinate of the junction point */
 	 float x;     
 	 /** y-(col-)coordinate of the junction point */
@@ -42,7 +42,7 @@ public class Junction implements Comparable<Junction> {
 
 	@Override
 	public int compareTo(Junction o) {
-		return (int) (((this.cont1 - o.cont1) != 0) ? this.cont1 - o.cont1
+		return  (((this.cont1 - o.cont1) != 0) ? this.cont1 - o.cont1
 				: this.pos - o.pos);
 	}
 	

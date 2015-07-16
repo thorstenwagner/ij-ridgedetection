@@ -24,6 +24,7 @@ import java.awt.AWTEvent;
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Polygon;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +48,7 @@ import ij.gui.TextRoi;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ExtendedPlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
+import ij.plugin.frame.RoiManager;
 import ij.process.FloatPolygon;
 import ij.process.ImageProcessor;
 
@@ -76,6 +78,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	boolean showJunctionPoints = false;
 	boolean isPreview = false;
 	boolean displayResults = true;
+	boolean addToRoiManager = true;
 	boolean contrastOrLineWidthChangedOnce = false;
 	boolean doStack = false;
 	boolean showIDs = false;
@@ -109,10 +112,13 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	public int setup(String arg, ImagePlus imp) {
 		if (arg.equals("final")) {
 			sortLists();
-			assignLinesToJunctions();
+			//assignLinesToJunctions();
 			displayContours();
 			if(displayResults){
 				createResultsTable(true);
+			}
+			if(addToRoiManager){
+				addToRoiManager();
 			}
 			return DONE;
 
@@ -155,8 +161,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		for (Junctions js : resultJunction) {
 			Lines c = getContoursByFrame(js.getFrame());
 			for (Junction j : js) {
-				j.lineCont1 = c.get((int) j.cont1);
-				j.lineCont2 = c.get((int) j.cont2);
+				j.lineCont1 = c.get( j.cont1);
+				j.lineCont2 = c.get( j.cont2);
 			}
 		}
 	}
@@ -207,7 +213,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Show junction points", showJunctionPoints);
 		gd.addCheckbox("Show IDs", showIDs);
 		gd.addCheckbox("Display Results", displayResults);
-		
+		gd.addCheckbox("Add to Manager", addToRoiManager);
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
@@ -233,6 +239,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
+		addToRoiManager = gd.getNextBoolean();
 		result = new ArrayList<Lines>();
 		resultJunction = new ArrayList<Junctions>();
 		
@@ -251,6 +258,48 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 		}
 		return null;
+	}
+	
+	public void addToRoiManager(){
+		RoiManager rm = RoiManager.getInstance();
+		if(rm==null){
+			rm = new RoiManager();
+			
+		}
+		for (Lines contours : result) {
+			for (Line c : contours) {
+			
+				float[] x = c.getXCoordinates();
+				for(int j = 0; j < x.length; j++){
+					x[j] = (float) (x[j] + 0.5);
+				}
+				float[] y = c.getYCoordinates();
+				for(int j = 0; j < y.length; j++){
+					y[j] = (float) (y[j] + 0.5);
+				}
+				
+			
+				FloatPolygon p = new FloatPolygon(x, y,	c.getNumber());
+				Roi r = new PolygonRoi(p, Roi.FREELINE);
+				r.setPosition(c.getFrame());
+				r.setName("C"+c.getID());
+				
+				rm.addRoi(r);
+				
+			}
+		}
+		for (Junctions junctions : resultJunction) {
+			for (Junction j : junctions) {
+				
+				PointRoi pr = new PointRoi(j.x+0.5,j.y+0.5);
+				pr.setName("JP-C"+j.getLine1().getID()+"-C"+j.getLine2().getID());
+				pr.setPosition(j.getLine1().getFrame());
+				rm.addRoi(pr);
+			}
+		}
+		rm.setVisible(true);
+		IJ.run("Labels...", "color=white font=12 show use draw");
+		
 	}
 
 	private void createResultsTable(boolean showJunctions) {
@@ -289,7 +338,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				for (Junction j : junctions) {
 					rt2.incrementCounter();
 					rt2.addValue("Frame", junctions.getFrame());
-					rt2.addValue("Contour ID 1", j.getLine1().getID());//c.get((int) j.cont1)
+					rt2.addValue("Contour ID 1", j.getLine1().getID());//c.get( j.cont1)
 					rt2.addValue("Contour ID 2", j.getLine2().getID());
 					rt2.addValue("X", j.x);
 					rt2.addValue("Y", j.y);
@@ -314,7 +363,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				FloatPolygon polyR = new FloatPolygon();
 				FloatPolygon polyL = new FloatPolygon();
 				Line cont = result.get(k).get(i);
-				int num_points = (int) cont.num;
+				int num_points =  cont.num;
 				last_w_r = 0;
 				last_w_l = 0;
 			
@@ -355,23 +404,11 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				if(!doStack || isPreview){
 					position = imp.getCurrentSlice();
 				}
+			
 				polyRoiMitte.setPosition(position);
 				ovpoly.add(polyRoiMitte);
 				
-				//Show IDs
-				if(showIDs){
-					int posx = (int) polyMitte.xpoints[0];
-					int posy = (int) polyMitte.ypoints[0];
-					if(cont.cont_class == contour_class.cont_start_junc){
-						posx = (int) polyMitte.xpoints[polyMitte.npoints-1];
-						posy = (int) polyMitte.ypoints[polyMitte.npoints-1];
-					}
-					TextRoi tr = new TextRoi(posx , posy, ""+cont.getID());
-					tr.setCurrentFont(new Font(Font.SANS_SERIF, Font.PLAIN, 9));
-					tr.setIgnoreClipRect(true);
-					tr.setStrokeColor(Color.yellow);
-					ovpoly.add(tr);
-				}
+				
 				
 				
 				if (doEstimateWidth) {
@@ -392,6 +429,26 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 						polyRoiRand2.setPosition(position);
 						ovpoly.add(polyRoiRand2);
 					}
+				}
+				
+				//Show IDs
+				if(showIDs){/*
+					int posx =  polyMitte.xpoints[0];
+					int posy =  polyMitte.ypoints[0];
+					if(cont.cont_class == contour_class.cont_start_junc){
+						posx =  polyMitte.xpoints[polyMitte.npoints-1];
+						posy =  polyMitte.ypoints[polyMitte.npoints-1];
+					}
+					*/
+					
+					int posx =  (int)polyMitte.xpoints[polyMitte.npoints/2];
+					int posy =  (int)polyMitte.ypoints[polyMitte.npoints/2];
+					TextRoi tr = new TextRoi(posx , posy, ""+cont.getID());
+					tr.setCurrentFont(new Font(Font.SANS_SERIF, Font.PLAIN, 9));
+					tr.setIgnoreClipRect(true);
+					tr.setStrokeColor(Color.orange);
+					tr.setPosition(resultJunction.get(k).getFrame());
+					ovpoly.add(tr);
 				}
 			}
 		}
@@ -419,7 +476,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			imp.setOverlay(ovpoly);
 		}
 	}
-
+	
+	
 	@Override
 	public void setNPasses(int nPasses) {
 		IJ.showProgress(nPasses, imp.getNSlices());
@@ -435,20 +493,20 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		
 		double lwCand = gd.getNextNumber();
 		double diff = Math.abs(lwCand-lineWidth);
-		if (Double.isNaN(diff) || diff>0.0001) {
+		if (diff>0.0001) {
 			lineWidth = lwCand;
 			lwChanged = true;
 		}
 		double conCand = gd.getNextNumber();
 		diff = Math.abs(conCand-contrastHigh);
-		if (Double.isNaN(diff) || diff > 0.0001) {
+		if ( diff > 0.0001) {
 			contrastHigh = conCand;
 			contHighChanged = true;
 		}
 
 		conCand = gd.getNextNumber();
 		diff = Math.abs(conCand-contrastLow);
-		if (Double.isNaN(diff) || diff>0.0001) {
+		if (diff>0.0001) {
 			contrastLow = conCand;
 			contLowChanged = true;
 		}
@@ -467,10 +525,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
+		addToRoiManager = gd.getNextBoolean();
 	
 		if(lwChanged || contHighChanged || contLowChanged){
 			contrastOrLineWidthChangedOnce=true;
 		}
+	
 		if (lwChanged || contHighChanged || contLowChanged || (darklineChanged&&contrastOrLineWidthChangedOnce)) {
 			double estimatedSigma = lineWidth / (2 * Math.sqrt(3)) + 0.5;
 			TextField textSigma = (TextField) gd.getNumericFields().get(3);
@@ -510,7 +570,6 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				|| sigma < 0.4
 				|| Double.isNaN(sigma + lowerThresh + upperThresh
 						)) {
-			IJ.log("" + sigma + " " + lowerThresh + " " + upperThresh);
 			return false;
 		}
 		
