@@ -77,6 +77,7 @@ public class LinesUtil {
 	public static int BC(int col, int width) { 
 		return ((col) < 0 ? -(col) :  (col) >= width ? width - (col) + width - 2 : (col));
 	}
+	
 	               
 	public enum contour_class {
 		  cont_no_junc,    /* no end point is a junction */

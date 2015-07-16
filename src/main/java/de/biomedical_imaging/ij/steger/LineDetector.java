@@ -1,5 +1,6 @@
 package de.biomedical_imaging.ij.steger;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -330,9 +331,10 @@ public class LineDetector {
 			junction.x = junction.y;
 			junction.y = help;
 		}
-		
+
 		Junctions newJunctions = new Junctions(junctions.getFrame());
 		int[][] processed = new int[ip.getWidth()][ip.getHeight()];
+		ArrayList<Point2D> processedJunctions = new ArrayList<Point2D>();
 		for(int i = 0; i < junctions.size(); i++){
 			Junction junc = junctions.get(i);
 			Line mainLine = null;
@@ -343,8 +345,9 @@ public class LineDetector {
 			ArrayList<Integer> secondaryLinePos = new ArrayList<Integer>();
 			
 			//Verarbeite jede Junction-Position nur einmal.
-			if(processed[(int)junc.x][(int)junc.y]==0){
+			if(!processedJunctions.contains(new Point2D.Float(junc.x, junc.y))){ //processed[(int)junc.x][(int)junc.y]==0
 				processed[(int)junc.x][(int)junc.y]=1;
+				processedJunctions.add(new Point2D.Float(junc.x, junc.y));
 				
 				/*
 				 * Finde die Sekundärlinien und Hauptlinien
@@ -353,12 +356,13 @@ public class LineDetector {
 					Line l = lines.get(j);
 				
 					double[] mindist = minDistance(l, junc.x, junc.y);
-					if(mindist[0]==0){
-						if(mindist[1]==0 || mindist[1]==(l.num-1)){
+					if(mindist[0]==0){ //Wenn der Punkt auf der Linie liegt, analysiere genauer
+						
+						if(mindist[1]==0 || mindist[1]==(l.num-1)){ //Wenn der Junction-Point am Ende oder am Anfang liegt, ist es sekundäre Linie.
 							secondaryLines.add(l);
 							secondaryLineIndex.add(j);
 							secondaryLinePos.add((int)mindist[1]);
-						} else {
+						} else {			// Wenn er innerhalb der Linie liegt, ist dies die Hauptlinie.
 			
 							if(mainLine!=null){
 								if(mainLine.getID()==l.getID()){

@@ -24,6 +24,7 @@ import java.awt.AWTEvent;
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Polygon;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +48,7 @@ import ij.gui.TextRoi;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ExtendedPlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
+import ij.plugin.frame.RoiManager;
 import ij.process.FloatPolygon;
 import ij.process.ImageProcessor;
 
@@ -76,6 +78,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	boolean showJunctionPoints = false;
 	boolean isPreview = false;
 	boolean displayResults = true;
+	boolean addToRoiManager = true;
 	boolean contrastOrLineWidthChangedOnce = false;
 	boolean doStack = false;
 	boolean showIDs = false;
@@ -113,6 +116,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			displayContours();
 			if(displayResults){
 				createResultsTable(true);
+			}
+			if(addToRoiManager){
+				addToRoiManager();
 			}
 			return DONE;
 
@@ -207,7 +213,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Show junction points", showJunctionPoints);
 		gd.addCheckbox("Show IDs", showIDs);
 		gd.addCheckbox("Display Results", displayResults);
-		
+		gd.addCheckbox("Add to Manager", addToRoiManager);
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
@@ -233,6 +239,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
+		addToRoiManager = gd.getNextBoolean();
 		result = new ArrayList<Lines>();
 		resultJunction = new ArrayList<Junctions>();
 		
@@ -251,6 +258,48 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 		}
 		return null;
+	}
+	
+	public void addToRoiManager(){
+		RoiManager rm = RoiManager.getInstance();
+		if(rm==null){
+			rm = new RoiManager();
+			
+		}
+		for (Lines contours : result) {
+			for (Line c : contours) {
+			
+				float[] x = c.getXCoordinates();
+				for(int j = 0; j < x.length; j++){
+					x[j] = (float) (x[j] + 0.5);
+				}
+				float[] y = c.getYCoordinates();
+				for(int j = 0; j < y.length; j++){
+					y[j] = (float) (y[j] + 0.5);
+				}
+				
+			
+				FloatPolygon p = new FloatPolygon(x, y,	c.getNumber());
+				Roi r = new PolygonRoi(p, Roi.FREELINE);
+				r.setPosition(c.getFrame());
+				r.setName("C"+c.getID());
+				
+				rm.addRoi(r);
+				
+			}
+		}
+		for (Junctions junctions : resultJunction) {
+			for (Junction j : junctions) {
+				
+				PointRoi pr = new PointRoi(j.x+0.5,j.y+0.5);
+				pr.setName("JP-C"+j.getLine1().getID()+"-C"+j.getLine2().getID());
+				pr.setPosition(j.getLine1().getFrame());
+				rm.addRoi(pr);
+			}
+		}
+		rm.setVisible(true);
+		IJ.run("Labels...", "color=white font=12 show use draw");
+		
 	}
 
 	private void createResultsTable(boolean showJunctions) {
@@ -476,6 +525,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
+		addToRoiManager = gd.getNextBoolean();
 	
 		if(lwChanged || contHighChanged || contLowChanged){
 			contrastOrLineWidthChangedOnce=true;
