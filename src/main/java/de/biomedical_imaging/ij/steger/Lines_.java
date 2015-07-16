@@ -298,7 +298,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			}
 		}
 		rm.setVisible(true);
-		IJ.run("Labels...", "color=white font=12 show use draw");
+		rm.runCommand("UseNames", "true");
 		
 	}
 
