@@ -73,6 +73,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	boolean isPreview = false;
 	boolean displayResults = true;
 	boolean addToRoiManager = true;
+	OverlapOption overlapOption = OverlapOption.NONE;
 	boolean contrastOrLineWidthChangedOnce = false;
 	boolean doStack = false;
 	boolean showIDs = false;
@@ -199,6 +200,13 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Verbose mode", verbose);
 		gd.addCheckbox("Display Results", displayResults);
 		gd.addCheckbox("Add to Manager", addToRoiManager);
+
+		final String[] overlap = new String[OverlapOption.values().length];
+		for (int i=0; i<overlap.length; i++) {
+			overlap[i] = OverlapOption.values()[i].name();
+		}
+
+		gd.addChoice("Method for overlap resolution", overlap, overlapOption.name());
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
@@ -226,6 +234,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		verbose = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
+		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
 		result = new ArrayList<Lines>();
 		resultJunction = new ArrayList<Junctions>();
 		
@@ -570,7 +579,17 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 		LineDetector detect = new LineDetector();
 		detect.bechatty = verbose;
-		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine));
+		OverlapResolver resolver = null;
+
+		switch (overlapOption) {
+			default:
+			case NONE:
+				break;
+			case SLOPE: resolver = new SlopeOverlapResolver();
+				break;
+		}
+
+		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, resolver));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
 

@@ -74,16 +74,24 @@ public class LineDetector {
 			double upperThresh, double lowerThresh, boolean isDarkLine,
 			boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine) {
-		this.ip = ip;
-		this.isDarkLine = isDarkLine;
-		this.doCorrectPosition = doCorrectPosition;
-		this.doEstimateWidth = doEstimateWidth;
-		this.doExtendLine = doExtendLine;
-		junctions = new Junctions(ip.getSliceNumber());
-		lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
-				ip.getWidth(), ip, junctions);
-		return lines;
+		return detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine,
+			doCorrectPosition, doEstimateWidth, doExtendLine, null);
 	}
+
+	public Lines detectLines(ImageProcessor ip, double sigma,
+		double upperThresh, double lowerThresh, boolean isDarkLine,
+		boolean doCorrectPosition, boolean doEstimateWidth,
+		boolean doExtendLine, OverlapResolver overlapResolver) {
+	this.ip = ip;
+	this.isDarkLine = isDarkLine;
+	this.doCorrectPosition = doCorrectPosition;
+	this.doEstimateWidth = doEstimateWidth;
+	this.doExtendLine = doExtendLine;
+	junctions = new Junctions(ip.getSliceNumber());
+	lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
+			ip.getWidth(), ip, junctions, overlapResolver);
+	return lines;
+}
 	
 	
 	private void assignLinesToJunctions(Lines lines, Junctions junctions){
@@ -537,7 +545,7 @@ public class LineDetector {
 	}
 
 	private Lines get_lines(double sigma, double high, double low, int rows,
-			int cols, ImageProcessor in_img, Junctions resultJunction) {
+			int cols, ImageProcessor in_img, Junctions resultJunction, OverlapResolver overlapResolver) {
 		FloatProcessor image;
 		Lines contours = new Lines(in_img.getSliceNumber());
 		int num_cont = 0;
@@ -579,7 +587,7 @@ public class LineDetector {
 		addAdditionalJunctionPointsAndLines(contours,resultJunction);
 		Collections.sort(resultJunction);
 		junctions = resultJunction;
-		
+
 		/*
 		 * RECONSRUCTION OF CONTOUR CLASS
 		 */
@@ -596,7 +604,7 @@ public class LineDetector {
 				IJ.log("");		
 			}
 		}
-		
+
 	    //Reconstruction contour class
 		for(int i = 0; i < junctions.size(); i++){
 			Junction j = junctions.get(i);
@@ -606,6 +614,8 @@ public class LineDetector {
 			j.getLine2().setContourClass(reconstructContourClass(j.getLine2(),j.getLine2().getStartOrdEndPosition(x, y)));
 		}
 		
+
+		if (overlapResolver != null) contours = overlapResolver.resolve(contours, junctions, bechatty);
 		return contours;
 
 	}
