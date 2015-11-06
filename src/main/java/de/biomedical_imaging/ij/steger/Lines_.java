@@ -76,6 +76,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	boolean contrastOrLineWidthChangedOnce = false;
 	boolean doStack = false;
 	boolean showIDs = false;
+	boolean verbose = false;
 	private Options usedOptions = null;
 	private static Lines_ instance = null;
 	
@@ -195,6 +196,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Extend line", doExtendLine);
 		gd.addCheckbox("Show junction points", showJunctionPoints);
 		gd.addCheckbox("Show IDs", showIDs);
+		gd.addCheckbox("Verbose mode", verbose);
 		gd.addCheckbox("Display Results", displayResults);
 		gd.addCheckbox("Add to Manager", addToRoiManager);
 				
@@ -221,6 +223,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		doExtendLine = gd.getNextBoolean();
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
+		verbose = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
 		result = new ArrayList<Lines>();
@@ -566,6 +569,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		}
 
 		LineDetector detect = new LineDetector();
+		detect.bechatty = verbose;
 		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
