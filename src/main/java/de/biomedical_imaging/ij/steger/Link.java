@@ -22,8 +22,6 @@
 
 package de.biomedical_imaging.ij.steger;
 
-import ij.IJ;
-
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 

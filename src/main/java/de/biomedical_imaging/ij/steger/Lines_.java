@@ -148,17 +148,6 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		return DOES_8G + DOES_STACKS + FINAL_PROCESSING + PARALLELIZE_STACKS;
 	}
 	
-	private void assignLinesToJunctions(){
-		
-		for (Junctions js : resultJunction) {
-			Lines c = getContoursByFrame(js.getFrame());
-			for (Junction j : js) {
-				j.lineCont1 = c.get( j.cont1);
-				j.lineCont2 = c.get( j.cont2);
-			}
-		}
-	}
-	
 	private void sortLists(){
 		
 		Collections.sort(result, new Comparator<Lines>() {
@@ -240,16 +229,6 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		doStack = (labels!=DOES_8G + FINAL_PROCESSING
 				+ PARALLELIZE_STACKS);
 		return labels;
-	}
-
-	private Lines getContoursByFrame(int frame) {
-		for (Lines contours : result) {
-			if (contours.getFrame() == frame) {
-				return contours;
-			}
-
-		}
-		return null;
 	}
 	
 	public void addToRoiManager(){
@@ -455,7 +434,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				}
 
 				PointRoi pointroi = new PointRoi(pointpoly);
-				pointroi.setHideLabels(true);
+				pointroi.setShowLabels(false);
 				int position = resultJunction.get(k).getFrame();
 				if(!doStack || isPreview){
 					position = imp.getCurrentSlice();

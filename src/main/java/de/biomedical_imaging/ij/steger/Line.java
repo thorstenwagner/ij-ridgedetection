@@ -22,8 +22,6 @@
 
 package de.biomedical_imaging.ij.steger;
 
-import ij.IJ;
-
 /** This class holds one extracted line.  The field num contains the number of
    points in the line.  The coordinates of the line points are given in the
    arrays row and col.  The array angle contains the direction of the normal
