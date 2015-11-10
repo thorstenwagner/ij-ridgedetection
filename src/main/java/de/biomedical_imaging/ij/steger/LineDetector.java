@@ -75,13 +75,13 @@ public class LineDetector {
 			boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine) {
 		return detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine,
-			doCorrectPosition, doEstimateWidth, doExtendLine, null);
+			doCorrectPosition, doEstimateWidth, doExtendLine, OverlapOption.NONE);
 	}
 
 	public Lines detectLines(ImageProcessor ip, double sigma,
 		double upperThresh, double lowerThresh, boolean isDarkLine,
 		boolean doCorrectPosition, boolean doEstimateWidth,
-		boolean doExtendLine, OverlapResolver overlapResolver) {
+		boolean doExtendLine, OverlapOption overlapOption) {
 	this.ip = ip;
 	this.isDarkLine = isDarkLine;
 	this.doCorrectPosition = doCorrectPosition;
@@ -89,7 +89,7 @@ public class LineDetector {
 	this.doExtendLine = doExtendLine;
 	junctions = new Junctions(ip.getSliceNumber());
 	lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
-			ip.getWidth(), ip, junctions, overlapResolver);
+			ip.getWidth(), ip, junctions, overlapOption);
 	return lines;
 }
 	
@@ -545,18 +545,28 @@ public class LineDetector {
 	}
 
 	private Lines get_lines(double sigma, double high, double low, int rows,
-			int cols, ImageProcessor in_img, Junctions resultJunction, OverlapResolver overlapResolver) {
+			int cols, ImageProcessor in_img, Junctions resultJunction, OverlapOption overlapOption) {
 		FloatProcessor image;
 		Lines contours = new Lines(in_img.getSliceNumber());
 		int num_cont = 0;
 		opts = new Options(-1.0, -1.0, -1.0, isDarkLine ? LinesUtil.MODE_DARK
 				: LinesUtil.MODE_LIGHT, doCorrectPosition, doEstimateWidth,
-				doExtendLine, false, false, false);
+				doExtendLine, false, false, false, overlapOption);
 
 		opts.sigma = sigma;
 		opts.high = high;
 		opts.low = low;
 		check_sigma(opts.sigma, cols, rows);
+
+		OverlapResolver resolver = null;
+
+		switch (overlapOption) {
+			default:
+			case NONE:
+				break;
+			case SLOPE: resolver = new SlopeOverlapResolver();
+				break;
+		}
 
 		int i2, j2;
 		// //(float *) malloc(rows*cols*sizeof(float));
@@ -615,7 +625,7 @@ public class LineDetector {
 		}
 		
 
-		if (overlapResolver != null) contours = overlapResolver.resolve(contours, junctions, bechatty);
+		if (resolver != null) contours = resolver.resolve(contours, junctions, bechatty);
 		return contours;
 
 	}

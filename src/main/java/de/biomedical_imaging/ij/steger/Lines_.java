@@ -579,17 +579,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 		LineDetector detect = new LineDetector();
 		detect.bechatty = verbose;
-		OverlapResolver resolver = null;
 
-		switch (overlapOption) {
-			default:
-			case NONE:
-				break;
-			case SLOPE: resolver = new SlopeOverlapResolver();
-				break;
-		}
-
-		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, resolver));
+		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
 
