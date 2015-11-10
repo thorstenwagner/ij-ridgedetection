@@ -22,6 +22,8 @@
 
 package de.biomedical_imaging.ij.steger;
 
+import ij.IJ;
+
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -793,7 +795,7 @@ public class Link {
 				cont[ num_cont].asymmetry = null;
 				cont[ num_cont].intensity = null;
 				cont[ num_cont].num = num_pnt;
-				cont[ num_cont].cont_class = cls;
+				cont[ num_cont].setContourClass(cls);
 				num_cont++;
 			} else {
 				/*
@@ -835,7 +837,7 @@ public class Link {
 				num_pnt = tmp_cont.num;
 				if (num_pnt == 1)
 					continue;
-				if (tmp_cont.cont_class == LinesUtil.contour_class.cont_closed)
+				if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_closed)
 					continue;
 				trow = tmp_cont.row;
 				tcol = tmp_cont.col;
@@ -852,8 +854,8 @@ public class Link {
 					 */
 					if (it == -1) {
 						/* Start point of the line. */
-						if (tmp_cont.cont_class == LinesUtil.contour_class.cont_start_junc
-								|| tmp_cont.cont_class == LinesUtil.contour_class.cont_both_junc)
+						if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_start_junc
+								|| tmp_cont.getContourClass() == LinesUtil.contour_class.cont_both_junc)
 							continue;
 						dx = trow[1] - trow[0];
 						dy = tcol[1] - tcol[0];
@@ -874,8 +876,8 @@ public class Link {
 						response = tresp[0];
 					} else {
 						/* End point of the line. */
-						if (tmp_cont.cont_class == LinesUtil.contour_class.cont_end_junc
-								|| tmp_cont.cont_class == LinesUtil.contour_class.cont_both_junc)
+						if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_end_junc
+								|| tmp_cont.getContourClass() == LinesUtil.contour_class.cont_both_junc)
 							continue;
 						dx = trow[ (num_pnt - 1)]
 								- trow[ (num_pnt - 2)];
@@ -972,8 +974,9 @@ public class Link {
 							 * This should not happen... But better safe than
 							 * sorry...
 							 */
-							if (mindist > 3.0)
+							if (mindist > 3.0){
 								break;
+							}
 							extx[ num_add] = cont[ m].row[ j];
 							exty[ num_add] = cont[ m].col[ j];
 							end_resp = cont[ m].response[ j];
@@ -1085,15 +1088,15 @@ public class Link {
 						 */
 						if (j > 0 && j < cont[ m].num - 1) {
 							if (it == -1) {
-								if (tmp_cont.cont_class == LinesUtil.contour_class.cont_end_junc)
-									tmp_cont.cont_class = LinesUtil.contour_class.cont_both_junc;
+								if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_end_junc)
+									tmp_cont.setContourClass(LinesUtil.contour_class.cont_both_junc);
 								else
-									tmp_cont.cont_class = LinesUtil.contour_class.cont_start_junc;
+									tmp_cont.setContourClass(LinesUtil.contour_class.cont_start_junc);
 							} else {
-								if (tmp_cont.cont_class == LinesUtil.contour_class.cont_start_junc)
-									tmp_cont.cont_class = LinesUtil.contour_class.cont_both_junc;
+								if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_start_junc)
+									tmp_cont.setContourClass(LinesUtil.contour_class.cont_both_junc);
 								else
-									tmp_cont.cont_class = LinesUtil.contour_class.cont_end_junc;
+									tmp_cont.setContourClass(LinesUtil.contour_class.cont_end_junc);
 							}
 							junc[ num_junc].cont1 = m;
 							junc[ num_junc].cont2 = i;
@@ -1109,6 +1112,7 @@ public class Link {
 						}
 					}
 				}
+				
 			}
 		}
 
@@ -1147,7 +1151,7 @@ public class Link {
 					tmp_cont.response[ l] = tresp[ pos];
 				}
 				/* Modify contour class. */
-				tmp_cont.cont_class = LinesUtil.contour_class.cont_both_junc;
+				tmp_cont.setContourClass(LinesUtil.contour_class.cont_both_junc);
 
 			} else {
 				/* Otherwise the line has to be split. */
@@ -1200,19 +1204,19 @@ public class Link {
 					cont[ num_cont].num = num_pnt;
 					/* Modify contour class. */
 					if (l == 0) {
-						if (tmp_cont.cont_class == LinesUtil.contour_class.cont_start_junc
-								|| tmp_cont.cont_class == LinesUtil.contour_class.cont_both_junc)
-							cont[ num_cont].cont_class = LinesUtil.contour_class.cont_both_junc;
+						if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_start_junc
+								|| tmp_cont.getContourClass() == LinesUtil.contour_class.cont_both_junc)
+							cont[ num_cont].setContourClass(LinesUtil.contour_class.cont_both_junc);
 						else
-							cont[ num_cont].cont_class = LinesUtil.contour_class.cont_end_junc;
+							cont[ num_cont].setContourClass(LinesUtil.contour_class.cont_end_junc);
 					} else if (l == k) {
-						if (tmp_cont.cont_class == LinesUtil.contour_class.cont_end_junc
-								|| tmp_cont.cont_class == LinesUtil.contour_class.cont_both_junc)
-							cont[ num_cont].cont_class = LinesUtil.contour_class.cont_both_junc;
+						if (tmp_cont.getContourClass() == LinesUtil.contour_class.cont_end_junc
+								|| tmp_cont.getContourClass()== LinesUtil.contour_class.cont_both_junc)
+							cont[ num_cont].setContourClass(LinesUtil.contour_class.cont_both_junc);
 						else
-							cont[ num_cont].cont_class = LinesUtil.contour_class.cont_start_junc;
+							cont[ num_cont].setContourClass(LinesUtil.contour_class.cont_start_junc);
 					} else {
-						cont[ num_cont].cont_class = LinesUtil.contour_class.cont_both_junc;
+						cont[ num_cont].setContourClass(LinesUtil.contour_class.cont_both_junc);
 					}
 					num_cont++;
 				}
@@ -1258,12 +1262,13 @@ public class Link {
 		}
 
 		for (Line c : cont) {
-			if (c!=null && c.cont_class != null) {
+			if (c!=null && c.getContourClass()!= null) {
 				c.setFrame(contours.getFrame());
 				contours.add(c);
 
 			}
 		}
+	
 		for (Junction jun : junc) {
 			if (jun != null && !(jun.cont1 == 0 && jun.cont2 == 0)) {
 				junctions.add(jun);

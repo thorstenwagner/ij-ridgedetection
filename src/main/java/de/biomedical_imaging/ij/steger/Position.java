@@ -255,9 +255,7 @@ public class Position {
 	  Link l = new Link();
 	  l.compute_contours(ismax,ev,n1,n2,p1,p2,k[0],k[1],contours,num_result,sigma,
 	                   extend_lines,mode,low,high,width,height,junctions);
-	  /*
-	   * HIER MÜSSEN DIE KORREKTUR METHODEN HIN!
-	   */
+
 	  Width w = new Width();
 	  if (compute_width)
 	    w.compute_line_width(k[0],k[1],width,height,sigma,mode,correct_pos,contours,

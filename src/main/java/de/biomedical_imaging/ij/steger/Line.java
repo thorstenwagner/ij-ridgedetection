@@ -22,6 +22,8 @@
 
 package de.biomedical_imaging.ij.steger;
 
+import ij.IJ;
+
 /** This class holds one extracted line.  The field num contains the number of
    points in the line.  The coordinates of the line points are given in the
    arrays row and col.  The array angle contains the direction of the normal
@@ -69,7 +71,7 @@ public class Line {
 	float[] intensity;          
 	
 	/** contour class (e.g., closed, no_junc) */
-	LinesUtil.contour_class cont_class; 
+	private LinesUtil.contour_class cont_class; 
 	
 	static int idCounter = 0;
 	private int id;
@@ -78,6 +80,15 @@ public class Line {
 		// TODO Auto-generated constructor stub
 		assignID();
 		
+	}
+	
+	public LinesUtil.contour_class getContourClass(){
+		
+		return cont_class;
+	}
+	
+	public void setContourClass(LinesUtil.contour_class cont_class){
+		this.cont_class = cont_class;
 	}
 	
 	public void setFrame(int frame){

@@ -268,6 +268,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				rm.addRoi(pr);
 			}
 		}
+		
 		rm.setVisible(true);
 		rm.runCommand("UseNames", "true");
 		
@@ -296,7 +297,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 						rt.addValue("Line width", IJ.d2s(c.width_l[i]+c.width_r[i],1));
 						rt.addValue("Angle of normal", IJ.d2s(c.angle[i],2));
 					}
-					rt.addValue("Class", c.cont_class.toString().substring(5));
+					rt.addValue("Class", c.getContourClass().toString().substring(5));
 				}
 			}
 		}
@@ -311,8 +312,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 					rt2.addValue("Frame", junctions.getFrame());
 					rt2.addValue("Contour ID 1", j.getLine1().getID());//c.get( j.cont1)
 					rt2.addValue("Contour ID 2", j.getLine2().getID());
-					rt2.addValue("X", j.x);
-					rt2.addValue("Y", j.y);
+					rt2.addValue("X", IJ.d2s(j.x,1));
+					rt2.addValue("Y", IJ.d2s(j.y,1));
 				}
 			}
 			rt2.show("Junctions");

@@ -241,13 +241,13 @@ public class Width {
 	    /* Do not correct the position of a junction point if its width is found
 	       by interpolation, i.e., if the position could be corrected differently
 	       for each junction point, thereby destroying the junction. */
-	    correct_start = ((cont.cont_class == LinesUtil.contour_class.cont_no_junc ||
-	                      cont.cont_class == LinesUtil.contour_class.cont_end_junc ||
-	                      cont.cont_class == LinesUtil.contour_class.cont_closed) &&
+	    correct_start = ((cont.getContourClass() == LinesUtil.contour_class.cont_no_junc ||
+	                      cont.getContourClass() == LinesUtil.contour_class.cont_end_junc ||
+	                      cont.getContourClass() == LinesUtil.contour_class.cont_closed) &&
 	                     (width_r[0] > 0 && width_l[0] > 0));
-	    correct_end = ((cont.cont_class == LinesUtil.contour_class.cont_no_junc ||
-	                    cont.cont_class == LinesUtil.contour_class.cont_start_junc ||
-	                    cont.cont_class == LinesUtil.contour_class.cont_closed) &&
+	    correct_end = ((cont.getContourClass() == LinesUtil.contour_class.cont_no_junc ||
+	                    cont.getContourClass() == LinesUtil.contour_class.cont_start_junc ||
+	                    cont.getContourClass() == LinesUtil.contour_class.cont_closed) &&
 	                   (width_r[ (num_points-1)] > 0 && width_l[ (num_points-1)] > 0));
 	    /* Calculate the true width and assymetry, and its corresponding
 	       correction for each line point. */
@@ -407,6 +407,7 @@ public class Width {
 	  for (i=0; i<num_contours.getValue(); i++) {
 	    cont = contours.get(i);
 	    num_points = cont.num;
+	    
 	    for (j=0; j<num_points; j++) {
 	      px = cont.row[ j];
 	      py = cont.col[ j];
