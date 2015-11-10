@@ -18,6 +18,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
  
 	<name>Ridge Detection Plugin for ImageJ</name>
 	<url>https://github.com/jumpfunky/ij-ridgedetection</url>
+	<inceptionYear>2014</inceptionYear>
 	
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -53,4 +54,17 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		</developer>
 	</developers>
 	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<licenseName>gpl_v2</licenseName>
+					<organizationName>Thorsten Wagner (ImageJ java plugin), 1996-1998 Carsten Steger (original C code), 1999 R. Balasubramanian (detect lines code to incorporate within GRASP)</organizationName>
+					<projectName>Ridge Detection plugin for ImageJ</projectName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
