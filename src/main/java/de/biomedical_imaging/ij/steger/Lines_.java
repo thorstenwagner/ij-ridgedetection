@@ -303,6 +303,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		}
 
 		rt.show("Contours");
+		
 		if (showJunctions) {
 			ResultsTable rt2 = new ResultsTable();
 			rt2.setPrecision(0);
