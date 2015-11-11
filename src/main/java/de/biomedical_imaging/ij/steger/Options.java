@@ -32,8 +32,9 @@ public class Options {
 	  boolean   postscript;
 	  boolean   encapsulated;
 	  boolean   image;
+		OverlapOption overlap;
 	  
-	  public Options(double sigma, double low, double high, int mode, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image) {
+	  public Options(double sigma, double low, double high, int mode, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image, OverlapOption overlap) {
 		// TODO Auto-generated constructor stub
 		  this.sigma = sigma;
 		  this.low = low;
@@ -45,6 +46,7 @@ public class Options {
 		  this.postscript = postscript;
 		  this.encapsulated = encapsulated;
 		  this.image = image;
+		  this.overlap = overlap;
 	}
 
 	public double getSigma() {
@@ -125,5 +127,13 @@ public class Options {
 
 	public void setImage(boolean image) {
 		this.image = image;
+	}
+
+	public OverlapOption getOverlapResolution() {
+		return overlap;
+	}
+
+	public void setOverlapResolution(OverlapOption overlap) {
+		this.overlap = overlap;
 	}
 }
