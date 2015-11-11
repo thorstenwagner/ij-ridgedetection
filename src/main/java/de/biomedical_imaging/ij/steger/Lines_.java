@@ -197,6 +197,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Extend_line", doExtendLine);
 		gd.addCheckbox("Show_junction_points", showJunctionPoints);
 		gd.addCheckbox("Show_IDs", showIDs);
+		gd.addCheckbox("Verbose mode", verbose);
 		gd.addCheckbox("DisplayResults", displayResults);
 		gd.addCheckbox("Add_to_Manager", addToRoiManager);
 
@@ -510,6 +511,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		doExtendLine = gd.getNextBoolean();
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
+		verbose = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
 		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
