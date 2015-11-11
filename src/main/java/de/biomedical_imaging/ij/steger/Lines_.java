@@ -512,7 +512,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		showIDs = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
-	
+		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
 		if(lwChanged || contHighChanged || contLowChanged){
 			contrastOrLineWidthChangedOnce=true;
 		}
