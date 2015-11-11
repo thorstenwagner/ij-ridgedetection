@@ -179,23 +179,35 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 		// clean up enclosed lines.. any enclosed line that intersects with another
 		// enclosed line at BOTH ends should be removed.
-		final Set<Line> toRemove = new HashSet<Line>();
 
-		for (final Line l1 : enclosed) {
-			boolean foundStartMatch = false;
-			boolean foundEndMatch = false;
+		boolean pruneEnclosed = true;
 
-			for (final Line l2 : enclosed) {
-				if (l2 == l1) continue;
-				else if (intersectsStart(l1, l2, SIGMA)) foundStartMatch = true;
-				else if (intersectsEnd(l1, l2, SIGMA)) foundEndMatch = true;
+		while (pruneEnclosed) {
+			pruneEnclosed = false;
+			Line toRemove = null;
+
+			for (final Line l1 : enclosed) {
+				boolean foundStartMatch = false;
+				boolean foundEndMatch = false;
+
+				for (final Line l2 : enclosed) {
+					if (l2 == l1) continue;
+					else if (intersectsStart(l1, l2, SIGMA)) foundStartMatch = true;
+					else if (intersectsEnd(l1, l2, SIGMA)) foundEndMatch = true;
+
+					if (foundStartMatch && foundEndMatch) break;
+				}
+
+				// found a line to prune
+				// remove it and restart
+				if (foundStartMatch && foundEndMatch) {
+					toRemove = l1;
+					pruneEnclosed = true;
+				}
 			}
 
-			if (foundStartMatch && foundEndMatch) toRemove.add(l1);
+			if (toRemove != null) enclosed.remove(toRemove);
 		}
-
-		for (final Line l : toRemove)
-			enclosed.remove(l);
 
 		if (verbose) {
 			for (final Line l : enclosed)
