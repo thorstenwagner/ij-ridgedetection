@@ -182,21 +182,21 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		
 		GenericDialogPlus gd = new GenericDialogPlus("Ridge Detection");
 		gd.addMessage("Optional parameters:");
-		gd.addNumericField("Line width", lineWidth, 1);
-		gd.addNumericField("High Contrast", contrastHigh, 0);
-		gd.addNumericField("Low Contrast", contrastLow, 0);
+		gd.addNumericField("Line_width", lineWidth, 1);
+		gd.addNumericField("High_Contrast", contrastHigh, 0);
+		gd.addNumericField("Low_Contrast", contrastLow, 0);
 		gd.addMessage("Mandatory parameters:");
 		gd.addNumericField("Sigma", sigma, 2);
-		gd.addNumericField("Lower Threshold", lowerThresh, 2);
-		gd.addNumericField("Upper Threshold", upperThresh, 2);
+		gd.addNumericField("Lower_Threshold", lowerThresh, 2);
+		gd.addNumericField("Upper_Threshold", upperThresh, 2);
 		gd.addCheckbox("Darkline", isDarkLine);
-		gd.addCheckbox("Correct position", doCorrectPosition);
-		gd.addCheckbox("Estimate width", doEstimateWidth);
-		gd.addCheckbox("Extend line", doExtendLine);
-		gd.addCheckbox("Show junction points", showJunctionPoints);
-		gd.addCheckbox("Show IDs", showIDs);
-		gd.addCheckbox("Display Results", displayResults);
-		gd.addCheckbox("Add to Manager", addToRoiManager);
+		gd.addCheckbox("Correct_position", doCorrectPosition);
+		gd.addCheckbox("Estimate_width", doEstimateWidth);
+		gd.addCheckbox("Extend_line", doExtendLine);
+		gd.addCheckbox("Show_junction_points", showJunctionPoints);
+		gd.addCheckbox("Show_IDs", showIDs);
+		gd.addCheckbox("Display_Results", displayResults);
+		gd.addCheckbox("Add_to_Manager", addToRoiManager);
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
