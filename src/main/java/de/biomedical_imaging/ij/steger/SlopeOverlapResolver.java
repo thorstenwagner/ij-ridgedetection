@@ -49,7 +49,12 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	// Length from junction point to use in line segment calculation.
 	// Smaller distances are more subject to variance, while larger distances
 	// could introduce error due to actual curvature of line segments
-	private static final int SLOPE_DIST = 7;
+	private static final int SLOPE_DIST = 5;
+
+	// When considering the portion of a line segment to use in straightness
+	// comparisons, we take the longest segment possible within the following
+	// tolerance. A value of "1" would require perfect straightness.
+	private static final float STRAIGHT_TOLERANCE = 1.02f;
 
 	@Override
 	public Lines resolve(final Lines originalLines, final Junctions junctions,
@@ -569,19 +574,59 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * the intercept point between the query line and given point.
 	 */
 	private float[] getInterceptPoint(final float[] p1, final Line query) {
-		final float[] p2 = new float[2];
-		int pos = Math.max(0, query.getNumber() - 1 - SLOPE_DIST);
+		int dist = 0;
+		final List<float[]> points = new ArrayList<float[]>();
+		points.add(p1);
 
+		return findLongestPath(query, dist, points);
+	}
+
+	/**
+	 * Recursive helper method. Iteratively searches to the next
+	 * {@link #SLOPE_DIST} position in the query line. As long as this point
+	 * maintains straightness within {@link #STRAIGHT_TOLERANCE}, and we haven't
+	 * gone past the query line boundaries, recursion continues.
+	 */
+	private float[] findLongestPath(final Line query, int dist, final List<float[]> points) {
+		// p1 is the original point to test
+		final float[] p1 = points.get(0);
+		// Incrementally check the next position
+		dist += SLOPE_DIST;
+
+		// pos is is the position in the query line to check
+		int pos = 0;
+
+		// Determine the position to check based on whether the query line intersects
+		// with p1 at its start or end
 		if (Math.abs(p1[0] - query.getXCoordinates()[0]) < SIGMA && Math.abs(p1[1] -
 			query.getYCoordinates()[0]) < SIGMA)
 		{
-			pos = Math.min(SLOPE_DIST, query.getNumber() - 1);
+			pos = Math.min(dist, query.getNumber() - 1);
 		}
+		else {
+			pos = Math.max(0, query.getNumber() - 1 - dist);
+		}
+
+		final float[] p2 = new float[2];
 
 		p2[0] = query.getXCoordinates()[pos];
 		p2[1] = query.getYCoordinates()[pos];
 
-		return p2;
+
+		// if our position has reached the start (or end) of the query line,
+		// return p2.
+		if (pos == 0 || pos == query.getNumber() -1) {
+			return p2;
+		}
+
+		// If we still have a straight enough line, recurse to the next position
+		points.add(p2);
+		if (straightCalc(points.toArray(new float[points.size()][])) <= STRAIGHT_TOLERANCE) {
+			return findLongestPath(query, dist, points);
+		}
+
+		// If the line is not straight enough, return the previous point.
+		return points.get(points.size() - 2);
 	}
 
 	/**
