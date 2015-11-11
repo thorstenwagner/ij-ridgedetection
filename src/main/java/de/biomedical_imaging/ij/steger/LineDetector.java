@@ -42,7 +42,6 @@ public class LineDetector {
 	private Options opts = null;
 	private Junctions junctions;
 	private Lines lines;
-	private ImageProcessor ip;
 	Set<Integer> alreadyProcessedJunctionPoints;
 	boolean bechatty = false;
 
@@ -82,7 +81,6 @@ public class LineDetector {
 		double upperThresh, double lowerThresh, boolean isDarkLine,
 		boolean doCorrectPosition, boolean doEstimateWidth,
 		boolean doExtendLine, OverlapOption overlapOption) {
-	this.ip = ip;
 	this.isDarkLine = isDarkLine;
 	this.doCorrectPosition = doCorrectPosition;
 	this.doEstimateWidth = doEstimateWidth;

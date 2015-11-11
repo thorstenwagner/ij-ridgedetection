@@ -205,7 +205,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			overlap[i] = OverlapOption.values()[i].name();
 		}
 
-		gd.addChoice("Method for overlap resolution", overlap, overlapOption.name());
+		gd.addChoice("Method_for_overlap_resolution", overlap, overlapOption.name());
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
