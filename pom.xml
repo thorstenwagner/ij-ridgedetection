@@ -53,6 +53,20 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			</properties>
 		</developer>
 	</developers>
+
+	<contributors>
+		<contributor>
+			<name>Mark Hiner</name>
+			<email>hiner@wisc.edu</email>
+			<url>http://loci.wisc.edu/people/mark-hiner</url>
+			<organization>UW-Madison LOCI</organization>
+			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>-6</timezone>
+		</contributor>
+	</contributors>
 	
 	<build>
 		<plugins>

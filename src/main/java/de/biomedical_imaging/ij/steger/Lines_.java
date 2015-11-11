@@ -73,9 +73,11 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	boolean isPreview = false;
 	boolean displayResults = true;
 	boolean addToRoiManager = true;
+	OverlapOption overlapOption = OverlapOption.NONE;
 	boolean contrastOrLineWidthChangedOnce = false;
 	boolean doStack = false;
 	boolean showIDs = false;
+	boolean verbose = false;
 	private Options usedOptions = null;
 	private static Lines_ instance = null;
 	
@@ -182,21 +184,28 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		
 		GenericDialogPlus gd = new GenericDialogPlus("Ridge Detection");
 		gd.addMessage("Optional parameters:");
-		gd.addNumericField("Line_width", lineWidth, 1);
-		gd.addNumericField("High_Contrast", contrastHigh, 0);
-		gd.addNumericField("Low_Contrast", contrastLow, 0);
+		gd.addNumericField("Line width", lineWidth, 1);
+		gd.addNumericField("High Contrast", contrastHigh, 0);
+		gd.addNumericField("Low Contrast", contrastLow, 0);
 		gd.addMessage("Mandatory parameters:");
 		gd.addNumericField("Sigma", sigma, 2);
-		gd.addNumericField("Lower_Threshold", lowerThresh, 2);
-		gd.addNumericField("Upper_Threshold", upperThresh, 2);
+		gd.addNumericField("Lower Threshold", lowerThresh, 2);
+		gd.addNumericField("Upper Threshold", upperThresh, 2);
 		gd.addCheckbox("Darkline", isDarkLine);
-		gd.addCheckbox("Correct_position", doCorrectPosition);
-		gd.addCheckbox("Estimate_width", doEstimateWidth);
-		gd.addCheckbox("Extend_line", doExtendLine);
-		gd.addCheckbox("Show_junction_points", showJunctionPoints);
-		gd.addCheckbox("Show_IDs", showIDs);
-		gd.addCheckbox("Display_Results", displayResults);
-		gd.addCheckbox("Add_to_Manager", addToRoiManager);
+		gd.addCheckbox("Correct position", doCorrectPosition);
+		gd.addCheckbox("Estimate width", doEstimateWidth);
+		gd.addCheckbox("Extend line", doExtendLine);
+		gd.addCheckbox("Show junction points", showJunctionPoints);
+		gd.addCheckbox("Show IDs", showIDs);
+		gd.addCheckbox("Display Results", displayResults);
+		gd.addCheckbox("Add to Manager", addToRoiManager);
+
+		final String[] overlap = new String[OverlapOption.values().length];
+		for (int i=0; i<overlap.length; i++) {
+			overlap[i] = OverlapOption.values()[i].name();
+		}
+
+		gd.addChoice("Method for overlap resolution", overlap, overlapOption.name());
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
@@ -221,8 +230,10 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		doExtendLine = gd.getNextBoolean();
 		showJunctionPoints = gd.getNextBoolean();
 		showIDs = gd.getNextBoolean();
+		verbose = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
+		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
 		result = new ArrayList<Lines>();
 		resultJunction = new ArrayList<Junctions>();
 		
@@ -566,7 +577,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		}
 
 		LineDetector detect = new LineDetector();
-		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine));
+		detect.bechatty = verbose;
+
+		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
 
