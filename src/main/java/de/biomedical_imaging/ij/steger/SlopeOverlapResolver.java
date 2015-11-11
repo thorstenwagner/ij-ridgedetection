@@ -307,6 +307,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 						if (straightness < minStraightness) {
 							startIndex = i;
 							endIndex = j;
+							minStraightness = straightness;
 						}
 					}
 				}
