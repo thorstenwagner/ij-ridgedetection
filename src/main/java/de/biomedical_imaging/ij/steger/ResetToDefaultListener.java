@@ -23,6 +23,8 @@ package de.biomedical_imaging.ij.steger;
 
 import ij.IJ;
 
+import java.awt.Checkbox;
+import java.awt.Choice;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,6 +63,18 @@ public class ResetToDefaultListener implements ActionListener {
 		TextField textUppThresh = (TextField) gd.getNumericFields().get(5);
 		textUppThresh.setText("" + IJ.d2s(Lines_.upperThreshDefault, 2));
 		textUppThresh.setEditable(true);
+		
+		((Checkbox)gd.getCheckboxes().get(0)).setState(Lines_.isDarkLineDefault);
+		((Checkbox)gd.getCheckboxes().get(1)).setState(Lines_.doCorrectPositionDefault);
+		((Checkbox)gd.getCheckboxes().get(2)).setState(Lines_.doEstimateWidthDefault);
+		((Checkbox)gd.getCheckboxes().get(3)).setState(Lines_.doExtendLineDefault);
+		((Checkbox)gd.getCheckboxes().get(4)).setState(Lines_.showJunctionPointsDefault);
+		((Checkbox)gd.getCheckboxes().get(5)).setState(Lines_.showIDsDefault);
+		((Checkbox)gd.getCheckboxes().get(6)).setState(Lines_.verboseDefault);
+		((Checkbox)gd.getCheckboxes().get(7)).setState(Lines_.displayResultsDefault);
+		((Checkbox)gd.getCheckboxes().get(8)).setState(Lines_.addToRoiManagerDefault);
+		
+		((Choice)gd.getChoices().get(0)).select(0);
 		
 	}
 

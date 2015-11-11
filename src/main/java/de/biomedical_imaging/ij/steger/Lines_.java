@@ -32,6 +32,7 @@ import java.util.Comparator;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
 import ij.gui.Overlay;
@@ -58,26 +59,47 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	double contrastLow = contrastLowDefault;
 	
 	final static double sigmaDefault = 1.51;
-	double sigma = 1.5;
+	double sigma = sigmaDefault;
 	
 	final static double lowerThreshDefault = 3.06;
 	double lowerThresh = lowerThreshDefault;
 	
 	final static double upperThreshDefault = 7.99;
 	double upperThresh = upperThreshDefault;
-	boolean isDarkLine = false;
-	boolean doCorrectPosition = false;
-	boolean doEstimateWidth = false;
-	boolean doExtendLine = true;
-	boolean showJunctionPoints = false;
-	boolean isPreview = false;
-	boolean displayResults = true;
-	boolean addToRoiManager = true;
+	
+	final static boolean isDarkLineDefault = false;
+	boolean isDarkLine = isDarkLineDefault;
+	
+	final static boolean doCorrectPositionDefault = false;
+	boolean doCorrectPosition = doCorrectPositionDefault;
+	
+	final static boolean doEstimateWidthDefault = false;
+	boolean doEstimateWidth = doEstimateWidthDefault;
+	
+	final static boolean doExtendLineDefault = true;
+	boolean doExtendLine = doExtendLineDefault;
+	
+	final static boolean showJunctionPointsDefault = false;
+	boolean showJunctionPoints = showJunctionPointsDefault;
+	
+	final static boolean displayResultsDefault = true;
+	boolean displayResults = displayResultsDefault;
+	
+	final static boolean addToRoiManagerDefault = true;
+	boolean addToRoiManager = addToRoiManagerDefault;
+	
 	OverlapOption overlapOption = OverlapOption.NONE;
+	
+	final static boolean showIDsDefault = false;
+	boolean showIDs = showIDsDefault;
+	
+	final static boolean verboseDefault = false;
+	boolean verbose = verboseDefault;
+	
+	boolean isPreview = false;
 	boolean contrastOrLineWidthChangedOnce = false;
 	boolean doStack = false;
-	boolean showIDs = false;
-	boolean verbose = false;
+	
 	private Options usedOptions = null;
 	private static Lines_ instance = null;
 	
@@ -148,7 +170,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		this.imp = imp;
 		result = new ArrayList<Lines>();
 		resultJunction = new ArrayList<Junctions>();
-		
+		readSettings();
 		return DOES_8G + DOES_STACKS + FINAL_PROCESSING + PARALLELIZE_STACKS;
 	}
 	
@@ -235,6 +257,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
 		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
+		saveSettings();
+		
 		result = new ArrayList<Lines>();
 		resultJunction = new ArrayList<Junctions>();
 		
@@ -242,7 +266,47 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				+ PARALLELIZE_STACKS);
 		doStack = (labels!=DOES_8G + FINAL_PROCESSING
 				+ PARALLELIZE_STACKS);
+		
 		return labels;
+	}
+	
+	private void readSettings(){
+		lineWidth = Prefs.get("RidgeDetection.lineWidth", lineWidthDefault);
+		contrastHigh = Prefs.get("RidgeDetection.contrastHigh", contrastHighDefault);
+		contrastLow = Prefs.get("RidgeDetection.contrastLow", contrastLowDefault);
+		sigma = Prefs.get("RidgeDetection.sigma",sigmaDefault);
+		lowerThresh = Prefs.get("RidgeDetection.lowerThresh", lowerThreshDefault);
+		upperThresh = Prefs.get("RidgeDetection.upperThresh", upperThreshDefault);
+		isDarkLine = Prefs.get("RidgeDetection.isDarkLine", isDarkLineDefault);
+		doCorrectPosition = Prefs.get("RidgeDetection.doCorrectPosition", doCorrectPositionDefault);
+		doEstimateWidth = Prefs.get("RidgeDetection.doEstimateWidth", doEstimateWidthDefault);
+		doExtendLine = Prefs.get("RidgeDetection.doExtendLine", doExtendLineDefault);
+		showJunctionPoints = Prefs.get("RidgeDetection.showJunctionPoints", showJunctionPointsDefault);
+		showIDs = Prefs.get("RidgeDetection.showIDs", showIDsDefault);
+		verbose = Prefs.get("RidgeDetection.verbose", verboseDefault);
+		displayResults = Prefs.get("RidgeDetection.displayResults", displayResultsDefault);
+		addToRoiManager = Prefs.get("RidgeDetection.addToRoiManager", addToRoiManagerDefault);
+		String overlapOptionString = Prefs.get("RidgeDetection.overlapOption", OverlapOption.NONE.name());
+		overlapOption = OverlapOption.valueOf(overlapOptionString);
+	}
+	
+	private void saveSettings(){
+		Prefs.set("RidgeDetection.lineWidth", lineWidth);
+		Prefs.set("RidgeDetection.contrastHigh", contrastHigh);
+		Prefs.set("RidgeDetection.contrastLow", contrastLow);
+		Prefs.set("RidgeDetection.sigma", sigma);
+		Prefs.set("RidgeDetection.lowerThresh", lowerThresh);
+		Prefs.set("RidgeDetection.upperThresh", upperThresh);
+		Prefs.set("RidgeDetection.isDarkLine", isDarkLine);
+		Prefs.set("RidgeDetection.doCorrectPosition", doCorrectPosition);
+		Prefs.set("RidgeDetection.doEstimateWidth", doEstimateWidth);
+		Prefs.set("RidgeDetection.doExtendLine", doExtendLine);
+		Prefs.set("RidgeDetection.showJunctionPoints", showJunctionPoints);
+		Prefs.set("RidgeDetection.showIDs", showIDs);
+		Prefs.set("RidgeDetection.verbose", verbose);
+		Prefs.set("RidgeDetection.displayResults", displayResults);
+		Prefs.set("RidgeDetection.addToRoiManager", addToRoiManager);
+		Prefs.set("RidgeDetection.overlapOption", overlapOption.name());
 	}
 	
 	public void addToRoiManager(){
