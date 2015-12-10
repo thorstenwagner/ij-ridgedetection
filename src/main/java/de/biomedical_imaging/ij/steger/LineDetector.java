@@ -94,6 +94,7 @@ public class LineDetector {
 	
 	private void assignLinesToJunctions(Lines lines, Junctions junctions){
 		for (Junction j : junctions) {
+			j.lineCont1 = lines.get(j.cont1);
 			j.lineCont2 = lines.get(j.cont2);
 		}
 	}
