@@ -94,13 +94,6 @@ public class LineDetector {
 	
 	private void assignLinesToJunctions(Lines lines, Junctions junctions){
 		for (Junction j : junctions) {
-			if(lines.get(j.cont1)==null){
-				IJ.log("aaaaaaaah " + j.cont1);
-			}
-			j.lineCont1 = lines.get(j.cont1);
-			if(lines.get(j.cont2)==null){
-				IJ.log("aaaaaaaah " + j.cont1);
-			}
 			j.lineCont2 = lines.get(j.cont2);
 		}
 	}
@@ -386,8 +379,8 @@ public class LineDetector {
 								if(mainLine.getID()==l.getID()){
 									continue;
 								}
-								IJ.error("Äh, zwei Hauptlininen geht nich..." + mainLine.getID() + " x " + junc.x + " y " + junc.y);
-								IJ.error("Äh, zwei Hauptlininen geht nich..." + l.getID() + " x " + junc.x + " y " + junc.y);
+								log("Äh, zwei Hauptlininen geht nich..." + mainLine.getID() + " x " + junc.x + " y " + junc.y);
+								log("Äh, zwei Hauptlininen geht nich..." + l.getID() + " x " + junc.x + " y " + junc.y);
 							}
 							mainLine = l;
 							mainLineIndex = j;
