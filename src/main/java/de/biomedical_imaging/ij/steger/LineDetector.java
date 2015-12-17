@@ -602,8 +602,7 @@ public class LineDetector {
 		for(int i = 0; i < contours.size(); i++){
 			boolean isClosedContour = contours.get(i).col[0] == contours.get(i).col[contours.get(i).num-1] && contours.get(i).row[0] == contours.get(i).row[contours.get(i).num-1];
 			if(isClosedContour){
-				contours.get(i).setContourClass(LinesUtil.contour_class.cont_closed);
-				IJ.log("");		
+				contours.get(i).setContourClass(LinesUtil.contour_class.cont_closed);	
 			}
 		}
 

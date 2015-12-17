@@ -353,7 +353,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 
 	private void createResultsTable(boolean showJunctions) {
-		ResultsTable rt = new ResultsTable();
+		ResultsTable rt = ResultsTable.getResultsTable();
 		rt.setPrecision(3);
 		for (Lines contours : result) {
 			for (Line c : contours) {
@@ -380,7 +380,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			}
 		}
 
-		rt.show("Contours");
+		rt.show("Results");
 		
 		if (showJunctions) {
 			ResultsTable rt2 = new ResultsTable();
