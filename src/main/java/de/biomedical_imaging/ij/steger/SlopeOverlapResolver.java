@@ -479,7 +479,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 				merged.width_l = new float[newSize];
 				merged.width_r = new float[newSize];
 				merged.num = newSize;
-				merged.setContourClass(contour_class.cont_closed);
+				merged.setContourClass(contour_class.cont_no_junc);
 				merged.setFrame(frame);
 
 				// Get the enclosed line
