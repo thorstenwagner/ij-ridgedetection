@@ -76,15 +76,29 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 		final List<List<Line>> lineMerges = new ArrayList<List<Line>>();
 
-		// merge enclosed
+		// find enclosed merges
 		buildMergeList(lineMerges, enclosedLines, startIntersections,
 			endIntersections, verbose);
 
-		// merge n-way intersections
+		// find n-way intersections
 		buildMergeList(lineMerges, nWayIntersections, verbose);
 
-		final Lines resolvedLines = buildResolvedList(originalLines, lineMerges,
+		// perform the actual merges. This will also populate the lineMap
+		// with mappings from original to merged lines.
+		final Map<Line, Line> lineMap = new HashMap<Line, Line>();
+		final Lines resolvedLines = buildResolvedList(originalLines, lineMerges, lineMap,
 			verbose);
+
+		// use lineMap to update references in original junction points
+		// the updatedJunctions list will be populated so we can further process
+		// any updated junctions.
+		final Set<Junction> updatedJunctions = updateJunctions(junctions, lineMap);
+
+		// Remove any Junctions that are no longer valid
+		pruneJunctions(junctions, updatedJunctions);
+
+		// update the intersection points of each surviving Junction in UpdatedJunctions..
+		updateContourClasses(updatedJunctions);
 
 		return resolvedLines;
 	}
@@ -448,7 +462,8 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * Step 4: resolve merged line list
 	 */
 	private Lines buildResolvedList(final Lines originalLines,
-		final List<List<Line>> lineMerges, final boolean verbose)
+		final List<List<Line>> lineMerges, final Map<Line, Line> lineMap,
+		final boolean verbose)
 	{
 		final Set<Line> finalLines = new HashSet<Line>(originalLines);
 
@@ -479,6 +494,10 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 				merged.width_l = new float[newSize];
 				merged.width_r = new float[newSize];
 				merged.num = newSize;
+				// Assume the lines are now standing alone or no longer
+				// intersect on terminal ends and thus are "no_junc" class.
+				// This will be updated later after the Junction points are
+				// reassessed.
 				merged.setContourClass(contour_class.cont_no_junc);
 				merged.setFrame(frame);
 
@@ -507,6 +526,9 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 					fillArray(line, adjacent, i == 0, merged.width_r, pos, line.width_r,
 						num);
 					pos += num;
+
+					// map the original line to the merged
+					lineMap.put(line, merged);
 				}
 			}
 
@@ -517,6 +539,132 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 		resolvedLines.addAll(finalLines);
 
 		return resolvedLines;
+	}
+
+	/**
+	 * Look through all {@link Junction}s. If either of the lines has
+	 * been merged, the Junction is updated to reference the merged line.
+	 * Returns the set of all such modified Junctions.
+	 */
+	private Set<Junction> updateJunctions(final Junctions junctions,
+		final Map<Line, Line> lineMap)
+	{
+		final Set<Junction> updated = new HashSet<Junction>();
+
+		for (final Junction junction : junctions) {
+			Line mergedLine = null;
+			if ((mergedLine =lineMap.get(junction.lineCont1)) != null) {
+				junction.lineCont1 = mergedLine;
+				junction.cont1 = mergedLine.getID();
+				updated.add(junction);
+			}
+			mergedLine = null;
+			if ((mergedLine =lineMap.get(junction.lineCont2)) != null) {
+				junction.lineCont2 = mergedLine;
+				junction.cont2 = mergedLine.getID();
+				updated.add(junction);
+			}
+		}
+
+		return updated;
+	}
+
+	/**
+	 * Remove all redundant {@link Junction}s from the list. This
+	 * includes Junctions with two references to the same line
+	 * (because their lines were merged) and cases where multiple
+	 * Junctions refer to the same lines as each other and occupy
+	 * the same physical position.
+	 */
+	private void pruneJunctions(final Junctions junctions,
+		final Set<Junction> updatedJunctions)
+	{
+		final Map<String, Junction> jMap = new HashMap<String, Junction>();
+		for (final Junction j : updatedJunctions) {
+			String key = null;
+			// Remove Junctions with references to the same Line
+			if (j.cont1 == j.cont2) junctions.remove(j);
+			// Remove Junctions of the same two lines at the same x,y point
+			else if (jMap.containsKey((key = getKey(j)))) junctions.remove(j);
+			else {
+				// Keep the junction and register it as "the" definitive junction
+				// for its two lines at this point.
+				jMap.put(key, j);
+			}
+		}
+
+		// Update the updatedJunctions set by removing all Junction instances
+		// that have been removed from the master Junctions collection.
+		updatedJunctions.retainAll(junctions);
+	}
+
+	/**
+	 * For each {@link Junction} in the provided set, update the Junction's
+	 * {@link Junction#pos}, {@link Junction#isNonTerminal}, and each line's
+	 * {@link LinesUtil.contour_class} as appropriate.
+	 */
+	private void updateContourClasses(final Set<Junction> updatedJunctions) {
+		for (final Junction j : updatedJunctions) {
+			// process both lines.
+			// For isNonTerminal to be updated, the junction point can't be on
+			// either line's terminals.
+			// We only update the pos of the Junction on the first line.
+			j.isNonTerminal = processLine(j, j.lineCont1, true);
+			j.isNonTerminal = processLine(j, j.lineCont2, false) && j.isNonTerminal;
+		}
+	}
+
+	/**
+	 * Iterate over the points of the line and find the pos of the junction If pos
+	 * is 0 or line.length, update the line's contour class If this is the first
+	 * line, set the Junction's pos to match If this junction doesn't sit on
+	 * either line's terminals, set the Junction's isNonTerminal to true
+	 *
+	 * @param updatePos - if true, update the pos of the given Junction
+	 * @return True if the junction point was NOT on the start or end terminal of
+	 *         the given line.
+	 */
+	private boolean processLine(final Junction j, final Line line, final boolean updatePos) {
+		int pos = -1;
+		final float[] x = line.getXCoordinates();
+		final float[] y = line.getYCoordinates();
+		// loop over all points of the line, or until we find the
+		// point of intersection with the junction.
+		for (int i=0; i<line.num && pos < 0; i++) {
+			if (Float.compare(x[i], j.x) == 0 && Float.compare(y[i], j.y) == 0) pos =
+				i;
+		}
+	
+		// update the Junction position if requested
+		if (updatePos) j.pos = pos;
+	
+		// update contour class if appropriate
+		// Nothing can supersede "cont_both_junc"
+		if (!line.getContourClass().equals(contour_class.cont_both_junc)) {
+			if (pos == 0) {
+				// If this line is already an "end_junc", upgrade it to a "both"
+				if (line.getContourClass().equals(contour_class.cont_end_junc)) {
+					line.setContourClass(contour_class.cont_both_junc);
+				}
+				// Otherwise, set it as a "start_junc"
+				else {
+					line.setContourClass(contour_class.cont_start_junc);
+				}
+			}
+			else if (pos == line.num - 1) {
+				// If this line is already a "start_junc", upgrade it to a "both"
+				if (line.getContourClass().equals(contour_class.cont_start_junc)) {
+					line.setContourClass(contour_class.cont_both_junc);
+				}
+				// Otherwise, set it as a "end_junc"
+				else {
+					line.setContourClass(contour_class.cont_end_junc);
+				}
+			}
+		}
+	
+		// Check the position of the junction within the line
+		return !(pos == 0 || pos == line.num - 1);
 	}
 
 	/**
@@ -677,6 +825,21 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	{
 		return Math.abs(qEnd[0] - tEnd[0]) < threshold && Math.abs(qEnd[1] -
 			tEnd[1]) < threshold;
+	}
+
+	/**
+	 * Builds a unique key identifying a given {@link Junction} based
+	 * on the two associated lines, and the Junction's position.
+	 */
+	private String getKey(final Junction junction) {
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(Math.min(junction.cont1, junction.cont2));
+		sb.append(Math.max(junction.cont1, junction.cont2));
+		sb.append(junction.x);
+		sb.append(junction.y);
+
+		return sb.toString();
 	}
 
 	/**
