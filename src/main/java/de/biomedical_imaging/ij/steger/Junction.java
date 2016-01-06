@@ -37,6 +37,8 @@ public class Junction implements Comparable<Junction> {
 	 Line lineCont1; 
 	 /** line that runs into idCont1 */
 	 Line lineCont2; 
+	 /** True if this junction sits on a start/end of at least one line*/
+	 boolean isNonTerminal = false;
 	 
 
 	@Override
@@ -73,6 +75,12 @@ public class Junction implements Comparable<Junction> {
 		return lineCont2;
 	}
 	
-	
+	/**
+	 * @return True iff this junction point does not sit on either line's
+	 *         start/end
+	 */
+	public boolean isNonTerminal() {
+		return isNonTerminal;
+	}
 	 
 }
