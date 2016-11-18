@@ -422,7 +422,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			
 				float[] y = c.getYCoordinates();
 				for(int j = 0; j < x.length; j++){
-					is.getProcessor(c.getFrame()).putPixel(Math.round(x[j]),Math.round(y[j]),100);
+					is.getProcessor(c.getFrame()).putPixel(Math.round(x[j]-0.5f),Math.round(y[j]-0.5f),0);
 				}
 			}
 		}
