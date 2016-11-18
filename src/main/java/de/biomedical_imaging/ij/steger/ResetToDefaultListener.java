@@ -73,6 +73,7 @@ public class ResetToDefaultListener implements ActionListener {
 		((Checkbox)gd.getCheckboxes().get(6)).setState(Lines_.verboseDefault);
 		((Checkbox)gd.getCheckboxes().get(7)).setState(Lines_.displayResultsDefault);
 		((Checkbox)gd.getCheckboxes().get(8)).setState(Lines_.addToRoiManagerDefault);
+		((Checkbox)gd.getCheckboxes().get(9)).setState(Lines_.makeBinaryDefault);
 		
 		((Choice)gd.getChoices().get(0)).select(0);
 		

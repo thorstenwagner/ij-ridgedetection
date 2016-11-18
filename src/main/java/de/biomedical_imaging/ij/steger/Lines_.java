@@ -32,6 +32,7 @@ import java.util.Comparator;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.ImageStack;
 import ij.Prefs;
 import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
@@ -40,6 +41,7 @@ import ij.gui.PointRoi;
 import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
+import ij.gui.NewImage;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ExtendedPlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
@@ -87,6 +89,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	
 	final static boolean addToRoiManagerDefault = true;
 	boolean addToRoiManager = addToRoiManagerDefault;
+
+	final static boolean makeBinaryDefault = true;
+	boolean makeBinary = makeBinaryDefault;
 	
 	OverlapOption overlapOption = OverlapOption.NONE;
 	
@@ -137,6 +142,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			}
 			if(addToRoiManager){
 				addToRoiManager();
+			}
+			if (makeBinary) {
+				makeBinary();
 			}
 			return DONE;
 
@@ -222,6 +230,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addCheckbox("Verbose mode", verbose);
 		gd.addCheckbox("DisplayResults", displayResults);
 		gd.addCheckbox("Add_to_Manager", addToRoiManager);
+		gd.addCheckbox("Make_Binary", makeBinary);
 
 		final String[] overlap = new String[OverlapOption.values().length];
 		for (int i=0; i<overlap.length; i++) {
@@ -232,7 +241,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 				
 		gd.addHelp("http://fiji.sc/Ridge_Detection");
 		gd.addDialogListener(this);
-		gd.addPreviewCheckbox(pfr);
+		gd.addPreviewCheckbox(pfr,"Preview");
 		gd.addButton("Reset settings to default", new ResetToDefaultListener(gd));
 		gd.showDialog();
 		if (gd.wasCanceled()) {
@@ -256,6 +265,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		verbose = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
+		makeBinary = gd.getNextBoolean();
 		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
 		saveSettings();
 		
@@ -286,8 +296,10 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		verbose = Prefs.get("RidgeDetection.verbose", verboseDefault);
 		displayResults = Prefs.get("RidgeDetection.displayResults", displayResultsDefault);
 		addToRoiManager = Prefs.get("RidgeDetection.addToRoiManager", addToRoiManagerDefault);
+		makeBinary = Prefs.get("RidgeDetection.makeBinary", makeBinaryDefault);
 		String overlapOptionString = Prefs.get("RidgeDetection.overlapOption", OverlapOption.NONE.name());
 		overlapOption = OverlapOption.valueOf(overlapOptionString);
+		
 	}
 	
 	private void saveSettings(){
@@ -306,6 +318,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		Prefs.set("RidgeDetection.verbose", verbose);
 		Prefs.set("RidgeDetection.displayResults", displayResults);
 		Prefs.set("RidgeDetection.addToRoiManager", addToRoiManager);
+		Prefs.set("RidgeDetection.makeBinary", makeBinary);
 		Prefs.set("RidgeDetection.overlapOption", overlapOption.name());
 	}
 	
@@ -399,6 +412,24 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		}
 	}
 	
+	public void makeBinary() {
+		ImagePlus binary = NewImage.createByteImage(imp.getTitle()+" Detected segments",imp.getWidth(), imp.getHeight(),imp.getStackSize(),NewImage.FILL_WHITE);
+		ImageStack is = binary.getImageStack();
+		for (Lines contours : result) {
+			for (Line c : contours) {
+			
+				float[] x = c.getXCoordinates();
+			
+				float[] y = c.getYCoordinates();
+				for(int j = 0; j < x.length; j++){
+					is.getProcessor(c.getFrame()).putPixel(Math.round(x[j]),Math.round(y[j]),100);
+				}
+			}
+		}
+		binary.show();
+		binary.updateAndDraw();
+	}
+		
 	private void displayContours() {
 		imp.setOverlay(null);
 		Overlay ovpoly = new Overlay();
@@ -578,6 +609,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		verbose = gd.getNextBoolean();
 		displayResults = gd.getNextBoolean();
 		addToRoiManager = gd.getNextBoolean();
+		makeBinary = gd.getNextBoolean();
 		overlapOption = OverlapOption.valueOf(gd.getNextChoice());
 		if(lwChanged || contHighChanged || contLowChanged){
 			contrastOrLineWidthChangedOnce=true;
