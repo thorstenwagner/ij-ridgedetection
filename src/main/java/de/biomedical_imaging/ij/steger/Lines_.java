@@ -419,10 +419,21 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			for (Line c : contours) {
 			
 				float[] x = c.getXCoordinates();
-			
 				float[] y = c.getYCoordinates();
+				int prev_x =0;
+				int prev_y =0;
 				for(int j = 0; j < x.length; j++){
-					is.getProcessor(c.getFrame()).putPixel(Math.round(x[j]-0.5f),Math.round(y[j]-0.5f),0);
+					int new_x = (int) Math.floor(x[j]);
+					int new_y = (int) Math.floor(y[j]);
+					is.getProcessor(c.getFrame()).putPixel(new_x,new_y,0);
+					if (j >0) {
+						if (Math.abs(new_x - prev_x) >1 || Math.abs(new_y - prev_y) >1) {
+							is.getProcessor(c.getFrame()).putPixel(new_x - 1*Integer.signum(new_x - prev_x),new_y - 1*Integer.signum(new_y - prev_y),0);
+						} 
+					}
+					
+					prev_x = new_x;
+					prev_y = new_y;
 				}
 			}
 		}
