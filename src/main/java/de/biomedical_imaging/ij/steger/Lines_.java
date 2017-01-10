@@ -367,9 +367,11 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 	private void createResultsTable(boolean showJunctions) {
 		ResultsTable rt = ResultsTable.getResultsTable();
+		ResultsTable rtSum = new ResultsTable();
 		rt.setPrecision(3);
 		for (Lines contours : result) {
 			for (Line c : contours) {
+				double meanWidth =0;
 				for (int i = 0; i < c.num; i++) {
 					rt.incrementCounter();
 					rt.addValue("Frame", IJ.d2s(contours.getFrame(),0));
@@ -386,14 +388,23 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 					if(doEstimateWidth){
 						
 						rt.addValue("Line width", IJ.d2s(c.width_l[i]+c.width_r[i],1));
+						meanWidth+=c.width_l[i]+c.width_r[i];
 						rt.addValue("Angle of normal", IJ.d2s(c.angle[i],2));
 					}
 					rt.addValue("Class", c.getContourClass().toString().substring(5));
+				}
+				rtSum.incrementCounter();
+				rtSum.addValue("Frame", IJ.d2s(contours.getFrame(),0));
+				rtSum.addValue("Contour ID", IJ.d2s(c.getID(),0));
+				rtSum.addValue("Length", IJ.d2s(c.estimateLength(),1));
+				if(doEstimateWidth){
+					rtSum.addValue("Mean line width",meanWidth/c.num);
 				}
 			}
 		}
 
 		rt.show("Results");
+		rtSum.show("Summary");
 		
 		if (showJunctions) {
 			ResultsTable rt2 = new ResultsTable();
@@ -684,7 +695,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			resultJunction = new ArrayList<Junctions>();
 
 		}
-
+		
 		LineDetector detect = new LineDetector();
 		detect.bechatty = verbose;
 
