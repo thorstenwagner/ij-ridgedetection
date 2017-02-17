@@ -42,6 +42,7 @@ import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
 import ij.gui.NewImage;
+import ij.measure.Calibration;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ExtendedPlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
@@ -369,36 +370,40 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		ResultsTable rt = ResultsTable.getResultsTable();
 		ResultsTable rtSum = new ResultsTable();
 		rt.setPrecision(3);
+		
+		Calibration cal= imp.getCalibration();
 		for (Lines contours : result) {
 			for (Line c : contours) {
 				double meanWidth =0;
 				for (int i = 0; i < c.num; i++) {
 					rt.incrementCounter();
-					rt.addValue("Frame", IJ.d2s(contours.getFrame(),0));
-					rt.addValue("Contour ID", IJ.d2s(c.getID(),0));
-					rt.addValue("Pos.", IJ.d2s(i + 1,0));
-					rt.addValue("X", IJ.d2s(c.col[i],1));
+					rt.addValue("Frame", contours.getFrame());
 					
-					rt.addValue("Y", IJ.d2s(c.row[i],1));
-					rt.addValue("Length", IJ.d2s(c.estimateLength(),1));
+					rt.addValue("Contour ID", c.getID());
+					rt.addValue("Pos.", i + 1);
+					rt.addValue("X", c.col[i]*cal.pixelWidth);
+					
+					rt.addValue("Y", c.row[i]*cal.pixelHeight);
+					rt.addValue("Length", c.estimateLength()*cal.pixelHeight);
 					if(doCorrectPosition && doEstimateWidth){
 						rt.addValue("Contrast", Math.abs(c.intensity[i]));
 						rt.addValue("Asymmetry", Math.abs(c.asymmetry[i]));
 					}
 					if(doEstimateWidth){
 						
-						rt.addValue("Line width", IJ.d2s(c.width_l[i]+c.width_r[i],1));
+						rt.addValue("Line width", (c.width_l[i]+c.width_r[i])*cal.pixelWidth);
 						meanWidth+=c.width_l[i]+c.width_r[i];
-						rt.addValue("Angle of normal", IJ.d2s(c.angle[i],2));
+						rt.addValue("Angle of normal", c.angle[i]);
 					}
 					rt.addValue("Class", c.getContourClass().toString().substring(5));
 				}
 				rtSum.incrementCounter();
-				rtSum.addValue("Frame", IJ.d2s(contours.getFrame(),0));
-				rtSum.addValue("Contour ID", IJ.d2s(c.getID(),0));
-				rtSum.addValue("Length", IJ.d2s(c.estimateLength(),1));
+				rtSum.addValue("Frame", contours.getFrame());
+				rtSum.addValue("Contour ID", c.getID());
+				rtSum.addValue("Length", c.estimateLength()*cal.pixelWidth);
+				
 				if(doEstimateWidth){
-					rtSum.addValue("Mean line width",meanWidth/c.num);
+					rtSum.addValue("Mean line width",meanWidth/c.num *cal.pixelWidth);
 				}
 			}
 		}
@@ -415,8 +420,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 					rt2.addValue("Frame", junctions.getFrame());
 					rt2.addValue("Contour ID 1", j.getLine1().getID());//c.get( j.cont1)
 					rt2.addValue("Contour ID 2", j.getLine2().getID());
-					rt2.addValue("X", IJ.d2s(j.x,1));
-					rt2.addValue("Y", IJ.d2s(j.y,1));
+					rt2.addValue("X", j.x*cal.pixelWidth);
+					rt2.addValue("Y", j.y*cal.pixelHeight);
 				}
 			}
 			rt2.show("Junctions");
