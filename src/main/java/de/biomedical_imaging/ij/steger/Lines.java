@@ -22,6 +22,7 @@
 package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Lines extends ArrayList<Line> {
 	
@@ -53,5 +54,17 @@ public class Lines extends ArrayList<Line> {
 		return -1;
 	}
 
+	public Lines prune(double minLength, double maxLength) {
+		double lgth;
+		Iterator<Line> it = this.iterator();
+		while (it.hasNext()) {
+			lgth = it.next().estimateLength();
+			
+			if ((lgth < minLength) || (maxLength > 0 && lgth > maxLength)) {
+				it.remove();
+			} 
+		}
+		return this;
+	}
 
 }

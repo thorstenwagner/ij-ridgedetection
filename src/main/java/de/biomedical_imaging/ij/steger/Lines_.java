@@ -70,6 +70,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	final static double upperThreshDefault = 7.99;
 	double upperThresh = upperThreshDefault;
 	
+    final static double minLengthDefault = 0;
+    double minLength = minLengthDefault;
+    
+    final static double maxLengthDefault = 0;
+    double maxLength = maxLengthDefault;
+    
 	final static boolean isDarkLineDefault = false;
 	boolean isDarkLine = isDarkLineDefault;
 	
@@ -91,7 +97,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	final static boolean addToRoiManagerDefault = true;
 	boolean addToRoiManager = addToRoiManagerDefault;
 
-	final static boolean makeBinaryDefault = true;
+	final static boolean makeBinaryDefault = false;
 	boolean makeBinary = makeBinaryDefault;
 	
 	OverlapOption overlapOption = OverlapOption.NONE;
@@ -222,6 +228,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addNumericField("Sigma", sigma, 2);
 		gd.addNumericField("Lower_Threshold", lowerThresh, 2);
 		gd.addNumericField("Upper_Threshold", upperThresh, 2);
+		gd.addNumericField("Minimum_Line_Length", minLength, 2);
+		gd.addNumericField("Maximum Line Length", maxLength, 2);
 		gd.addCheckbox("Darkline", isDarkLine);
 		gd.addCheckbox("Correct_position", doCorrectPosition);
 		gd.addCheckbox("Estimate_width", doEstimateWidth);
@@ -257,6 +265,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		sigma = gd.getNextNumber();
 		lowerThresh = gd.getNextNumber();
 		upperThresh = gd.getNextNumber();
+        minLength = gd.getNextNumber();
+        maxLength = gd.getNextNumber();
 		isDarkLine = gd.getNextBoolean();
 		doCorrectPosition = gd.getNextBoolean();
 		doEstimateWidth = gd.getNextBoolean();
@@ -288,6 +298,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		sigma = Prefs.get("RidgeDetection.sigma",sigmaDefault);
 		lowerThresh = Prefs.get("RidgeDetection.lowerThresh", lowerThreshDefault);
 		upperThresh = Prefs.get("RidgeDetection.upperThresh", upperThreshDefault);
+		minLength = Prefs.get("RidgeDetection.minLength", minLengthDefault);
+		maxLength = Prefs.get("RidgeDetection.maxLength", maxLengthDefault);
 		isDarkLine = Prefs.get("RidgeDetection.isDarkLine", isDarkLineDefault);
 		doCorrectPosition = Prefs.get("RidgeDetection.doCorrectPosition", doCorrectPositionDefault);
 		doEstimateWidth = Prefs.get("RidgeDetection.doEstimateWidth", doEstimateWidthDefault);
@@ -310,6 +322,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		Prefs.set("RidgeDetection.sigma", sigma);
 		Prefs.set("RidgeDetection.lowerThresh", lowerThresh);
 		Prefs.set("RidgeDetection.upperThresh", upperThresh);
+        Prefs.set("RidgeDetection.minLength", minLength);
+        Prefs.set("RidgeDetection.maxLength", maxLength);
 		Prefs.set("RidgeDetection.isDarkLine", isDarkLine);
 		Prefs.set("RidgeDetection.doCorrectPosition", doCorrectPosition);
 		Prefs.set("RidgeDetection.doEstimateWidth", doEstimateWidth);
@@ -606,6 +620,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			lineWidth = lwCand;
 			lwChanged = true;
 		}
+		
 		double conCand = gd.getNextNumber();
 		diff = Math.abs(conCand-contrastHigh);
 		if ( diff > 0.0001) {
@@ -619,14 +634,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			contrastLow = conCand;
 			contLowChanged = true;
 		}
-
 		
 		boolean darklineCand = gd.getNextBoolean();
 		if(darklineCand != isDarkLine){
 			isDarkLine = darklineCand;
 			darklineChanged = true;
 		}
-		
 		
 		doCorrectPosition = gd.getNextBoolean();
 		doEstimateWidth = gd.getNextBoolean();
@@ -684,6 +697,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			return false;
 		}
 		
+		minLength = gd.getNextNumber();
+		maxLength = gd.getNextNumber();
 
 		isPreview = gd.isPreviewActive();
 
@@ -704,7 +719,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		LineDetector detect = new LineDetector();
 		detect.bechatty = verbose;
 
-		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption));
+		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption).prune(minLength,maxLength));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
 

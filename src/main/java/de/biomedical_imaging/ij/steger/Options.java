@@ -26,6 +26,8 @@ public class Options {
 	  double low;
 	  double high;
 	  int   mode;
+      double minLength;
+      double maxLength;
 	  boolean   correct;
 	  boolean   width;
 	  boolean   extend;
@@ -76,6 +78,22 @@ public class Options {
 	public int getMode() {
 		return mode;
 	}
+    
+    public double getminLength() {
+        return minLength;
+    }
+    
+    public void setminLength(double minLength) {
+        this.minLength = minLength;
+    }
+    
+    public double getmaxLength() {
+        return maxLength;
+    }
+    
+    public void setmaxLength(double maxLength) {
+        this.maxLength = maxLength;
+    }
 
 	public void setMode(int mode) {
 		this.mode = mode;
