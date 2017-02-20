@@ -532,15 +532,20 @@ public class LineDetector {
 
 	private void fixContours(Lines contours, Junctions junctions) {
 
+		ArrayList<Line> remove = new ArrayList<Line>();
 		// Contours with only a single position cant be valid.
 		for (Line contour : contours) {
 			if (contour.num == 1) {
-				deleteContour(contours,junctions,contour);
-				continue;
+				deleteJunctions(contours,junctions,contour);
+				remove.add(contour);
 			}
 			//If the results are corrupted, this informationen has to be reconstructed in fixJunctions
 			contour.setContourClass(LinesUtil.contour_class.cont_no_junc);
 		}
+
+		for (Line c : remove) {
+       		contours.remove(c);
+       	}
 
 		// For some reason the first and the last element are the same. Delete
 		// it!
@@ -553,18 +558,17 @@ public class LineDetector {
 	}
     
     private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength) {
-        for (Line c : contours) {
-            if ((c.estimateLength() < minLength) || (maxLength > 0 && c.estimateLength() > maxLength)) {
-                deleteJunctions(contours, junctions, c);
-            }
-        }
-        Iterator<Line> c = contours.iterator();
-        while (c.hasNext()) {
-            double lgth = c.next().estimateLength();
-            if (( minLength > 0 && lgth < minLength ) || (maxLength > 0 && lgth > maxLength )) {
-                c.remove();
-            }
-        }
+      ArrayList<Line> remove = new ArrayList<Line>();
+      
+      for (Line c : contours) {
+      	if ((c.estimateLength() < minLength) || (maxLength > 0 && c.estimateLength() > maxLength)) {
+        	deleteJunctions(contours, junctions, c);
+        	remove.add(c);
+       	}
+       }
+       for (Line c : remove) {
+       	contours.remove(c);
+       }
     }
     
     
