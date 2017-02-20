@@ -36,7 +36,7 @@ public class Options {
 	  boolean   image;
 		OverlapOption overlap;
 	  
-	  public Options(double sigma, double low, double high, int mode, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image, OverlapOption overlap) {
+	  public Options(double sigma, double low, double high, int mode, double minLength, double maxLength, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image, OverlapOption overlap) {
 		// TODO Auto-generated constructor stub
 		  this.sigma = sigma;
 		  this.low = low;

@@ -70,15 +70,15 @@ public class LineDetector {
 	 * @return An arraylist with line objects
 	 */
 	public Lines detectLines(ImageProcessor ip, double sigma,
-			double upperThresh, double lowerThresh, boolean isDarkLine,
+			double upperThresh, double lowerThresh, double minLength, double maxLength, boolean isDarkLine,
 			boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine) {
-		return detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine,
+		return detectLines(ip, sigma, upperThresh, lowerThresh, minLength, maxLength,isDarkLine,
 			doCorrectPosition, doEstimateWidth, doExtendLine, OverlapOption.NONE);
 	}
 
 	public Lines detectLines(ImageProcessor ip, double sigma,
-		double upperThresh, double lowerThresh, boolean isDarkLine,
+		double upperThresh, double lowerThresh, double minLength, double maxLength, boolean isDarkLine,
 		boolean doCorrectPosition, boolean doEstimateWidth,
 		boolean doExtendLine, OverlapOption overlapOption) {
 	this.isDarkLine = isDarkLine;
@@ -86,7 +86,7 @@ public class LineDetector {
 	this.doEstimateWidth = doEstimateWidth;
 	this.doExtendLine = doExtendLine;
 	junctions = new Junctions(ip.getSliceNumber());
-	lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
+	lines = get_lines(sigma, upperThresh, lowerThresh, minLength, maxLength, ip.getHeight(),
 			ip.getWidth(), ip, junctions, overlapOption);
 	return lines;
 }
@@ -514,6 +514,22 @@ public class LineDetector {
 		contours.remove(c);
 	}
 
+	private void deleteJunctions(Lines contours, Junctions junctions, Line c) {	
+
+		ArrayList<Junction> remove = new ArrayList<Junction>();
+		for (Junction junction : junctions) {
+
+			if (contours.get((int) junction.cont1).getID() == c.getID()
+					|| contours.get((int) junction.cont2).getID() == c.getID())  {
+				remove.add(junction);
+			}
+			
+		}
+		for (Junction junction : remove) {
+			junctions.remove(junction);
+		}
+	}
+
 	private void fixContours(Lines contours, Junctions junctions) {
 
 		// Contours with only a single position cant be valid.
@@ -535,20 +551,40 @@ public class LineDetector {
 			}
 		}
 	}
-
-	private Lines get_lines(double sigma, double high, double low, int rows,
+    
+    private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength) {
+        for (Line c : contours) {
+            if ((c.estimateLength() < minLength) || (maxLength > 0 && c.estimateLength() > maxLength)) {
+                deleteJunctions(contours, junctions, c);
+            }
+        }
+        Iterator<Line> c = contours.iterator();
+        while (c.hasNext()) {
+            double lgth = c.next().estimateLength();
+            if (( minLength > 0 && lgth < minLength ) || (maxLength > 0 && lgth > maxLength )) {
+                c.remove();
+            }
+        }
+    }
+    
+    
+    
+    private Lines get_lines(double sigma, double high, double low, double minLength, double maxLength, int rows,
 			int cols, ImageProcessor in_img, Junctions resultJunction, OverlapOption overlapOption) {
 		FloatProcessor image;
 		Lines contours = new Lines(in_img.getSliceNumber());
 		int num_cont = 0;
 		opts = new Options(-1.0, -1.0, -1.0, isDarkLine ? LinesUtil.MODE_DARK
-				: LinesUtil.MODE_LIGHT, doCorrectPosition, doEstimateWidth,
+				: LinesUtil.MODE_LIGHT, -1.0, -1.0, doCorrectPosition, doEstimateWidth,
 				doExtendLine, false, false, false, overlapOption);
 
 		opts.sigma = sigma;
 		opts.high = high;
 		opts.low = low;
 		check_sigma(opts.sigma, cols, rows);
+
+		opts.minLength = minLength; 
+		opts.maxLength = maxLength; 
 
 		OverlapResolver resolver = null;
 
@@ -591,7 +627,7 @@ public class LineDetector {
 		junctions = resultJunction;
 
 		/*
-		 * RECONSRUCTION OF CONTOUR CLASS
+		 * RECONSTRUCTION OF CONTOUR CLASS
 		 */
 		//Reset contour class
 		for(int i = 0; i < contours.size(); i++){
@@ -617,6 +653,8 @@ public class LineDetector {
 		
 
 		if (resolver != null) contours = resolver.resolve(contours, junctions, bechatty);
+		if (minLength != 0 || maxLength != 0) pruneContours(contours, junctions, minLength, maxLength);
+		
 		return contours;
 
 	}

@@ -719,7 +719,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		LineDetector detect = new LineDetector();
 		detect.bechatty = verbose;
 
-		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption).prune(minLength,maxLength));
+		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, minLength,maxLength, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
 
