@@ -496,7 +496,8 @@ public class LineDetector {
 		double[] ret =  {min,index};
 		return ret;
 	}
-	private void deleteContour(Lines contours, Junctions junctions, Line c) {
+	
+/*	private void deleteContour(Lines contours, Junctions junctions, Line c) {
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
 		for (Junction junction : junctions) {
@@ -512,18 +513,27 @@ public class LineDetector {
 		}
 
 		contours.remove(c);
-	}
+	} */
 
-	private void deleteJunctions(Lines contours, Junctions junctions, Line c) {	
+	//To be removed once the problem with junctions.cont1 & .cont2 is solved.
+	private void deleteJunctions(Lines contours, Junctions junctions, Line c) {
+		deleteJunctions(contours, junctions, c, OverlapOption.NONE);
+	}
+	private void deleteJunctions(Lines contours, Junctions junctions, Line c, OverlapOption overlapOption) {	
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
 		for (Junction junction : junctions) {
-
-			if (contours.get((int) junction.cont1).getID() == c.getID()
+			if (overlapOption == OverlapOption.SLOPE) {
+				if (junction.cont1 == c.getID() || junction.cont2 == c.getID())  {
+					IJ.log("Removing junction ");
+					remove.add(junction);
+				}
+			} else {
+				if (contours.get((int) junction.cont1).getID() == c.getID()
 					|| contours.get((int) junction.cont2).getID() == c.getID())  {
-				remove.add(junction);
+					remove.add(junction);
+				}	
 			}
-			
 		}
 		for (Junction junction : remove) {
 			junctions.remove(junction);
@@ -557,16 +567,21 @@ public class LineDetector {
 		}
 	}
     
-    private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength) {
+    private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength, OverlapOption overlapOption) {
       ArrayList<Line> remove = new ArrayList<Line>();
-      
+
+      log("Pruning lines");
       for (Line c : contours) {
       	if ((c.estimateLength() < minLength) || (maxLength > 0 && c.estimateLength() > maxLength)) {
-        	deleteJunctions(contours, junctions, c);
+        	deleteJunctions(contours, junctions, c,overlapOption);
+        	log("Removing line "+c.getID()+ " of length "+c.estimateLength());
         	remove.add(c);
+       	} else {
+       		log("Keeping line "+c.getID()+ " of length "+c.estimateLength());
        	}
        }
        for (Line c : remove) {
+       	
        	contours.remove(c);
        }
     }
@@ -655,9 +670,12 @@ public class LineDetector {
 			j.getLine2().setContourClass(reconstructContourClass(j.getLine2(),j.getLine2().getStartOrdEndPosition(x, y)));
 		}
 		
-
 		if (resolver != null) contours = resolver.resolve(contours, junctions, bechatty);
-		if (minLength != 0 || maxLength != 0) pruneContours(contours, junctions, minLength, maxLength);
+
+		if (minLength != 0 || maxLength != 0) {
+			pruneContours(contours, junctions, minLength, maxLength,overlapOption);
+		}
+
 		
 		return contours;
 
