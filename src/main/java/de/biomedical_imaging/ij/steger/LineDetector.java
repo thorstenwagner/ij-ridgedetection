@@ -523,14 +523,16 @@ public class LineDetector {
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
 		for (Junction junction : junctions) {
+			// This if() should be removed once cont1 and 2 contain the same info whatever OverlapOption
 			if (overlapOption == OverlapOption.SLOPE) {
 				if (junction.cont1 == c.getID() || junction.cont2 == c.getID())  {
-					IJ.log("Removing junction ");
+					log("Removing junction between line IDs"+ junction.cont1+ " and "+junction.cont2);
 					remove.add(junction);
 				}
 			} else {
 				if (contours.get((int) junction.cont1).getID() == c.getID()
 					|| contours.get((int) junction.cont2).getID() == c.getID())  {
+					log("Removing junction between line idx "+ junction.cont1+ " and "+junction.cont2);
 					remove.add(junction);
 				}	
 			}
@@ -570,11 +572,11 @@ public class LineDetector {
     private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength, OverlapOption overlapOption) {
       ArrayList<Line> remove = new ArrayList<Line>();
 
-      log("Pruning lines");
+      log("Pruning lines:");
       for (Line c : contours) {
       	if ((c.estimateLength() < minLength) || (maxLength > 0 && c.estimateLength() > maxLength)) {
-        	deleteJunctions(contours, junctions, c,overlapOption);
         	log("Removing line "+c.getID()+ " of length "+c.estimateLength());
+        	deleteJunctions(contours, junctions, c,overlapOption);
         	remove.add(c);
        	} else {
        		log("Keeping line "+c.getID()+ " of length "+c.estimateLength());

@@ -26,6 +26,7 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.TextField;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.CompositeImage;
 import ij.Prefs;
 import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
@@ -48,6 +50,7 @@ import ij.plugin.filter.ExtendedPlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
 import ij.plugin.frame.RoiManager;
 import ij.process.FloatPolygon;
+import ij.process.LUT;
 import ij.process.ImageProcessor;
 
 
@@ -443,28 +446,64 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 	
 	public void makeBinary() {
-		ImagePlus binary = NewImage.createByteImage(imp.getTitle()+" Detected segments",imp.getWidth(), imp.getHeight(),imp.getStackSize(),NewImage.FILL_WHITE);
+		ImagePlus binary = IJ.createHyperStack(imp.getTitle()+" Detected segments",imp.getWidth(), imp.getHeight(),imp.getNChannels(), imp.getStackSize()/imp.getNChannels(),1,8);
+		binary.copyScale(imp);
+
+		ImageProcessor binaryProcessor = binary.getProcessor();
+		binaryProcessor.invertLut();
+		if (imp.getCompositeMode()>0) {
+			((CompositeImage)binary).setLuts(imp.getLuts());
+		}
+		
 		ImageStack is = binary.getImageStack();
+		ImageProcessor ip = binary.getProcessor();
+		
 		for (Lines contours : result) {
 			for (Line c : contours) {
-			
+				
 				float[] x = c.getXCoordinates();
 				float[] y = c.getYCoordinates();
-				int prev_x =0;
-				int prev_y =0;
+
+				int[] x_poly_r = new int[x.length];
+				int[] y_poly_r = new int[x.length];
+				
+				Polygon LineSurface = new Polygon();
+
+				ip = is.getProcessor(c.getFrame());
+
+				ip.setLineWidth(1);
+				ip.setColor(255);
+			
 				for(int j = 0; j < x.length; j++){
-					int new_x = (int) Math.floor(x[j]);
-					int new_y = (int) Math.floor(y[j]);
-					is.getProcessor(c.getFrame()).putPixel(new_x,new_y,0);
+					// this draws the identified line
 					if (j >0) {
-						if (Math.abs(new_x - prev_x) >1 || Math.abs(new_y - prev_y) >1) {
-							is.getProcessor(c.getFrame()).putPixel(new_x - 1*Integer.signum(new_x - prev_x),new_y - 1*Integer.signum(new_y - prev_y),0);
-						} 
+						ip.drawLine((int) Math.round(x[j-1]), (int) Math.round(y[j-1]),(int) Math.round(x[j]), (int) Math.round(y[j]));
 					}
-					
-					prev_x = new_x;
-					prev_y = new_y;
+			
+					// If Estimate Width is ticked, we also draw the line surface in the binary
+					if (doEstimateWidth) {
+
+						double nx = Math.sin(c.angle[j]);
+						double ny = Math.cos(c.angle[j]);
+
+						//left point coordinates are directly added to the polygon. right coordinates are saved to be added at the end of the coordinates list
+						LineSurface.addPoint((int) Math.round(x[j] - c.width_l[j] * nx),(int) Math.round(y[j] - c.width_l[j] * ny));
+						
+						x_poly_r[j] = (int) Math.round(x[j] + c.width_r[j] * nx);
+						y_poly_r[j] = (int) Math.round(y[j] + c.width_r[j] * ny);
+					}
 				}
+				
+				if (doEstimateWidth) {
+					// loop to add the right coordinates to the end of the polygon, reversed
+					for (int j = 0; j < x.length; j++) {
+						if (j < x.length) {
+							LineSurface.addPoint(x_poly_r[x.length-1-j],y_poly_r[x.length-1-j]);
+						}
+					}
+					//draw surfaces.
+					ip.fillPolygon(LineSurface);
+				}		
 			}
 		}
 		binary.show();
