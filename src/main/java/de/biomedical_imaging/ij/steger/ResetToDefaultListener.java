@@ -63,6 +63,14 @@ public class ResetToDefaultListener implements ActionListener {
 		TextField textUppThresh = (TextField) gd.getNumericFields().get(5);
 		textUppThresh.setText("" + IJ.d2s(Lines_.upperThreshDefault, 2));
 		textUppThresh.setEditable(true);
+
+		TextField textMinLength = (TextField) gd.getNumericFields().get(6);
+		textMinLength.setText("" + IJ.d2s(Lines_.minLengthDefault, 2));
+		textMinLength.setEditable(true);
+		
+		TextField textMaxLength = (TextField) gd.getNumericFields().get(7);
+		textMaxLength.setText("" + IJ.d2s(Lines_.maxLengthDefault, 2));
+		textMaxLength.setEditable(true);
 		
 		((Checkbox)gd.getCheckboxes().get(0)).setState(Lines_.isDarkLineDefault);
 		((Checkbox)gd.getCheckboxes().get(1)).setState(Lines_.doCorrectPositionDefault);

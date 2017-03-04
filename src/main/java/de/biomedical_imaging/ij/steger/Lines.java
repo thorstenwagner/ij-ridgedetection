@@ -22,6 +22,7 @@
 package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Lines extends ArrayList<Line> {
 	
@@ -52,6 +53,4 @@ public class Lines extends ArrayList<Line> {
 		}
 		return -1;
 	}
-
-
 }

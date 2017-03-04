@@ -70,15 +70,15 @@ public class LineDetector {
 	 * @return An arraylist with line objects
 	 */
 	public Lines detectLines(ImageProcessor ip, double sigma,
-			double upperThresh, double lowerThresh, boolean isDarkLine,
+			double upperThresh, double lowerThresh, double minLength, double maxLength, boolean isDarkLine,
 			boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine) {
-		return detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine,
+		return detectLines(ip, sigma, upperThresh, lowerThresh, minLength, maxLength,isDarkLine,
 			doCorrectPosition, doEstimateWidth, doExtendLine, OverlapOption.NONE);
 	}
 
 	public Lines detectLines(ImageProcessor ip, double sigma,
-		double upperThresh, double lowerThresh, boolean isDarkLine,
+		double upperThresh, double lowerThresh, double minLength, double maxLength, boolean isDarkLine,
 		boolean doCorrectPosition, boolean doEstimateWidth,
 		boolean doExtendLine, OverlapOption overlapOption) {
 	this.isDarkLine = isDarkLine;
@@ -86,7 +86,7 @@ public class LineDetector {
 	this.doEstimateWidth = doEstimateWidth;
 	this.doExtendLine = doExtendLine;
 	junctions = new Junctions(ip.getSliceNumber());
-	lines = get_lines(sigma, upperThresh, lowerThresh, ip.getHeight(),
+	lines = get_lines(sigma, upperThresh, lowerThresh, minLength, maxLength, ip.getHeight(),
 			ip.getWidth(), ip, junctions, overlapOption);
 	return lines;
 }
@@ -496,7 +496,8 @@ public class LineDetector {
 		double[] ret =  {min,index};
 		return ret;
 	}
-	private void deleteContour(Lines contours, Junctions junctions, Line c) {
+	
+/*	private void deleteContour(Lines contours, Junctions junctions, Line c) {
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
 		for (Junction junction : junctions) {
@@ -512,19 +513,51 @@ public class LineDetector {
 		}
 
 		contours.remove(c);
+	} */
+
+	//To be removed once the problem with junctions.cont1 & .cont2 is solved.
+	private void deleteJunctions(Lines contours, Junctions junctions, Line c) {
+		deleteJunctions(contours, junctions, c, OverlapOption.NONE);
+	}
+	private void deleteJunctions(Lines contours, Junctions junctions, Line c, OverlapOption overlapOption) {	
+
+		ArrayList<Junction> remove = new ArrayList<Junction>();
+		for (Junction junction : junctions) {
+			// This if() should be removed once cont1 and 2 contain the same info whatever OverlapOption
+			if (overlapOption == OverlapOption.SLOPE) {
+				if (junction.cont1 == c.getID() || junction.cont2 == c.getID())  {
+					log("Removing junction between line IDs"+ junction.cont1+ " and "+junction.cont2);
+					remove.add(junction);
+				}
+			} else {
+				if (contours.get((int) junction.cont1).getID() == c.getID()
+					|| contours.get((int) junction.cont2).getID() == c.getID())  {
+					log("Removing junction between line idx "+ junction.cont1+ " and "+junction.cont2);
+					remove.add(junction);
+				}	
+			}
+		}
+		for (Junction junction : remove) {
+			junctions.remove(junction);
+		}
 	}
 
 	private void fixContours(Lines contours, Junctions junctions) {
 
+		ArrayList<Line> remove = new ArrayList<Line>();
 		// Contours with only a single position cant be valid.
 		for (Line contour : contours) {
 			if (contour.num == 1) {
-				deleteContour(contours,junctions,contour);
-				continue;
+				deleteJunctions(contours,junctions,contour);
+				remove.add(contour);
 			}
 			//If the results are corrupted, this informationen has to be reconstructed in fixJunctions
 			contour.setContourClass(LinesUtil.contour_class.cont_no_junc);
 		}
+
+		for (Line c : remove) {
+       		contours.remove(c);
+       	}
 
 		// For some reason the first and the last element are the same. Delete
 		// it!
@@ -535,20 +568,44 @@ public class LineDetector {
 			}
 		}
 	}
+    
+    private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength, OverlapOption overlapOption) {
+      ArrayList<Line> remove = new ArrayList<Line>();
 
-	private Lines get_lines(double sigma, double high, double low, int rows,
+      log("Pruning lines:");
+      for (Line c : contours) {
+      	if ((c.estimateLength() < minLength) || (maxLength > 0 && c.estimateLength() > maxLength)) {
+        	log("Removing line "+c.getID()+ " of length "+c.estimateLength());
+        	deleteJunctions(contours, junctions, c,overlapOption);
+        	remove.add(c);
+       	} else {
+       		log("Keeping line "+c.getID()+ " of length "+c.estimateLength());
+       	}
+       }
+       for (Line c : remove) {
+       	
+       	contours.remove(c);
+       }
+    }
+    
+    
+    
+    private Lines get_lines(double sigma, double high, double low, double minLength, double maxLength, int rows,
 			int cols, ImageProcessor in_img, Junctions resultJunction, OverlapOption overlapOption) {
 		FloatProcessor image;
 		Lines contours = new Lines(in_img.getSliceNumber());
 		int num_cont = 0;
 		opts = new Options(-1.0, -1.0, -1.0, isDarkLine ? LinesUtil.MODE_DARK
-				: LinesUtil.MODE_LIGHT, doCorrectPosition, doEstimateWidth,
+				: LinesUtil.MODE_LIGHT, -1.0, -1.0, doCorrectPosition, doEstimateWidth,
 				doExtendLine, false, false, false, overlapOption);
 
 		opts.sigma = sigma;
 		opts.high = high;
 		opts.low = low;
 		check_sigma(opts.sigma, cols, rows);
+
+		opts.minLength = minLength; 
+		opts.maxLength = maxLength; 
 
 		OverlapResolver resolver = null;
 
@@ -591,7 +648,7 @@ public class LineDetector {
 		junctions = resultJunction;
 
 		/*
-		 * RECONSRUCTION OF CONTOUR CLASS
+		 * RECONSTRUCTION OF CONTOUR CLASS
 		 */
 		//Reset contour class
 		for(int i = 0; i < contours.size(); i++){
@@ -615,8 +672,13 @@ public class LineDetector {
 			j.getLine2().setContourClass(reconstructContourClass(j.getLine2(),j.getLine2().getStartOrdEndPosition(x, y)));
 		}
 		
-
 		if (resolver != null) contours = resolver.resolve(contours, junctions, bechatty);
+
+		if (minLength != 0 || maxLength != 0) {
+			pruneContours(contours, junctions, minLength, maxLength,overlapOption);
+		}
+
+		
 		return contours;
 
 	}

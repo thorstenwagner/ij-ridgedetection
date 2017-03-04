@@ -26,6 +26,7 @@ import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.TextField;
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.CompositeImage;
 import ij.Prefs;
 import ij.gui.DialogListener;
 import ij.gui.GenericDialog;
@@ -48,6 +50,7 @@ import ij.plugin.filter.ExtendedPlugInFilter;
 import ij.plugin.filter.PlugInFilterRunner;
 import ij.plugin.frame.RoiManager;
 import ij.process.FloatPolygon;
+import ij.process.LUT;
 import ij.process.ImageProcessor;
 
 
@@ -70,6 +73,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	final static double upperThreshDefault = 7.99;
 	double upperThresh = upperThreshDefault;
 	
+    final static double minLengthDefault = 0;
+    double minLength = minLengthDefault;
+    
+    final static double maxLengthDefault = 0;
+    double maxLength = maxLengthDefault;
+    
 	final static boolean isDarkLineDefault = false;
 	boolean isDarkLine = isDarkLineDefault;
 	
@@ -91,7 +100,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	final static boolean addToRoiManagerDefault = true;
 	boolean addToRoiManager = addToRoiManagerDefault;
 
-	final static boolean makeBinaryDefault = true;
+	final static boolean makeBinaryDefault = false;
 	boolean makeBinary = makeBinaryDefault;
 	
 	OverlapOption overlapOption = OverlapOption.NONE;
@@ -222,6 +231,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		gd.addNumericField("Sigma", sigma, 2);
 		gd.addNumericField("Lower_Threshold", lowerThresh, 2);
 		gd.addNumericField("Upper_Threshold", upperThresh, 2);
+		gd.addNumericField("Minimum_Line_Length", minLength, 2);
+		gd.addNumericField("Maximum Line Length", maxLength, 2);
 		gd.addCheckbox("Darkline", isDarkLine);
 		gd.addCheckbox("Correct_position", doCorrectPosition);
 		gd.addCheckbox("Estimate_width", doEstimateWidth);
@@ -257,6 +268,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		sigma = gd.getNextNumber();
 		lowerThresh = gd.getNextNumber();
 		upperThresh = gd.getNextNumber();
+        minLength = gd.getNextNumber();
+        maxLength = gd.getNextNumber();
 		isDarkLine = gd.getNextBoolean();
 		doCorrectPosition = gd.getNextBoolean();
 		doEstimateWidth = gd.getNextBoolean();
@@ -288,6 +301,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		sigma = Prefs.get("RidgeDetection.sigma",sigmaDefault);
 		lowerThresh = Prefs.get("RidgeDetection.lowerThresh", lowerThreshDefault);
 		upperThresh = Prefs.get("RidgeDetection.upperThresh", upperThreshDefault);
+		minLength = Prefs.get("RidgeDetection.minLength", minLengthDefault);
+		maxLength = Prefs.get("RidgeDetection.maxLength", maxLengthDefault);
 		isDarkLine = Prefs.get("RidgeDetection.isDarkLine", isDarkLineDefault);
 		doCorrectPosition = Prefs.get("RidgeDetection.doCorrectPosition", doCorrectPositionDefault);
 		doEstimateWidth = Prefs.get("RidgeDetection.doEstimateWidth", doEstimateWidthDefault);
@@ -310,6 +325,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		Prefs.set("RidgeDetection.sigma", sigma);
 		Prefs.set("RidgeDetection.lowerThresh", lowerThresh);
 		Prefs.set("RidgeDetection.upperThresh", upperThresh);
+        Prefs.set("RidgeDetection.minLength", minLength);
+        Prefs.set("RidgeDetection.maxLength", maxLength);
 		Prefs.set("RidgeDetection.isDarkLine", isDarkLine);
 		Prefs.set("RidgeDetection.doCorrectPosition", doCorrectPosition);
 		Prefs.set("RidgeDetection.doEstimateWidth", doEstimateWidth);
@@ -429,28 +446,64 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 	
 	public void makeBinary() {
-		ImagePlus binary = NewImage.createByteImage(imp.getTitle()+" Detected segments",imp.getWidth(), imp.getHeight(),imp.getStackSize(),NewImage.FILL_WHITE);
+		ImagePlus binary = IJ.createHyperStack(imp.getTitle()+" Detected segments",imp.getWidth(), imp.getHeight(),imp.getNChannels(), imp.getStackSize()/imp.getNChannels(),1,8);
+		binary.copyScale(imp);
+
+		ImageProcessor binaryProcessor = binary.getProcessor();
+		binaryProcessor.invertLut();
+		if (imp.getCompositeMode()>0) {
+			((CompositeImage)binary).setLuts(imp.getLuts());
+		}
+		
 		ImageStack is = binary.getImageStack();
+		ImageProcessor ip = binary.getProcessor();
+		
 		for (Lines contours : result) {
 			for (Line c : contours) {
-			
+				
 				float[] x = c.getXCoordinates();
 				float[] y = c.getYCoordinates();
-				int prev_x =0;
-				int prev_y =0;
+
+				int[] x_poly_r = new int[x.length];
+				int[] y_poly_r = new int[x.length];
+				
+				Polygon LineSurface = new Polygon();
+
+				ip = is.getProcessor(c.getFrame());
+
+				ip.setLineWidth(1);
+				ip.setColor(255);
+			
 				for(int j = 0; j < x.length; j++){
-					int new_x = (int) Math.floor(x[j]);
-					int new_y = (int) Math.floor(y[j]);
-					is.getProcessor(c.getFrame()).putPixel(new_x,new_y,0);
+					// this draws the identified line
 					if (j >0) {
-						if (Math.abs(new_x - prev_x) >1 || Math.abs(new_y - prev_y) >1) {
-							is.getProcessor(c.getFrame()).putPixel(new_x - 1*Integer.signum(new_x - prev_x),new_y - 1*Integer.signum(new_y - prev_y),0);
-						} 
+						ip.drawLine((int) Math.round(x[j-1]), (int) Math.round(y[j-1]),(int) Math.round(x[j]), (int) Math.round(y[j]));
 					}
-					
-					prev_x = new_x;
-					prev_y = new_y;
+			
+					// If Estimate Width is ticked, we also draw the line surface in the binary
+					if (doEstimateWidth) {
+
+						double nx = Math.sin(c.angle[j]);
+						double ny = Math.cos(c.angle[j]);
+
+						//left point coordinates are directly added to the polygon. right coordinates are saved to be added at the end of the coordinates list
+						LineSurface.addPoint((int) Math.round(x[j] - c.width_l[j] * nx),(int) Math.round(y[j] - c.width_l[j] * ny));
+						
+						x_poly_r[j] = (int) Math.round(x[j] + c.width_r[j] * nx);
+						y_poly_r[j] = (int) Math.round(y[j] + c.width_r[j] * ny);
+					}
 				}
+				
+				if (doEstimateWidth) {
+					// loop to add the right coordinates to the end of the polygon, reversed
+					for (int j = 0; j < x.length; j++) {
+						if (j < x.length) {
+							LineSurface.addPoint(x_poly_r[x.length-1-j],y_poly_r[x.length-1-j]);
+						}
+					}
+					//draw surfaces.
+					ip.fillPolygon(LineSurface);
+				}		
 			}
 		}
 		binary.show();
@@ -606,6 +659,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			lineWidth = lwCand;
 			lwChanged = true;
 		}
+		
 		double conCand = gd.getNextNumber();
 		diff = Math.abs(conCand-contrastHigh);
 		if ( diff > 0.0001) {
@@ -619,14 +673,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			contrastLow = conCand;
 			contLowChanged = true;
 		}
-
 		
 		boolean darklineCand = gd.getNextBoolean();
 		if(darklineCand != isDarkLine){
 			isDarkLine = darklineCand;
 			darklineChanged = true;
 		}
-		
 		
 		doCorrectPosition = gd.getNextBoolean();
 		doEstimateWidth = gd.getNextBoolean();
@@ -684,6 +736,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 			return false;
 		}
 		
+		minLength = gd.getNextNumber();
+		maxLength = gd.getNextNumber();
 
 		isPreview = gd.isPreviewActive();
 
@@ -704,7 +758,7 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		LineDetector detect = new LineDetector();
 		detect.bechatty = verbose;
 
-		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption));
+		result.add(detect.detectLines(ip, sigma, upperThresh, lowerThresh, minLength,maxLength, isDarkLine, doCorrectPosition, doEstimateWidth, doExtendLine, overlapOption));
 		usedOptions = detect.getUsedParamters();
 		resultJunction.add(detect.getJunctions());
 
