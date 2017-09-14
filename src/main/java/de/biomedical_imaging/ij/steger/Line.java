@@ -22,7 +22,8 @@
 
 package de.biomedical_imaging.ij.steger;
 
-import ij.IJ;
+import java.util.stream.IntStream;
+import de.biomedical_imaging.ij.steger.LinesUtil;
 
 /** This class holds one extracted line.  The field num contains the number of
    points in the line.  The coordinates of the line points are given in the
@@ -80,6 +81,13 @@ public class Line {
 		// TODO Auto-generated constructor stub
 		assignID();
 		
+	}
+	
+	public Line(float[] x, float[] y) {
+		assignID();
+		col = x;
+		row = y;
+		num = x.length;
 	}
 	
 	public LinesUtil.contour_class getContourClass(){
