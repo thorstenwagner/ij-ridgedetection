@@ -1,43 +1,79 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi=
-"http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
- 	<parent>
-		<groupId>net.imagej</groupId>
-		<artifactId>pom-imagej</artifactId>
-		<version>7.0.0</version>
+
+	<parent>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>17.0.0</version>
 		<relativePath />
 	</parent>
-	
+
 	<groupId>de.biomedical-imaging.imagej</groupId>
 	<artifactId>ij_ridge_detect</artifactId>
 	<version>1.3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
- 
+
 	<name>Ridge Detection Plugin for ImageJ</name>
-	<url>https://github.com/jumpfunky/ij-ridgedetection</url>
+	<url>https://github.com/thorstenwagner/ij-ridgedetection</url>
 	<inceptionYear>2014</inceptionYear>
-	
+	<description>Detect ridges / lines with imagej.</description>
+
+	<properties>
+		<package-name>ij_ridge_detect</package-name>
+		<license.licenseName>gpl-2.0</license.licenseName>
+		<license.copyrightOwners>Thorsten Wagner</license.copyrightOwners>
+	</properties>
+
+	<organization>
+		<name>SciJava</name>
+		<url>http://www.scijava.org/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>GPLv2</name>
+			<url>http://choosealicense.com/licenses/gpl-2.0/</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<mailingLists>
+		<mailingList>
+			<name>ImageJ Forum</name>
+			<archive>http://forum.imagej.net/</archive>
+		</mailingList>
+	</mailingLists>
+
+	<scm>
+		<connection>scm:git:git://github.com/thorstenwagner/ij-ridgedetection</connection>
+		<developerConnection>scm:git:git@github.com:thorstenwagner/ij-ridgedetection</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/thorstenwagner/ij-ridgedetection</url>
+	</scm>
+
 	<issueManagement>
 		<system>GitHub Issues</system>
 		<url>https://github.com/thorstenwagner/ij-ridgedetection/issues</url>
 	</issueManagement>
-	
- 	<dependencies>
+
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://jenkins.imagej.net/job/FilamentDetector/</url>
+	</ciManagement>
+
+	<dependencies>
 		<dependency>
-   	 		<groupId>net.imagej</groupId>
-   	 		<artifactId>ij</artifactId>
-  	 		<version>1.49r</version>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
 		</dependency>
 		<dependency>
-    		<groupId>org.apache.commons</groupId>
-    		<artifactId>commons-lang3</artifactId>
-   			<version>3.4</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 	</dependencies>
-	
+
 	<developers>
 		<developer>
 			<id>twagner</id>
@@ -67,7 +103,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<timezone>-6</timezone>
 		</contributor>
 	</contributors>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -75,7 +111,9 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 				<artifactId>license-maven-plugin</artifactId>
 				<configuration>
 					<licenseName>gpl_v2</licenseName>
-					<organizationName>Thorsten Wagner (ImageJ java plugin), 1996-1998 Carsten Steger (original C code), 1999 R. Balasubramanian (detect lines code to incorporate within GRASP)</organizationName>
+					<organizationName>Thorsten Wagner (ImageJ java plugin), 1996-1998
+						Carsten Steger (original C code), 1999 R. Balasubramanian (detect
+						lines code to incorporate within GRASP)</organizationName>
 					<projectName>Ridge Detection plugin for ImageJ</projectName>
 				</configuration>
 			</plugin>
