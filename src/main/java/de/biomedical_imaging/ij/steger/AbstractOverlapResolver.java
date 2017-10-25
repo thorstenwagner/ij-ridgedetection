@@ -28,7 +28,7 @@ package de.biomedical_imaging.ij.steger;
  * Provides default {@link #resolve(Lines, Junctions)} implementation that
  * defaults verbosity to {@code false}.
  *
- * @author Mark Hiner <hinerm@gmail.com>
+ * @author Mark Hiner (hinerm@gmail.com)
  */
 public abstract class AbstractOverlapResolver implements OverlapResolver {
 
