@@ -23,6 +23,9 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<package-name>ij_ridge_detect</package-name>
 		<license.licenseName>gpl-2.0</license.licenseName>
 		<license.copyrightOwners>Thorsten Wagner</license.copyrightOwners>
+
+		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
+		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 	</properties>
 
 	<organization>
