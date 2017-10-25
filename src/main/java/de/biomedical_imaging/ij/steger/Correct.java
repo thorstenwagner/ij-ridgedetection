@@ -23,8 +23,13 @@ package de.biomedical_imaging.ij.steger;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Correct.
+ */
 public class Correct {
 
+	/** The Constant ctableh. */
 	private final static double[][][] ctableh = new double[][][] {
 			{ { 2.0, 0.00, 0.00000000, 0.00000000, 0.00000000, 1.00000000, 1.00000000, 0 },
 					{ 2.1, 0.00, 0.00000000, 0.00000000, 0.00000000, 1.00000000, 1.00000000, 0 },
@@ -888,8 +893,18 @@ public class Correct {
 					{ 5.9, 1.00, 2.94999984, 0.00000000, 0.00000000, 2.95000000, 2.95000000, 1 },
 					{ 6.0, 1.00, 2.99999991, 0.00000000, 0.00000000, 3.00000000, 3.00000000, 1 } } };
 
+	/** The ctable. */
 	private static Correction[][] ctable = null;
 
+	/**
+	 * Gets the c table.
+	 *
+	 * @param i
+	 *            the i
+	 * @param j
+	 *            the j
+	 * @return the c table
+	 */
 	public static Correction getCTable(int i, int j) {
 		if (ctable == null) {
 			init();
@@ -898,6 +913,9 @@ public class Correct {
 		return ctable[i][j];
 	}
 
+	/**
+	 * Inits the.
+	 */
 	private static void init() {
 		ctable = new Correction[21][41];
 
@@ -918,6 +936,21 @@ public class Correct {
 	// i=1 field = h
 	// i=2 field=correction
 	// i=3 field=w_strong
+	/**
+	 * Bilinear.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @param i_re
+	 *            the i re
+	 * @param i_we
+	 *            the i we
+	 * @param i
+	 *            the i
+	 * @return the double
+	 */
 	// i=4 field=w_weak;
 	private static double BILINEAR(double a, double b, int i_re, int i_we, int i) {
 		double value = 0;
@@ -947,6 +980,27 @@ public class Correct {
 		return value;
 	}
 
+	/**
+	 * Line corrections.
+	 *
+	 * @param sigma
+	 *            the sigma
+	 * @param w_est
+	 *            the w est
+	 * @param r_est
+	 *            the r est
+	 * @param w
+	 *            the w
+	 * @param h
+	 *            the h
+	 * @param correct
+	 *            the correct
+	 * @param w_strong
+	 *            the w strong
+	 * @param w_weak
+	 *            the w weak
+	 * @return true, if successful
+	 */
 	/*
 	 * Return the correct line width w and asymmetry h, and a line position
 	 * correction correct for a line with extracted width w_est and extracted

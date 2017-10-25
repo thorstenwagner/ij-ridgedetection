@@ -34,19 +34,42 @@ import ij.IJ;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class LineDetector.
+ */
 public class LineDetector {
+
+	/** The is dark line. */
 	boolean isDarkLine = false;
+
+	/** The do correct position. */
 	boolean doCorrectPosition = false;
+
+	/** The do estimate width. */
 	boolean doEstimateWidth = false;
+
+	/** The do extend line. */
 	boolean doExtendLine = false;
+
+	/** The opts. */
 	private Options opts = null;
+
+	/** The junctions. */
 	private Junctions junctions;
+
+	/** The lines. */
 	private Lines lines;
+
+	/** The already processed junction points. */
 	Set<Integer> alreadyProcessedJunctionPoints;
+
+	/** The bechatty. */
 	boolean bechatty = false;
 
 	/**
-	 * 
+	 * Detect lines.
+	 *
 	 * @param ip
 	 *            The image where the lines should be detected
 	 * @param sigma
@@ -58,6 +81,10 @@ public class LineDetector {
 	 * @param lowerThresh
 	 *            Lower hysteresis thresholds used in the linking algorithm (Depends
 	 *            on the minimum contour brightness (greyvalue)).
+	 * @param minLength
+	 *            the min length
+	 * @param maxLength
+	 *            the max length
 	 * @param isDarkLine
 	 *            True if the line darker than the background
 	 * @param doCorrectPosition
@@ -76,6 +103,33 @@ public class LineDetector {
 				doEstimateWidth, doExtendLine, OverlapOption.NONE);
 	}
 
+	/**
+	 * Detect lines.
+	 *
+	 * @param ip
+	 *            the ip
+	 * @param sigma
+	 *            the sigma
+	 * @param upperThresh
+	 *            the upper thresh
+	 * @param lowerThresh
+	 *            the lower thresh
+	 * @param minLength
+	 *            the min length
+	 * @param maxLength
+	 *            the max length
+	 * @param isDarkLine
+	 *            the is dark line
+	 * @param doCorrectPosition
+	 *            the do correct position
+	 * @param doEstimateWidth
+	 *            the do estimate width
+	 * @param doExtendLine
+	 *            the do extend line
+	 * @param overlapOption
+	 *            the overlap option
+	 * @return the lines
+	 */
 	public Lines detectLines(ImageProcessor ip, double sigma, double upperThresh, double lowerThresh, double minLength,
 			double maxLength, boolean isDarkLine, boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine, OverlapOption overlapOption) {
@@ -89,6 +143,14 @@ public class LineDetector {
 		return lines;
 	}
 
+	/**
+	 * Assign lines to junctions.
+	 *
+	 * @param lines
+	 *            the lines
+	 * @param junctions
+	 *            the junctions
+	 */
 	private void assignLinesToJunctions(Lines lines, Junctions junctions) {
 		for (Junction j : junctions) {
 			j.lineCont1 = lines.get(j.cont1);
@@ -96,14 +158,32 @@ public class LineDetector {
 		}
 	}
 
+	/**
+	 * Gets the used paramters.
+	 *
+	 * @return the used paramters
+	 */
 	public Options getUsedParamters() {
 		return opts;
 	}
 
+	/**
+	 * Gets the junctions.
+	 *
+	 * @return the junctions
+	 */
 	public Junctions getJunctions() {
 		return junctions;
 	}
 
+	/**
+	 * Adds the additional junction points and lines.
+	 *
+	 * @param lines
+	 *            the lines
+	 * @param junctions
+	 *            the junctions
+	 */
 	private void addAdditionalJunctionPointsAndLines(Lines lines, Junctions junctions) {
 
 		for (int i = 0; i < junctions.size(); i++) {
@@ -326,6 +406,15 @@ public class LineDetector {
 		}
 	}
 
+	/**
+	 * Fix junctions.
+	 *
+	 * @param lines
+	 *            the lines
+	 * @param junctions
+	 *            the junctions
+	 * @return the junctions
+	 */
 	private Junctions fixJunctions(Lines lines, Junctions junctions) {
 		/*
 		 * For some reason, the x and y coordinates are permuted
@@ -447,6 +536,15 @@ public class LineDetector {
 
 	}
 
+	/**
+	 * Reconstruct contour class.
+	 *
+	 * @param l
+	 *            the l
+	 * @param pos
+	 *            the pos
+	 * @return the lines util.contour class
+	 */
 	private LinesUtil.contour_class reconstructContourClass(Line l, int pos) {
 		LinesUtil.contour_class currentClass = l.getLineClass();
 
@@ -478,7 +576,8 @@ public class LineDetector {
 	}
 
 	/**
-	 * 
+	 * Min distance.
+	 *
 	 * @param l
 	 *            Line
 	 * @param x
@@ -516,11 +615,33 @@ public class LineDetector {
 	 * contours.remove(c); }
 	 */
 
+	/**
+	 * Delete junctions.
+	 *
+	 * @param contours
+	 *            the contours
+	 * @param junctions
+	 *            the junctions
+	 * @param c
+	 *            the c
+	 */
 	// To be removed once the problem with junctions.cont1 & .cont2 is solved.
 	private void deleteJunctions(Lines contours, Junctions junctions, Line c) {
 		deleteJunctions(contours, junctions, c, OverlapOption.NONE);
 	}
 
+	/**
+	 * Delete junctions.
+	 *
+	 * @param contours
+	 *            the contours
+	 * @param junctions
+	 *            the junctions
+	 * @param c
+	 *            the c
+	 * @param overlapOption
+	 *            the overlap option
+	 */
 	private void deleteJunctions(Lines contours, Junctions junctions, Line c, OverlapOption overlapOption) {
 
 		ArrayList<Junction> remove = new ArrayList<Junction>();
@@ -545,6 +666,14 @@ public class LineDetector {
 		}
 	}
 
+	/**
+	 * Fix contours.
+	 *
+	 * @param contours
+	 *            the contours
+	 * @param junctions
+	 *            the junctions
+	 */
 	private void fixContours(Lines contours, Junctions junctions) {
 
 		ArrayList<Line> remove = new ArrayList<Line>();
@@ -573,6 +702,20 @@ public class LineDetector {
 		}
 	}
 
+	/**
+	 * Prune contours.
+	 *
+	 * @param contours
+	 *            the contours
+	 * @param junctions
+	 *            the junctions
+	 * @param minLength
+	 *            the min length
+	 * @param maxLength
+	 *            the max length
+	 * @param overlapOption
+	 *            the overlap option
+	 */
 	private void pruneContours(Lines contours, Junctions junctions, double minLength, double maxLength,
 			OverlapOption overlapOption) {
 		ArrayList<Line> remove = new ArrayList<Line>();
@@ -593,6 +736,31 @@ public class LineDetector {
 		}
 	}
 
+	/**
+	 * Gets the lines.
+	 *
+	 * @param sigma
+	 *            the sigma
+	 * @param high
+	 *            the high
+	 * @param low
+	 *            the low
+	 * @param minLength
+	 *            the min length
+	 * @param maxLength
+	 *            the max length
+	 * @param rows
+	 *            the rows
+	 * @param cols
+	 *            the cols
+	 * @param in_img
+	 *            the in img
+	 * @param resultJunction
+	 *            the result junction
+	 * @param overlapOption
+	 *            the overlap option
+	 * @return the lines
+	 */
 	private Lines get_lines(double sigma, double high, double low, double minLength, double maxLength, int rows,
 			int cols, ImageProcessor in_img, Junctions resultJunction, OverlapOption overlapOption) {
 		FloatProcessor image;
@@ -689,12 +857,28 @@ public class LineDetector {
 
 	}
 
+	/**
+	 * Log.
+	 *
+	 * @param s
+	 *            the s
+	 */
 	private void log(String s) {
 		if (bechatty) {
 			IJ.log(s);
 		}
 	}
 
+	/**
+	 * Check sigma.
+	 *
+	 * @param sigma
+	 *            the sigma
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 */
 	private void check_sigma(double sigma, int width, int height) {
 		int min_dim;
 		min_dim = width < height ? width : height;

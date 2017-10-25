@@ -21,20 +21,39 @@
  */
 package de.biomedical_imaging.ij.steger;
 
-/* This data structure facilitates the quick search for the next possible
-   starting point of a line.  An array of crossrefs will be accumulated and
-   sorted according to its value.  x and y are the coordinates of a point in
-   the image.  When this point has been processed it will be marked as done. */
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Crossref.
+ */
+/*
+ * This data structure facilitates the quick search for the next possible
+ * starting point of a line. An array of crossrefs will be accumulated and
+ * sorted according to its value. x and y are the coordinates of a point in the
+ * image. When this point has been processed it will be marked as done.
+ */
 public class Crossref implements Comparable<Crossref> {
+
+	/** The x. */
 	short x;
+
+	/** The y. */
 	short y;
+
+	/** The value. */
 	double value;
+
+	/** The done. */
 	boolean done;
 	/*
 	 * int compare_crossrefs(crossref p1, crossref p2) { if (p1.value > p2.value)
 	 * return -1; if (p1.value < p2.value) return 1; return 0; }
 	 */
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	/*
 	 * This function compares two crossrefs according to their value. It is called
 	 * by qsort.

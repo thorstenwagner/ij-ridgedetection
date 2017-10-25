@@ -24,11 +24,17 @@ package de.biomedical_imaging.ij.steger;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Link.
+ */
 public class Link {
 
+	/** The Constant MAX_ANGLE_DIFFERENCE. */
 	public static final double MAX_ANGLE_DIFFERENCE = Math.PI / 6.0;
 	// public static final double MAX_LINE_EXTENSION = 2.5*sigma;
 
+	/** The Constant dirtab. */
 	/*
 	 * This table contains the three appropriate neighbor pixels that the linking
 	 * algorithm must examine. It is indexed by the octant the current line angle
@@ -39,6 +45,7 @@ public class Link {
 			{ { -1, -1 }, { -1, 0 }, { 0, -1 } }, { { 0, -1 }, { -1, -1 }, { 1, -1 } },
 			{ { 1, -1 }, { 0, -1 }, { 1, 0 } } };
 
+	/** The Constant cleartab. */
 	/*
 	 * This table contains the two neighbor pixels that the linking algorithm should
 	 * examine and mark as processed in case there are double responses.
@@ -47,6 +54,25 @@ public class Link {
 			{ { -1, 0 }, { 1, 0 } }, { { -1, -1 }, { 1, 1 } }, { { 0, -1 }, { 0, 1 } }, { { 1, -1 }, { -1, 1 } },
 			{ { 1, 0 }, { -1, 0 } }, { { 1, 1 }, { -1, -1 } } };
 
+	/**
+	 * Interpolate response.
+	 *
+	 * @param resp
+	 *            the resp
+	 * @param x
+	 *            the x
+	 * @param y
+	 *            the y
+	 * @param px
+	 *            the px
+	 * @param py
+	 *            the py
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @return the double
+	 */
 	/*
 	 * Compute the response of the operator with sub-pixel accuracy by using the
 	 * facet model to interpolate the pixel accurate responses.
@@ -83,6 +109,28 @@ public class Link {
 		return d + xx * dr + yy * dc + xx * xx * drr + xx * yy * drc + yy * yy * dcc;
 	}
 
+	/**
+	 * Closest point.
+	 *
+	 * @param lx
+	 *            the lx
+	 * @param ly
+	 *            the ly
+	 * @param dx
+	 *            the dx
+	 * @param dy
+	 *            the dy
+	 * @param px
+	 *            the px
+	 * @param py
+	 *            the py
+	 * @param cx
+	 *            the cx
+	 * @param cy
+	 *            the cy
+	 * @param t
+	 *            the t
+	 */
 	/*
 	 * Calculate the closest point to (px,py) on the line (lx,ly) + t*(dx,dy) and
 	 * return the result in (cx,cy), plus the parameter in t.
@@ -103,6 +151,24 @@ public class Link {
 		t.setValue(tt);
 	}
 
+	/**
+	 * Interpolate gradient.
+	 *
+	 * @param gradx
+	 *            the gradx
+	 * @param grady
+	 *            the grady
+	 * @param px
+	 *            the px
+	 * @param py
+	 *            the py
+	 * @param width
+	 *            the width
+	 * @param gx
+	 *            the gx
+	 * @param gy
+	 *            the gy
+	 */
 	/*
 	 * Interpolate the gradient of the gradient images gradx and grady with width
 	 * width at the point (px,py) using linear interpolation, and return the result
@@ -135,6 +201,46 @@ public class Link {
 		gy.setValue((1 - gfy) * ((1 - gfx) * gy1 + gfx * gy2) + gfy * ((1 - gfx) * gy3 + gfx * gy4));
 	}
 
+	/**
+	 * Compute contours.
+	 *
+	 * @param ismax
+	 *            the ismax
+	 * @param eigval
+	 *            the eigval
+	 * @param normx
+	 *            the normx
+	 * @param normy
+	 *            the normy
+	 * @param posx
+	 *            the posx
+	 * @param posy
+	 *            the posy
+	 * @param gradx
+	 *            the gradx
+	 * @param grady
+	 *            the grady
+	 * @param contours
+	 *            the contours
+	 * @param num_result
+	 *            the num result
+	 * @param sigma
+	 *            the sigma
+	 * @param extend_lines
+	 *            the extend lines
+	 * @param mode
+	 *            the mode
+	 * @param low
+	 *            the low
+	 * @param high
+	 *            the high
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @param junctions
+	 *            the junctions
+	 */
 	/*
 	 * This function links the line points into lines. The input to this function
 	 * are the response of the filter, i.e., the second directional derivative along

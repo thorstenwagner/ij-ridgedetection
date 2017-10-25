@@ -23,7 +23,13 @@ package de.biomedical_imaging.ij.steger;
 
 import org.apache.commons.lang3.mutable.MutableLong;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Convol.
+ */
 public class Convol {
+
+	/** The sqrt 2 pi inv. */
 	/* 1/sqrt(2*PI) */
 	private final double SQRT_2_PI_INV = 0.398942280401432677939946059935;
 
@@ -32,11 +38,29 @@ public class Convol {
 	 * Gaussian function 1/(sqrt(2*PI)*sigma)*exp(-0.5*x^2/sigma^2)
 	 */
 
+	/**
+	 * Phi 0.
+	 *
+	 * @param x
+	 *            the x
+	 * @param sigma
+	 *            the sigma
+	 * @return the double
+	 */
 	/* Integral of the Gaussian function */
 	private double phi0(double x, double sigma) {
 		return Normal.getNormal(x / sigma);
 	}
 
+	/**
+	 * Phi 1.
+	 *
+	 * @param x
+	 *            the x
+	 * @param sigma
+	 *            the sigma
+	 * @return the double
+	 */
 	/* The Gaussian function */
 	private double phi1(double x, double sigma) {
 		double t;
@@ -44,6 +68,15 @@ public class Convol {
 		return SQRT_2_PI_INV / sigma * Math.exp(-0.5 * t * t);
 	}
 
+	/**
+	 * Phi 2.
+	 *
+	 * @param x
+	 *            the x
+	 * @param sigma
+	 *            the sigma
+	 * @return the double
+	 */
 	/* First derivative of the Gaussian function */
 	public double phi2(double x, double sigma) {
 		double t;
@@ -64,6 +97,15 @@ public class Convol {
 
 	/* Gaussian smoothing mask */
 
+	/**
+	 * Compute gauss mask 0.
+	 *
+	 * @param num
+	 *            the num
+	 * @param sigma
+	 *            the sigma
+	 * @return the double[]
+	 */
 	/*
 	 * num ist eigentlich pointer - aufrufende Funkion nimmt an, dass num geändert
 	 * wird. Übergebe es deswegen als MutableDouble aus CommonsLang
@@ -86,6 +128,15 @@ public class Convol {
 	}
 
 	/* First derivative of Gaussian smoothing mask */
+	/**
+	 * Compute gauss mask 1.
+	 *
+	 * @param num
+	 *            the num
+	 * @param sigma
+	 *            the sigma
+	 * @return the double[]
+	 */
 	/*
 	 * num ist eigentlich pointer - aufrufende Funkion nimmt an, dass num geändert
 	 * wird. Übergebe es deswegen als MutableDouble aus CommonsLang
@@ -108,6 +159,15 @@ public class Convol {
 	}
 
 	/* Second derivative of Gaussian smoothing mask */
+	/**
+	 * Compute gauss mask 2.
+	 *
+	 * @param num
+	 *            the num
+	 * @param sigma
+	 *            the sigma
+	 * @return the double[]
+	 */
 	/*
 	 * num ist eigentlich pointer - aufrufende Funkion nimmt an, dass num geändert
 	 * wird. Übergebe es deswegen als MutableDouble aus CommonsLang
@@ -139,6 +199,22 @@ public class Convol {
 	 * At the border of the image the gray values are mirrored.
 	 */
 
+	/**
+	 * Convolve rows gauss.
+	 *
+	 * @param image
+	 *            the image
+	 * @param mask
+	 *            the mask
+	 * @param n
+	 *            the n
+	 * @param h
+	 *            the h
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 */
 	/* Convolve the rows of an image with the derivatives of a Gaussian. */
 	private void convolve_rows_gauss(float[] image, double[] mask, int n, float[] h, int width, int height) {
 		int j, r, c, l;
@@ -175,6 +251,22 @@ public class Convol {
 		}
 	}
 
+	/**
+	 * Convolve cols gauss.
+	 *
+	 * @param h
+	 *            the h
+	 * @param mask
+	 *            the mask
+	 * @param n
+	 *            the n
+	 * @param k
+	 *            the k
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 */
 	/* Convolve the columns of an image with the derivatives of a Gaussian. */
 	private void convolve_cols_gauss(float[] h, double[] mask, int n, float[] k, int width, int height) {
 		int j, r, c, l;
@@ -211,6 +303,22 @@ public class Convol {
 		}
 	}
 
+	/**
+	 * Convolve gauss.
+	 *
+	 * @param image
+	 *            the image
+	 * @param k
+	 *            the k
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @param sigma
+	 *            the sigma
+	 * @param deriv_type
+	 *            the deriv type
+	 */
 	/* Convolve an image with a derivative of the Gaussian. */
 	public void convolve_gauss(float[] image, float[] k, int width, int height, double sigma, int deriv_type) {
 		double[] hr = null, hc = null;

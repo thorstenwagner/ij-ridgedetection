@@ -21,6 +21,7 @@
  */
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
 /**
  * Abstract superclass for {@link OverlapResolver} implementations.
  *
@@ -31,6 +32,13 @@ package de.biomedical_imaging.ij.steger;
  */
 public abstract class AbstractOverlapResolver implements OverlapResolver {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.biomedical_imaging.ij.steger.OverlapResolver#resolve(de.biomedical_imaging
+	 * .ij.steger.Lines, de.biomedical_imaging.ij.steger.Junctions)
+	 */
 	@Override
 	public Lines resolve(final Lines lines, final Junctions junctions) {
 		return resolve(lines, junctions, false);

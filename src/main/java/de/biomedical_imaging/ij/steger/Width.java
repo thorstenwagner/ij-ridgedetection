@@ -26,11 +26,16 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Width.
+ */
 public class Width {
 
 	/* Maximum search line length. */
 	// #define MAX_LINE_WIDTH (2.5*sigma)
 
+	/** The Constant LINE_WIDTH_COMPENSATION. */
 	/*
 	 * This constant is introduced because for very narrow lines the facet model
 	 * width detection scheme sometimes extracts the line width too narrow. Since
@@ -41,12 +46,32 @@ public class Width {
 	 */
 	public static final double LINE_WIDTH_COMPENSATION = 1.05;
 
+	/** The Constant MIN_LINE_WIDTH. */
 	/* Minimum line width allowed (used for outlier check in fix_locations()) */
 	public static final double MIN_LINE_WIDTH = 0.1;
 
+	/** The Constant MAX_CONTRAST. */
 	/* Maximum contrast allowed (used for outlier check in fix_locations()) */
 	public static final double MAX_CONTRAST = 275.0;
 
+	/**
+	 * Bresenham.
+	 *
+	 * @param nx
+	 *            the nx
+	 * @param ny
+	 *            the ny
+	 * @param px
+	 *            the px
+	 * @param py
+	 *            the py
+	 * @param length
+	 *            the length
+	 * @param line
+	 *            the line
+	 * @param num_points
+	 *            the num points
+	 */
 	/*
 	 * Modified Bresenham algorithm. It returns in line all pixels that are
 	 * intersected by a half line less than length away from the point (px,py) aint
@@ -105,6 +130,18 @@ public class Width {
 		num_points.setValue(n);
 	}
 
+	/**
+	 * Fill gaps.
+	 *
+	 * @param master
+	 *            the master
+	 * @param slave1
+	 *            the slave 1
+	 * @param slave2
+	 *            the slave 2
+	 * @param cont
+	 *            the cont
+	 */
 	/*
 	 * Fill gaps in the arrays master, slave1, and slave2, i.e., points where
 	 * master=0, by interpolation (interior points) or extrapolation (end points).
@@ -211,6 +248,36 @@ public class Width {
 		}
 	}
 
+	/**
+	 * Fix locations.
+	 *
+	 * @param width_l
+	 *            the width l
+	 * @param width_r
+	 *            the width r
+	 * @param grad_l
+	 *            the grad l
+	 * @param grad_r
+	 *            the grad r
+	 * @param pos_x
+	 *            the pos x
+	 * @param pos_y
+	 *            the pos y
+	 * @param correction
+	 *            the correction
+	 * @param contr
+	 *            the contr
+	 * @param asymm
+	 *            the asymm
+	 * @param sigma
+	 *            the sigma
+	 * @param mode
+	 *            the mode
+	 * @param correct_pos
+	 *            the correct pos
+	 * @param cont
+	 *            the cont
+	 */
 	/*
 	 * Correct the extracted line positions and widths. The algorithm first closes
 	 * gaps in the extracted data width_l, width_r, grad_l, and grad_r to provide
@@ -348,6 +415,28 @@ public class Width {
 		}
 	}
 
+	/**
+	 * Compute line width.
+	 *
+	 * @param dx
+	 *            the dx
+	 * @param dy
+	 *            the dy
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @param sigma
+	 *            the sigma
+	 * @param mode
+	 *            the mode
+	 * @param correct_pos
+	 *            the correct pos
+	 * @param contours
+	 *            the contours
+	 * @param num_contours
+	 *            the num contours
+	 */
 	/*
 	 * Extract the line width by using a facet model line detector on an image of
 	 * the absolute value of the gradient.

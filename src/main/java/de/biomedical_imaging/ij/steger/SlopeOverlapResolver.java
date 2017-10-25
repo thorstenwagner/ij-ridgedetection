@@ -33,6 +33,7 @@ import java.util.Set;
 import de.biomedical_imaging.ij.steger.LinesUtil.contour_class;
 import ij.IJ;
 
+// TODO: Auto-generated Javadoc
 /**
  * Resolve overlap between lines by selecting the fragment with the closest
  * matching slope (which is really just trying to preserve straightness -
@@ -43,19 +44,29 @@ import ij.IJ;
 public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 	// TODO add configuration for these
+	/** The Constant SIGMA. */
 	// Sigma for deciding if two floats are "close enough"
 	private static final float SIGMA = 2.0f;
 
 	// Length from junction point to use in line segment calculation.
 	// Smaller distances are more subject to variance, while larger distances
+	/** The Constant SLOPE_DIST. */
 	// could introduce error due to actual curvature of line segments
 	private static final int SLOPE_DIST = 5;
 
 	// When considering the portion of a line segment to use in straightness
 	// comparisons, we take the longest segment possible within the following
+	/** The Constant STRAIGHT_TOLERANCE. */
 	// tolerance. A value of "1" would require perfect straightness.
 	private static final float STRAIGHT_TOLERANCE = 1.02f;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.biomedical_imaging.ij.steger.OverlapResolver#resolve(de.biomedical_imaging
+	 * .ij.steger.Lines, de.biomedical_imaging.ij.steger.Junctions, boolean)
+	 */
 	@Override
 	public Lines resolve(final Lines originalLines, final Junctions junctions, final boolean verbose) {
 		if (verbose)
@@ -100,7 +111,16 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 	/**
 	 * Step 1: find enclosed lines (lines with a junction at both start and end
-	 * point)
+	 * point).
+	 *
+	 * @param enclosed
+	 *            the enclosed
+	 * @param nWay
+	 *            the n way
+	 * @param junctions
+	 *            the junctions
+	 * @param verbose
+	 *            the verbose
 	 */
 	private void findOverlap(final Set<Line> enclosed, final List<List<Line>> nWay, final Junctions junctions,
 			final boolean verbose) {
@@ -240,6 +260,17 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * Step 2: for each enclosed line, we want to map to the sets of all other lines
 	 * with one intersection at the start, and all lines with one intersection at
 	 * the end.
+	 *
+	 * @param lines
+	 *            the lines
+	 * @param enclosedLines
+	 *            the enclosed lines
+	 * @param startIntersections
+	 *            the start intersections
+	 * @param endIntersections
+	 *            the end intersections
+	 * @param verbose
+	 *            the verbose
 	 */
 	private void buildIntersectionMaps(final Lines lines, final Set<Line> enclosedLines,
 			final Map<Line, List<Line>> startIntersections, final Map<Line, List<Line>> endIntersections,
@@ -274,7 +305,18 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 	/**
 	 * Step 3a: With all mapped combinations determined, we determine the
-	 * combinations that best preserve slope/straightness
+	 * combinations that best preserve slope/straightness.
+	 *
+	 * @param lineMerges
+	 *            the line merges
+	 * @param enclosedLines
+	 *            the enclosed lines
+	 * @param startIntersections
+	 *            the start intersections
+	 * @param endIntersections
+	 *            the end intersections
+	 * @param verbose
+	 *            the verbose
 	 */
 	private void buildMergeList(final List<List<Line>> lineMerges, final Set<Line> enclosedLines,
 			final Map<Line, List<Line>> startIntersections, final Map<Line, List<Line>> endIntersections,
@@ -394,7 +436,14 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	/**
 	 * Step 3b: The process for determining merges from N-way merges is to find the
 	 * point where each line intersects, then compute the straightness of each
-	 * potential merge and take the straightest
+	 * potential merge and take the straightest.
+	 *
+	 * @param lineMerges
+	 *            the line merges
+	 * @param nWayIntersections
+	 *            the n way intersections
+	 * @param verbose
+	 *            the verbose
 	 */
 	private void buildMergeList(List<List<Line>> lineMerges, List<List<Line>> nWayIntersections, boolean verbose) {
 		for (final List<Line> iSection : nWayIntersections) {
@@ -453,7 +502,17 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	}
 
 	/**
-	 * Step 4: resolve merged line list
+	 * Step 4: resolve merged line list.
+	 *
+	 * @param originalLines
+	 *            the original lines
+	 * @param lineMerges
+	 *            the line merges
+	 * @param lineMap
+	 *            the line map
+	 * @param verbose
+	 *            the verbose
+	 * @return the lines
 	 */
 	private Lines buildResolvedList(final Lines originalLines, final List<List<Line>> lineMerges,
 			final Map<Line, Line> lineMap, final boolean verbose) {
@@ -533,6 +592,12 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * Look through all {@link Junction}s. If either of the lines has been merged,
 	 * the Junction is updated to reference the merged line. Returns the set of all
 	 * such modified Junctions.
+	 *
+	 * @param junctions
+	 *            the junctions
+	 * @param lineMap
+	 *            the line map
+	 * @return the sets the
 	 */
 	private Set<Junction> updateJunctions(final Junctions junctions, final Map<Line, Line> lineMap) {
 		final Set<Junction> updated = new HashSet<Junction>();
@@ -560,6 +625,11 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * with two references to the same line (because their lines were merged) and
 	 * cases where multiple Junctions refer to the same lines as each other and
 	 * occupy the same physical position.
+	 *
+	 * @param junctions
+	 *            the junctions
+	 * @param updatedJunctions
+	 *            the updated junctions
 	 */
 	private void pruneJunctions(final Junctions junctions, final Set<Junction> updatedJunctions) {
 		final Map<String, Junction> jMap = new HashMap<String, Junction>();
@@ -587,6 +657,9 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * For each {@link Junction} in the provided set, update the Junction's
 	 * {@link Junction#pos}, {@link Junction#isNonTerminal}, and each line's
 	 * {@link LinesUtil.contour_class} as appropriate.
+	 *
+	 * @param updatedJunctions
+	 *            the updated junctions
 	 */
 	private void updateContourClasses(final Set<Junction> updatedJunctions) {
 		for (final Junction j : updatedJunctions) {
@@ -605,6 +678,10 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * line, set the Junction's pos to match If this junction doesn't sit on either
 	 * line's terminals, set the Junction's isNonTerminal to true
 	 *
+	 * @param j
+	 *            the j
+	 * @param line
+	 *            the line
 	 * @param updatePos
 	 *            - if true, update the pos of the given Junction
 	 * @return True if the junction point was NOT on the start or end terminal of
@@ -657,6 +734,10 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * Compute the striaghtness between the 3 given points. This is done by
 	 * comparing distances: {@code ((p1 + p2) + (p2 + 3)) / (p3 + p1)} The closer
 	 * the value is to 1, the straighter the line.
+	 *
+	 * @param points
+	 *            the points
+	 * @return the float
 	 */
 	private float straightCalc(final float[]... points) {
 		float ideal = dist(points[0], points[points.length - 1]);
@@ -668,7 +749,13 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	}
 
 	/**
-	 * return the distance between 2 points
+	 * return the distance between 2 points.
+	 *
+	 * @param p1
+	 *            the p 1
+	 * @param p2
+	 *            the p 2
+	 * @return the float
 	 */
 	private float dist(final float[] p1, final float[] p2) {
 		return (float) Math.sqrt(Math.pow((p2[0] - p1[0]), 2) + Math.pow((p2[1] - p1[1]), 2));
@@ -677,6 +764,21 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	/**
 	 * Copy to the target at the given position. Use the source array if it is
 	 * non-null. Otherwise fill with 0's
+	 *
+	 * @param line
+	 *            the line
+	 * @param adjacent
+	 *            the adjacent
+	 * @param adjacentIsNext
+	 *            the adjacent is next
+	 * @param target
+	 *            the target
+	 * @param pos
+	 *            the pos
+	 * @param source
+	 *            the source
+	 * @param length
+	 *            the length
 	 */
 	private void fillArray(final Line line, final Line adjacent, final boolean adjacentIsNext, final float[] target,
 			int pos, final float[] source, final int length) {
@@ -705,6 +807,12 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	/**
 	 * Helper method to get the point at {@code SLOPE_DIST} positions away from the
 	 * intercept point between the query line and given point.
+	 *
+	 * @param p1
+	 *            the p 1
+	 * @param query
+	 *            the query
+	 * @return the intercept point
 	 */
 	private float[] getInterceptPoint(final float[] p1, final Line query) {
 		int dist = 0;
@@ -719,6 +827,14 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * position in the query line. As long as this point maintains straightness
 	 * within {@link #STRAIGHT_TOLERANCE}, and we haven't gone past the query line
 	 * boundaries, recursion continues.
+	 *
+	 * @param query
+	 *            the query
+	 * @param dist
+	 *            the dist
+	 * @param points
+	 *            the points
+	 * @return the float[]
 	 */
 	private float[] findLongestPath(final Line query, int dist, final List<float[]> points) {
 		// p1 is the original point to test
@@ -760,6 +876,14 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	}
 
 	/**
+	 * Intersects.
+	 *
+	 * @param l1
+	 *            the l 1
+	 * @param l2
+	 *            the l 2
+	 * @param threshold
+	 *            the threshold
 	 * @return true iff the two specified lines intersect at their start or end
 	 *         points
 	 */
@@ -769,7 +893,15 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 	/**
 	 * Helper method to determine if the query line intersects with the target at
-	 * its start terminal
+	 * its start terminal.
+	 *
+	 * @param target
+	 *            the target
+	 * @param query
+	 *            the query
+	 * @param threshold
+	 *            the threshold
+	 * @return true, if successful
 	 */
 	private boolean intersectsStart(final Line target, final Line query, final float threshold) {
 		final float[] tStart = getPoint(target, 0);
@@ -780,7 +912,15 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 	/**
 	 * Helper method to determine if the query line intersects with the target at
-	 * its end terminal
+	 * its end terminal.
+	 *
+	 * @param target
+	 *            the target
+	 * @param query
+	 *            the query
+	 * @param threshold
+	 *            the threshold
+	 * @return true, if successful
 	 */
 	private boolean intersectsEnd(final Line target, final Line query, final float threshold) {
 		final float[] tEnd = getPoint(target, target.getNumber() - 1);
@@ -790,6 +930,14 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	}
 
 	/**
+	 * Intersects.
+	 *
+	 * @param tEnd
+	 *            the t end
+	 * @param qEnd
+	 *            the q end
+	 * @param threshold
+	 *            the threshold
 	 * @return if the distance between two points is within the given threshold
 	 */
 	private boolean intersects(final float[] tEnd, final float[] qEnd, final float threshold) {
@@ -799,6 +947,10 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	/**
 	 * Builds a unique key identifying a given {@link Junction} based on the two
 	 * associated lines, and the Junction's position.
+	 *
+	 * @param junction
+	 *            the junction
+	 * @return the key
 	 */
 	private String getKey(final Junction junction) {
 		final StringBuilder sb = new StringBuilder();
@@ -814,6 +966,12 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	/**
 	 * Helper method to return the x and y coordinates of the point at the specified
 	 * index of a given line.
+	 *
+	 * @param target
+	 *            the target
+	 * @param i
+	 *            the i
+	 * @return the point
 	 */
 	private float[] getPoint(final Line target, final int i) {
 		float[] coords = new float[2];
@@ -823,14 +981,26 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	}
 
 	/**
-	 * Helper method to determine if a junction sits on the start point of a line
+	 * Helper method to determine if a junction sits on the start point of a line.
+	 *
+	 * @param junction
+	 *            the junction
+	 * @param line
+	 *            the line
+	 * @return true, if successful
 	 */
 	private boolean matchesStart(final Junction junction, final Line line) {
 		return line.getXCoordinates()[0] == junction.getX() && line.getYCoordinates()[0] == junction.getY();
 	}
 
 	/**
-	 * Helper method to determine if a junction sits on the end point of a line
+	 * Helper method to determine if a junction sits on the end point of a line.
+	 *
+	 * @param junction
+	 *            the junction
+	 * @param line
+	 *            the line
+	 * @return true, if successful
 	 */
 	private boolean matchesEnd(final Junction junction, final Line line) {
 		int count = line.getNumber() - 1;

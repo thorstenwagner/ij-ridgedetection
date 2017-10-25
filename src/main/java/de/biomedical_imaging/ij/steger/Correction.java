@@ -21,16 +21,56 @@
  */
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Correction.
+ */
 public class Correction {
+
+	/** The w est. */
 	double w_est; /* Total line width extracted from the image */
+
+	/** The r est. */
 	double r_est; /* Gradient ratio extracted from the image */
+
+	/** The w. */
 	double w; /* True line width */
+
+	/** The h. */
 	double h; /* True asymmetry */
+
+	/** The correction. */
 	double correction; /* Line position correction */
+
+	/** The w strong. */
 	double w_strong; /* True width on the side with the stronger gradient */
+
+	/** The w weak. */
 	double w_weak; /* True width on the side with the weaker gradient */
+
+	/** The is valid. */
 	boolean is_valid; /* Is this table entry valid? */
 
+	/**
+	 * Instantiates a new correction.
+	 *
+	 * @param w_est
+	 *            the w est
+	 * @param r_rest
+	 *            the r rest
+	 * @param w
+	 *            the w
+	 * @param h
+	 *            the h
+	 * @param correction
+	 *            the correction
+	 * @param w_strong
+	 *            the w strong
+	 * @param w_weak
+	 *            the w weak
+	 * @param is_valid
+	 *            the is valid
+	 */
 	public Correction(double w_est, double r_rest, double w, double h, double correction, double w_strong,
 			double w_weak, boolean is_valid) {
 		this.w_est = w_est;

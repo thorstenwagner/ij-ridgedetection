@@ -21,8 +21,18 @@
  */
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Chord.
+ */
 public class Chord {
+
+	/** The r. */
 	short r; /* row coordinate of the chord */
+
+	/** The cb. */
 	short cb; /* column coordinate of the start of the chord */
+
+	/** The ce. */
 	short ce; /* column coordinate of the end of the chord */
 }

@@ -23,16 +23,21 @@ package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Lines.
+ */
 public class Lines extends ArrayList<Line> {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+
+	/** The frame. */
 	private int frame;
 
 	/**
-	 * 
+	 * Instantiates a new lines.
+	 *
 	 * @param frame
 	 *            Slice number
 	 */
@@ -41,10 +46,22 @@ public class Lines extends ArrayList<Line> {
 		this.frame = frame;
 	}
 
+	/**
+	 * Gets the frame.
+	 *
+	 * @return the frame
+	 */
 	public int getFrame() {
 		return frame;
 	}
 
+	/**
+	 * Gets the index by ID.
+	 *
+	 * @param id
+	 *            the id
+	 * @return the index by ID
+	 */
 	public int getIndexByID(int id) {
 		for (int i = 0; i < this.size(); i++) {
 			if (this.get(i).getID() == id) {

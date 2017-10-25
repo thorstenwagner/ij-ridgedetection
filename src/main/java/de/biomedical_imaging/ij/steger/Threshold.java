@@ -21,8 +21,26 @@
  */
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Threshold.
+ */
 public class Threshold {
 
+	/**
+	 * Threshold.
+	 *
+	 * @param image
+	 *            the image
+	 * @param min
+	 *            the min
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @param out
+	 *            the out
+	 */
 	static void threshold(byte[] image, int min, int width, int height, Region out) {
 		int grey;
 		int r, c, l, num, num_max;

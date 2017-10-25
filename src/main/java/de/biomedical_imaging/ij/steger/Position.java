@@ -24,7 +24,13 @@ package de.biomedical_imaging.ij.steger;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Position.
+ */
 public class Position {
+
+	/** The Constant PIXEL_BOUNDARY. */
 	/*
 	 * The pixel boundaries need to be enlarged slightly since in practice it
 	 * frequently happens for neighboring pixels a and b that pixel a says a maximum
@@ -36,7 +42,16 @@ public class Position {
 	/**
 	 * Solve the linear equation a*x+b=0 and return the result in t and the number
 	 * of solutions in num.
-	 **/
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @param t
+	 *            the t
+	 * @param num
+	 *            the num
+	 */
 	public void solve_linear(double a, double b, MutableDouble t, MutableInt num) {
 
 		if (a == 0.0) { //
@@ -53,7 +68,18 @@ public class Position {
 	 * Compute the eigenvalues and eigenvectors of the Hessian matrix given by
 	 * dfdrr, dfdrc, and dfdcc, and sort them in descending order according to their
 	 * absolute values.
-	 **/
+	 *
+	 * @param dfdrr
+	 *            the dfdrr
+	 * @param dfdrc
+	 *            the dfdrc
+	 * @param dfdcc
+	 *            the dfdcc
+	 * @param eigval
+	 *            the eigval
+	 * @param eigvec
+	 *            the eigvec
+	 */
 	public void compute_eigenvals(double dfdrr, double dfdrc, double dfdcc, double[] eigval, double[][] eigvec) {
 		double theta, t, c, s, e1, e2, n1, n2; /* , phi; */
 
@@ -114,6 +140,16 @@ public class Position {
 		}
 	}
 
+	/**
+	 * Prints the ascii 2.
+	 *
+	 * @param image
+	 *            the image
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 */
 	@SuppressWarnings("unused")
 	private void print_ascii2(byte[] image, int width, int height) {
 		int i = 0;
@@ -128,6 +164,16 @@ public class Position {
 		}
 	}
 
+	/**
+	 * Prints the ascii 2.
+	 *
+	 * @param image
+	 *            the image
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 */
 	@SuppressWarnings("unused")
 	private void print_ascii2(float[] image, int width, int height) {
 		int i = 0;
@@ -142,6 +188,34 @@ public class Position {
 		}
 	}
 
+	/**
+	 * Compute line points.
+	 *
+	 * @param ku
+	 *            the ku
+	 * @param ismax
+	 *            the ismax
+	 * @param ev
+	 *            the ev
+	 * @param nx
+	 *            the nx
+	 * @param ny
+	 *            the ny
+	 * @param px
+	 *            the px
+	 * @param py
+	 *            the py
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @param low
+	 *            the low
+	 * @param high
+	 *            the high
+	 * @param mode
+	 *            the mode
+	 */
 	/*
 	 * For each point in the image determine whether there is a local maximum of the
 	 * second directional derivative in the direction (nx[l],ny[l]) within the
@@ -210,6 +284,36 @@ public class Position {
 		}
 	}
 
+	/**
+	 * Detect lines.
+	 *
+	 * @param image
+	 *            the image
+	 * @param width
+	 *            the width
+	 * @param height
+	 *            the height
+	 * @param contours
+	 *            the contours
+	 * @param num_result
+	 *            the num result
+	 * @param sigma
+	 *            the sigma
+	 * @param low
+	 *            the low
+	 * @param high
+	 *            the high
+	 * @param mode
+	 *            the mode
+	 * @param compute_width
+	 *            the compute width
+	 * @param correct_pos
+	 *            the correct pos
+	 * @param extend_lines
+	 *            the extend lines
+	 * @param junctions
+	 *            the junctions
+	 */
 	/*
 	 * Main routine to detect lines in an image of dimension width * height. The
 	 * extracted lines are returned in result, while num_result is the number of

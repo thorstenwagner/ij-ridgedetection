@@ -22,6 +22,7 @@
 
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
 /**
  * This class holds one extracted line. The field num contains the number of
  * points in the line. The coordinates of the line points are given in the
@@ -43,46 +44,63 @@ package de.biomedical_imaging.ij.steger;
  * is set to a negative value.
  */
 public class Line {
-	/** number of points */
+
+	/** number of points. */
 	int num;
 
-	/** row coordinates of the line points */
+	/** row coordinates of the line points. */
 	float[] row;
 
-	/** column coordinates of the line points */
+	/** column coordinates of the line points. */
 	float[] col;
 
-	/** angle of normal (measured from the row axis) */
+	/** angle of normal (measured from the row axis). */
 	float[] angle;
 
-	/** response of line point (second derivative) */
+	/** response of line point (second derivative). */
 	float[] response;
 
-	/** width to the left of the line */
+	/** width to the left of the line. */
 	float[] width_l;
 
-	/** width to the right of the line */
+	/** width to the right of the line. */
 	float[] width_r;
 
-	/** asymmetry of the line point */
+	/** asymmetry of the line point. */
 	float[] asymmetry;
 
-	/** intensity of the line point */
+	/** intensity of the line point. */
 	float[] intensity;
 
 	/** contour class (e.g., closed, no_junc) */
 	private LinesUtil.contour_class cont_class;
 
+	/** The id counter. */
 	static int idCounter = 0;
+
+	/** The id. */
 	private int id;
+
+	/** The frame. */
 	private int frame;
 
+	/**
+	 * Instantiates a new line.
+	 */
 	public Line() {
 		// TODO Auto-generated constructor stub
 		assignID();
 
 	}
 
+	/**
+	 * Instantiates a new line.
+	 *
+	 * @param x
+	 *            the x
+	 * @param y
+	 *            the y
+	 */
 	public Line(float[] x, float[] y) {
 		assignID();
 		col = x;
@@ -90,20 +108,39 @@ public class Line {
 		num = x.length;
 	}
 
+	/**
+	 * Gets the contour class.
+	 *
+	 * @return the contour class
+	 */
 	public LinesUtil.contour_class getContourClass() {
 
 		return cont_class;
 	}
 
+	/**
+	 * Sets the contour class.
+	 *
+	 * @param cont_class
+	 *            the new contour class
+	 */
 	public void setContourClass(LinesUtil.contour_class cont_class) {
 		this.cont_class = cont_class;
 	}
 
+	/**
+	 * Sets the frame.
+	 *
+	 * @param frame
+	 *            the new frame
+	 */
 	public void setFrame(int frame) {
 		this.frame = frame;
 	}
 
 	/**
+	 * Gets the frame.
+	 *
 	 * @return the frame index where the line was detected
 	 */
 	public int getFrame() {
@@ -111,6 +148,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the x coordinates.
+	 *
 	 * @return x coordinates of the line points
 	 */
 	public float[] getXCoordinates() {
@@ -118,6 +157,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the y coordinates.
+	 *
 	 * @return y coordinates of the line points
 	 */
 	public float[] getYCoordinates() {
@@ -125,6 +166,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the response.
+	 *
 	 * @return response of line point (second derivative)
 	 */
 	public float[] getResponse() {
@@ -132,7 +175,8 @@ public class Line {
 	}
 
 	/**
-	 * 
+	 * Gets the intensity.
+	 *
 	 * @return intensity of the line points
 	 */
 	public float[] getIntensity() {
@@ -140,6 +184,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the angle.
+	 *
 	 * @return angle of normal (measured from the y-axis)
 	 */
 	public float[] getAngle() {
@@ -147,6 +193,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the asymmetry.
+	 *
 	 * @return asymmetry of the line point
 	 */
 	public float[] getAsymmetry() {
@@ -154,6 +202,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the line width L.
+	 *
 	 * @return width to the left of the line
 	 */
 	public float[] getLineWidthL() {
@@ -161,6 +211,8 @@ public class Line {
 	}
 
 	/**
+	 * Gets the line width R.
+	 *
 	 * @return width to the right of the line
 	 */
 	public float[] getLineWidthR() {
@@ -168,7 +220,8 @@ public class Line {
 	}
 
 	/**
-	 * 
+	 * Gets the number.
+	 *
 	 * @return Return the number of points
 	 */
 	public int getNumber() {
@@ -176,16 +229,32 @@ public class Line {
 	}
 
 	/**
+	 * Gets the id.
+	 *
 	 * @return unique ID of the line
 	 */
 	public int getID() {
 		return id;
 	}
 
+	/**
+	 * Gets the line class.
+	 *
+	 * @return the line class
+	 */
 	public LinesUtil.contour_class getLineClass() {
 		return cont_class;
 	}
 
+	/**
+	 * Gets the start ord end position.
+	 *
+	 * @param x
+	 *            the x
+	 * @param y
+	 *            the y
+	 * @return the start ord end position
+	 */
 	public int getStartOrdEndPosition(float x, float y) {
 		double distStart = Math.sqrt(Math.pow(col[0] - x, 2) + Math.pow(row[0] - y, 2));
 		double distEnd = Math.sqrt(Math.pow(col[(this.num - 1)] - x, 2) + Math.pow(row[(this.num - 1)] - y, 2));
@@ -193,7 +262,8 @@ public class Line {
 	}
 
 	/**
-	 * 
+	 * Estimate length.
+	 *
 	 * @return the estimated length of the line
 	 */
 	public double estimateLength() {
@@ -204,11 +274,17 @@ public class Line {
 		return length;
 	}
 
+	/**
+	 * Assign ID.
+	 */
 	private synchronized void assignID() {
 		this.id = idCounter;
 		idCounter++;
 	}
 
+	/**
+	 * Reset counter.
+	 */
 	static void resetCounter() {
 		idCounter = 0;
 	}

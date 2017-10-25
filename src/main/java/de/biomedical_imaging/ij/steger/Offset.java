@@ -21,7 +21,13 @@
  */
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Offset.
+ */
 public class Offset {
+
+	/** The y. */
 	public int x, y;
 
 }

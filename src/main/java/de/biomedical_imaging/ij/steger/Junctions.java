@@ -23,16 +23,21 @@ package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Junctions.
+ */
 public class Junctions extends ArrayList<Junction> {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5362657619521213733L;
+
+	/** The frame. */
 	private int frame;
 
 	/**
-	 * 
+	 * Instantiates a new junctions.
+	 *
 	 * @param frame
 	 *            Slice number
 	 */
@@ -40,6 +45,11 @@ public class Junctions extends ArrayList<Junction> {
 		this.frame = frame;
 	}
 
+	/**
+	 * Gets the frame.
+	 *
+	 * @return the frame
+	 */
 	public int getFrame() {
 		return frame;
 	}

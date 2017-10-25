@@ -54,6 +54,7 @@ import ij.WindowManager;
 import ij.gui.GenericDialog;
 import ij.io.OpenDialog;
 
+// TODO: Auto-generated Javadoc
 /**
  * The GenericDialogPlus class enhances the GenericDialog by a few additional
  * methods.
@@ -62,19 +63,46 @@ import ij.io.OpenDialog;
  * button, and makes string (and file) fields drop targets.
  */
 public class GenericDialogPlus extends GenericDialog {
+
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The window I ds. */
 	protected int[] windowIDs;
+
+	/** The window titles. */
 	protected String[] windowTitles;
 
+	/**
+	 * Instantiates a new generic dialog plus.
+	 *
+	 * @param title
+	 *            the title
+	 */
 	public GenericDialogPlus(String title) {
 		super(title);
 	}
 
+	/**
+	 * Instantiates a new generic dialog plus.
+	 *
+	 * @param title
+	 *            the title
+	 * @param parent
+	 *            the parent
+	 */
 	public GenericDialogPlus(String title, Frame parent) {
 		super(title, parent);
 	}
 
+	/**
+	 * Adds the image choice.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultImage
+	 *            the default image
+	 */
 	public void addImageChoice(String label, String defaultImage) {
 		if (windowTitles == null) {
 			windowIDs = WindowManager.getIDList();
@@ -89,10 +117,21 @@ public class GenericDialogPlus extends GenericDialog {
 		addChoice(label, windowTitles, defaultImage);
 	}
 
+	/**
+	 * Gets the next image.
+	 *
+	 * @return the next image
+	 */
 	public ImagePlus getNextImage() {
 		return WindowManager.getImage(windowIDs[getNextChoiceIndex()]);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.gui.GenericDialog#addStringField(java.lang.String, java.lang.String,
+	 * int)
+	 */
 	@Override
 	public void addStringField(String label, String defaultString, int columns) {
 		super.addStringField(label, defaultString, columns);
@@ -104,10 +143,28 @@ public class GenericDialogPlus extends GenericDialog {
 		new DropTarget(text, new TextDropTarget(text));
 	}
 
+	/**
+	 * Adds the directory or file field.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultPath
+	 *            the default path
+	 */
 	public void addDirectoryOrFileField(String label, String defaultPath) {
 		addDirectoryOrFileField(label, defaultPath, 20);
 	}
 
+	/**
+	 * Adds the directory or file field.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultPath
+	 *            the default path
+	 * @param columns
+	 *            the columns
+	 */
 	public void addDirectoryOrFileField(String label, String defaultPath, int columns) {
 		addStringField(label, defaultPath, columns);
 		if (isHeadless())
@@ -132,10 +189,28 @@ public class GenericDialogPlus extends GenericDialog {
 		add(panel);
 	}
 
+	/**
+	 * Adds the directory field.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultPath
+	 *            the default path
+	 */
 	public void addDirectoryField(String label, String defaultPath) {
 		addDirectoryField(label, defaultPath, 20);
 	}
 
+	/**
+	 * Adds the directory field.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultPath
+	 *            the default path
+	 * @param columns
+	 *            the columns
+	 */
 	public void addDirectoryField(String label, String defaultPath, int columns) {
 		addStringField(label, defaultPath, columns);
 		if (isHeadless())
@@ -159,10 +234,28 @@ public class GenericDialogPlus extends GenericDialog {
 		add(panel);
 	}
 
+	/**
+	 * Adds the file field.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultPath
+	 *            the default path
+	 */
 	public void addFileField(String label, String defaultPath) {
 		addFileField(label, defaultPath, 20);
 	}
 
+	/**
+	 * Adds the file field.
+	 *
+	 * @param label
+	 *            the label
+	 * @param defaultPath
+	 *            the default path
+	 * @param columns
+	 *            the columns
+	 */
 	public void addFileField(String label, String defaultPath, int columns) {
 		addStringField(label, defaultPath, columns);
 		if (isHeadless())
@@ -187,8 +280,8 @@ public class GenericDialogPlus extends GenericDialog {
 	}
 
 	/**
-	 * Add button to the dialog
-	 * 
+	 * Add button to the dialog.
+	 *
 	 * @param label
 	 *            button label
 	 * @param listener
@@ -206,6 +299,12 @@ public class GenericDialogPlus extends GenericDialog {
 		addComponent(button);
 	}
 
+	/**
+	 * Adds the component.
+	 *
+	 * @param component
+	 *            the component
+	 */
 	public void addComponent(Component component) {
 		if (isHeadless())
 			return;
@@ -215,6 +314,16 @@ public class GenericDialogPlus extends GenericDialog {
 		add(component);
 	}
 
+	/**
+	 * Adds the component.
+	 *
+	 * @param component
+	 *            the component
+	 * @param fill
+	 *            the fill
+	 * @param weightx
+	 *            the weightx
+	 */
 	public void addComponent(Component component, int fill, double weightx) {
 		if (isHeadless())
 			return;
@@ -228,8 +337,8 @@ public class GenericDialogPlus extends GenericDialog {
 	}
 
 	/**
-	 * Adds an image to the generic dialog
-	 * 
+	 * Adds an image to the generic dialog.
+	 *
 	 * @param path
 	 *            - the path to the image in the jar, e.g. /images/fiji.png (the
 	 *            first / has to be there!)
@@ -243,8 +352,8 @@ public class GenericDialogPlus extends GenericDialog {
 	}
 
 	/**
-	 * Adds an image to the generic dialog
-	 * 
+	 * Adds an image to the generic dialog.
+	 *
 	 * @param imgURL
 	 *            - the {@link URL} pointing to the resource
 	 * @return true if the image was found and added, otherwise false
@@ -262,8 +371,8 @@ public class GenericDialogPlus extends GenericDialog {
 	}
 
 	/**
-	 * Adds an image to the generic dialog
-	 * 
+	 * Adds an image to the generic dialog.
+	 *
 	 * @param image
 	 *            - the {@link ImageIcon} to display
 	 * @return label - the {@link JLabel} that contains the image for updating:
@@ -285,7 +394,13 @@ public class GenericDialogPlus extends GenericDialog {
 		return label;
 	}
 
-	/** Returns an ImageIcon, or null if the path was invalid. */
+	/**
+	 * Returns an ImageIcon, or null if the path was invalid.
+	 *
+	 * @param imgURL
+	 *            the img URL
+	 * @return the image icon
+	 */
 	public static ImageIcon createImageIcon(final URL imgURL) {
 		if (isHeadless())
 			return null;
@@ -296,6 +411,11 @@ public class GenericDialogPlus extends GenericDialog {
 	}
 
 	// Work around too many private restrictions (add a new panel and remove it
+	/**
+	 * Gets the constraints.
+	 *
+	 * @return the constraints
+	 */
 	// right away)
 	protected GridBagConstraints getConstraints() {
 		GridBagLayout layout = (GridBagLayout) getLayout();
@@ -306,19 +426,51 @@ public class GenericDialogPlus extends GenericDialog {
 		return constraints;
 	}
 
+	/**
+	 * Checks if is headless.
+	 *
+	 * @return true, if is headless
+	 */
 	private static boolean isHeadless() {
 		return GraphicsEnvironment.isHeadless();
 	}
 
+	/**
+	 * The listener interface for receiving file events. The class that is
+	 * interested in processing a file event implements this interface, and the
+	 * object created with that class is registered with a component using the
+	 * component's <code>addFileListener<code> method. When the file event occurs,
+	 * that object's appropriate method is invoked.
+	 *
+	 * @see FileEvent
+	 */
 	static class FileListener implements ActionListener {
+
+		/** The title. */
 		String title;
+
+		/** The text. */
 		TextField text;
 
+		/**
+		 * Instantiates a new file listener.
+		 *
+		 * @param title
+		 *            the title
+		 * @param text
+		 *            the text
+		 */
 		public FileListener(String title, TextField text) {
 			this.title = title;
 			this.text = text;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String fileName = null;
@@ -344,21 +496,60 @@ public class GenericDialogPlus extends GenericDialog {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving directory events. The class that is
+	 * interested in processing a directory event implements this interface, and the
+	 * object created with that class is registered with a component using the
+	 * component's <code>addDirectoryListener<code> method. When the directory event
+	 * occurs, that object's appropriate method is invoked.
+	 *
+	 * @see DirectoryEvent
+	 */
 	static class DirectoryListener implements ActionListener {
+
+		/** The title. */
 		String title;
+
+		/** The text. */
 		TextField text;
+
+		/** The file selection mode. */
 		int fileSelectionMode;
 
+		/**
+		 * Instantiates a new directory listener.
+		 *
+		 * @param title
+		 *            the title
+		 * @param text
+		 *            the text
+		 */
 		public DirectoryListener(String title, TextField text) {
 			this(title, text, JFileChooser.DIRECTORIES_ONLY);
 		}
 
+		/**
+		 * Instantiates a new directory listener.
+		 *
+		 * @param title
+		 *            the title
+		 * @param text
+		 *            the text
+		 * @param fileSelectionMode
+		 *            the file selection mode
+		 */
 		public DirectoryListener(String title, TextField text, int fileSelectionMode) {
 			this.title = title;
 			this.text = text;
 			this.fileSelectionMode = fileSelectionMode;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			File directory = new File(text.getText());
@@ -375,10 +566,30 @@ public class GenericDialogPlus extends GenericDialog {
 		}
 	}
 
+	/**
+	 * Strip suffix.
+	 *
+	 * @param s
+	 *            the s
+	 * @param suffix
+	 *            the suffix
+	 * @return the string
+	 */
 	static String stripSuffix(String s, String suffix) {
 		return !s.endsWith(suffix) ? s : s.substring(0, s.length() - suffix.length());
 	}
 
+	/**
+	 * Gets the string.
+	 *
+	 * @param event
+	 *            the event
+	 * @return the string
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws UnsupportedFlavorException
+	 *             the unsupported flavor exception
+	 */
 	@SuppressWarnings("unchecked")
 	static String getString(DropTargetDropEvent event) throws IOException, UnsupportedFlavorException {
 		String text = null;
@@ -403,14 +614,32 @@ public class GenericDialogPlus extends GenericDialog {
 		return text;
 	}
 
+	/**
+	 * The Class TextDropTarget.
+	 */
 	static class TextDropTarget extends DropTargetAdapter {
+
+		/** The text. */
 		TextField text;
+
+		/** The flavor. */
 		DataFlavor flavor = DataFlavor.stringFlavor;
 
+		/**
+		 * Instantiates a new text drop target.
+		 *
+		 * @param text
+		 *            the text
+		 */
 		public TextDropTarget(TextField text) {
 			this.text = text;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
+		 */
 		@Override
 		public void drop(DropTargetDropEvent event) {
 			try {
@@ -421,6 +650,11 @@ public class GenericDialogPlus extends GenericDialog {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.gui.GenericDialog#keyPressed(java.awt.event.KeyEvent)
+	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
@@ -430,10 +664,20 @@ public class GenericDialogPlus extends GenericDialog {
 			windowClosing(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.gui.GenericDialog#keyReleased(java.awt.event.KeyEvent)
+	 */
 	@Override
 	public void keyReleased(KeyEvent e) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.gui.GenericDialog#keyTyped(java.awt.event.KeyEvent)
+	 */
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
