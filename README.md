@@ -1,3 +1,5 @@
+[![](https://travis-ci.org/hadim/ij-ridgedetection.svg?branch=master)](https://travis-ci.org/hadim/ij-ridgedetection)
+
 [![DOI](https://zenodo.org/badge/18649/thorstenwagner/ij-ridgedetection.svg)](https://zenodo.org/badge/latestdoi/18649/thorstenwagner/ij-ridgedetection)
 
 # Ridge Detection Plugin
