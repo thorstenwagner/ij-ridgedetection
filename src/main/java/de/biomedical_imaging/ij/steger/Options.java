@@ -20,35 +20,38 @@
  * #L%
  */
 package de.biomedical_imaging.ij.steger;
+
 /* Command line options for the program */
 public class Options {
-	  double sigma;
-	  double low;
-	  double high;
-	  int   mode;
-      double minLength;
-      double maxLength;
-	  boolean   correct;
-	  boolean   width;
-	  boolean   extend;
-	  boolean   postscript;
-	  boolean   encapsulated;
-	  boolean   image;
-		OverlapOption overlap;
-	  
-	  public Options(double sigma, double low, double high, int mode, double minLength, double maxLength, boolean correct, boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image, OverlapOption overlap) {
+	double sigma;
+	double low;
+	double high;
+	int mode;
+	double minLength;
+	double maxLength;
+	boolean correct;
+	boolean width;
+	boolean extend;
+	boolean postscript;
+	boolean encapsulated;
+	boolean image;
+	OverlapOption overlap;
+
+	public Options(double sigma, double low, double high, int mode, double minLength, double maxLength, boolean correct,
+			boolean width, boolean extend, boolean postscript, boolean encapsulated, boolean image,
+			OverlapOption overlap) {
 		// TODO Auto-generated constructor stub
-		  this.sigma = sigma;
-		  this.low = low;
-		  this.high = high;
-		  this.mode = mode;
-		  this.correct = correct;
-		  this.width = width;
-		  this.extend = extend;
-		  this.postscript = postscript;
-		  this.encapsulated = encapsulated;
-		  this.image = image;
-		  this.overlap = overlap;
+		this.sigma = sigma;
+		this.low = low;
+		this.high = high;
+		this.mode = mode;
+		this.correct = correct;
+		this.width = width;
+		this.extend = extend;
+		this.postscript = postscript;
+		this.encapsulated = encapsulated;
+		this.image = image;
+		this.overlap = overlap;
 	}
 
 	public double getSigma() {
@@ -78,22 +81,22 @@ public class Options {
 	public int getMode() {
 		return mode;
 	}
-    
-    public double getminLength() {
-        return minLength;
-    }
-    
-    public void setminLength(double minLength) {
-        this.minLength = minLength;
-    }
-    
-    public double getmaxLength() {
-        return maxLength;
-    }
-    
-    public void setmaxLength(double maxLength) {
-        this.maxLength = maxLength;
-    }
+
+	public double getminLength() {
+		return minLength;
+	}
+
+	public void setminLength(double minLength) {
+		this.minLength = minLength;
+	}
+
+	public double getmaxLength() {
+		return maxLength;
+	}
+
+	public void setmaxLength(double maxLength) {
+		this.maxLength = maxLength;
+	}
 
 	public void setMode(int mode) {
 		this.mode = mode;

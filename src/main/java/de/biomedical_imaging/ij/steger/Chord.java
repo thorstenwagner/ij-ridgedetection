@@ -22,7 +22,7 @@
 package de.biomedical_imaging.ij.steger;
 
 public class Chord {
-	short r;   /* row coordinate of the chord */
-	short cb;  /* column coordinate of the start of the chord */
-	short ce;  /* column coordinate of the end of the chord */
+	short r; /* row coordinate of the chord */
+	short cb; /* column coordinate of the start of the chord */
+	short ce; /* column coordinate of the end of the chord */
 }

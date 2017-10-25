@@ -22,75 +22,74 @@
 package de.biomedical_imaging.ij.steger;
 
 public class Threshold {
-	
-	static void threshold(byte[] image, int min,int width,int height,Region out)
-	{
-	  int   grey;
-	  int   r,c,l,num,num_max;
-	  boolean   inside;
-	  Chord[] rl;
 
-	  inside = false;
-	  num = 0;
-	  num_max = LinesUtil.INITIAL_SIZE;
-	  rl =new Chord[ num_max]; 
-	  for(int i = 0; i < num_max; i++){
-		  rl[i] = new Chord();
-	  }
-	  out.rl = null;
-	  out.num = 0;
+	static void threshold(byte[] image, int min, int width, int height, Region out) {
+		int grey;
+		int r, c, l, num, num_max;
+		boolean inside;
+		Chord[] rl;
 
-	  for (r=0; r<height; r++) {
-	    for (c=0; c<width; c++) {
-	      l = LinesUtil.LINCOOR(r,c,width);
-	      grey = image[ l];
-	      if (grey >= min) {
-	        if (!inside) {
-	          inside = true;
-	          rl[ num].r = (short) r;
-	          rl[ num].cb = (short) c;
-	        }
-	      } else {
-	        if (inside) {
-	          inside = false;
-	          rl[ num].ce = (short) (c - 1);
-	          num++;
-	          if (num >= num_max) {
-	            num_max =  (int)Math.floor((double)(num_max*LinesUtil.REALLOC_FACTOR));
-	            Chord[] rlh = new Chord[ num_max];
-	            for(int i = 0; i < rlh.length; i++){
-	            	if(i < rl.length)
-		        		rlh[i] = rl[i];
-		        	else
-		        		rlh[i] = new Chord();
-	      	  	}
-	            rl=rlh;
-	          }
-	        }
-	      }
-	    }
-	    if (inside) {
-	      inside = false;
-	      rl[ num].ce = (short) (width-1);
-	      num++;
-	      if (num >= num_max) {
-	        num_max =  (int)Math.floor((double)(num_max*LinesUtil.REALLOC_FACTOR));
-	        Chord[] rlh = new Chord[ num_max];
-	        for(int i = 0; i < rlh.length; i++){
-	        	if(i < rl.length)
-	        		rlh[i] = rl[i];
-	        	else
-	        		rlh[i] = new Chord();
-	        }
-	        rl = rlh;
-	      }
-	    }
-	  }
-	  out.rl = new Chord[ num];
-	  for(int i = 0; i < num; i++){
-		  out.rl[i] = rl[i];
-	  }
-	  out.num = num;
+		inside = false;
+		num = 0;
+		num_max = LinesUtil.INITIAL_SIZE;
+		rl = new Chord[num_max];
+		for (int i = 0; i < num_max; i++) {
+			rl[i] = new Chord();
+		}
+		out.rl = null;
+		out.num = 0;
+
+		for (r = 0; r < height; r++) {
+			for (c = 0; c < width; c++) {
+				l = LinesUtil.LINCOOR(r, c, width);
+				grey = image[l];
+				if (grey >= min) {
+					if (!inside) {
+						inside = true;
+						rl[num].r = (short) r;
+						rl[num].cb = (short) c;
+					}
+				} else {
+					if (inside) {
+						inside = false;
+						rl[num].ce = (short) (c - 1);
+						num++;
+						if (num >= num_max) {
+							num_max = (int) Math.floor((double) (num_max * LinesUtil.REALLOC_FACTOR));
+							Chord[] rlh = new Chord[num_max];
+							for (int i = 0; i < rlh.length; i++) {
+								if (i < rl.length)
+									rlh[i] = rl[i];
+								else
+									rlh[i] = new Chord();
+							}
+							rl = rlh;
+						}
+					}
+				}
+			}
+			if (inside) {
+				inside = false;
+				rl[num].ce = (short) (width - 1);
+				num++;
+				if (num >= num_max) {
+					num_max = (int) Math.floor((double) (num_max * LinesUtil.REALLOC_FACTOR));
+					Chord[] rlh = new Chord[num_max];
+					for (int i = 0; i < rlh.length; i++) {
+						if (i < rl.length)
+							rlh[i] = rl[i];
+						else
+							rlh[i] = new Chord();
+					}
+					rl = rlh;
+				}
+			}
+		}
+		out.rl = new Chord[num];
+		for (int i = 0; i < num; i++) {
+			out.rl[i] = rl[i];
+		}
+		out.num = num;
 	}
 
 }

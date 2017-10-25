@@ -23,5 +23,5 @@ package de.biomedical_imaging.ij.steger;
 
 public class Offset {
 	public int x, y;
-	
+
 }

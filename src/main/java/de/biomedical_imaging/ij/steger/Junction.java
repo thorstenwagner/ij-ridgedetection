@@ -20,67 +20,67 @@
  * #L%
  */
 package de.biomedical_imaging.ij.steger;
-/** This data structure is used to accumulate junction information.  It is
-   needed to split lines at junction points. */
+
+/**
+ * This data structure is used to accumulate junction information. It is needed
+ * to split lines at junction points.
+ */
 public class Junction implements Comparable<Junction> {
-	 /** Index of line that is already processed */
-	 int  cont1; 
-	 /** Index of line tnat runs into cont1 */
-	 int  cont2; 
-	 /** Index of the junction point in cont1 */
-	 int  pos; 
-	 /** x-(row-)coordinate of the junction point */
-	 float x;     
-	 /** y-(col-)coordinate of the junction point */
-	 float y;     
-	 /** line that is already processed */
-	 Line lineCont1; 
-	 /** line that runs into idCont1 */
-	 Line lineCont2; 
-	 /** True if this junction sits on a start/end of at least one line*/
-	 boolean isNonTerminal = false;
-	 
+	/** Index of line that is already processed */
+	int cont1;
+	/** Index of line tnat runs into cont1 */
+	int cont2;
+	/** Index of the junction point in cont1 */
+	int pos;
+	/** x-(row-)coordinate of the junction point */
+	float x;
+	/** y-(col-)coordinate of the junction point */
+	float y;
+	/** line that is already processed */
+	Line lineCont1;
+	/** line that runs into idCont1 */
+	Line lineCont2;
+	/** True if this junction sits on a start/end of at least one line */
+	boolean isNonTerminal = false;
 
 	@Override
 	public int compareTo(Junction o) {
-		return  (((this.cont1 - o.cont1) != 0) ? this.cont1 - o.cont1
-				: this.pos - o.pos);
+		return (((this.cont1 - o.cont1) != 0) ? this.cont1 - o.cont1 : this.pos - o.pos);
 	}
-	
+
 	/**
-	 * @return  x-coordinate of the junction point
+	 * @return x-coordinate of the junction point
 	 */
-	public float getX(){
+	public float getX() {
 		return x;
 	}
-	
+
 	/**
-	 * @return  y-coordinate of the junction point
+	 * @return y-coordinate of the junction point
 	 */
-	public float getY(){
+	public float getY() {
 		return y;
 	}
-	
+
 	/**
-	 * @return  The line that is already processed
+	 * @return The line that is already processed
 	 */
-	public Line getLine1(){
+	public Line getLine1() {
 		return lineCont1;
 	}
-	
+
 	/**
-	 * @return  The line that runs into line1
+	 * @return The line that runs into line1
 	 */
-	public Line getLine2(){
+	public Line getLine2() {
 		return lineCont2;
 	}
-	
+
 	/**
-	 * @return True iff this junction point does not sit on either line's
-	 *         start/end
+	 * @return True iff this junction point does not sit on either line's start/end
 	 */
 	public boolean isNonTerminal() {
 		return isNonTerminal;
 	}
-	 
+
 }

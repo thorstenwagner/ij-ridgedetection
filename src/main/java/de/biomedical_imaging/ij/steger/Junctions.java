@@ -24,22 +24,23 @@ package de.biomedical_imaging.ij.steger;
 import java.util.ArrayList;
 
 public class Junctions extends ArrayList<Junction> {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5362657619521213733L;
 	private int frame;
-	
+
 	/**
 	 * 
-	 * @param frame Slice number
+	 * @param frame
+	 *            Slice number
 	 */
 	public Junctions(int frame) {
 		this.frame = frame;
 	}
-	
-	public int getFrame(){
+
+	public int getFrame() {
 		return frame;
 	}
 

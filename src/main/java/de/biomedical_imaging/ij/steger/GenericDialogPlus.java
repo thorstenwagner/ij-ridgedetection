@@ -21,11 +21,6 @@
  */
 package de.biomedical_imaging.ij.steger;
 
-import ij.ImagePlus;
-import ij.WindowManager;
-import ij.gui.GenericDialog;
-import ij.io.OpenDialog;
-
 import java.awt.Button;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -54,13 +49,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 
+import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.GenericDialog;
+import ij.io.OpenDialog;
+
 /**
- * The GenericDialogPlus class enhances the GenericDialog by
- * a few additional methods.
+ * The GenericDialogPlus class enhances the GenericDialog by a few additional
+ * methods.
  *
- * It adds a method to add a file chooser, a dialog chooser,
- * an image chooser, a button, and makes string (and file) fields
- * drop targets.
+ * It adds a method to add a file chooser, a dialog chooser, an image chooser, a
+ * button, and makes string (and file) fields drop targets.
  */
 public class GenericDialogPlus extends GenericDialog {
 	private static final long serialVersionUID = 1L;
@@ -97,9 +96,10 @@ public class GenericDialogPlus extends GenericDialog {
 	@Override
 	public void addStringField(String label, String defaultString, int columns) {
 		super.addStringField(label, defaultString, columns);
-		if (isHeadless()) return;
+		if (isHeadless())
+			return;
 
-		TextField text = (TextField)stringField.lastElement();
+		TextField text = (TextField) stringField.lastElement();
 		text.setDropTarget(null);
 		new DropTarget(text, new TextDropTarget(text));
 	}
@@ -110,14 +110,16 @@ public class GenericDialogPlus extends GenericDialog {
 
 	public void addDirectoryOrFileField(String label, String defaultPath, int columns) {
 		addStringField(label, defaultPath, columns);
-		if (isHeadless()) return;
+		if (isHeadless())
+			return;
 
-		TextField text = (TextField)stringField.lastElement();
-		GridBagLayout layout = (GridBagLayout)getLayout();
+		TextField text = (TextField) stringField.lastElement();
+		GridBagLayout layout = (GridBagLayout) getLayout();
 		GridBagConstraints constraints = layout.getConstraints(text);
 
 		Button button = new Button("Browse...");
-		DirectoryListener listener = new DirectoryListener("Browse for " + label, text, JFileChooser.FILES_AND_DIRECTORIES);
+		DirectoryListener listener = new DirectoryListener("Browse for " + label, text,
+				JFileChooser.FILES_AND_DIRECTORIES);
 		button.addActionListener(listener);
 		button.addKeyListener(this);
 
@@ -136,10 +138,11 @@ public class GenericDialogPlus extends GenericDialog {
 
 	public void addDirectoryField(String label, String defaultPath, int columns) {
 		addStringField(label, defaultPath, columns);
-		if (isHeadless()) return;
+		if (isHeadless())
+			return;
 
-		TextField text = (TextField)stringField.lastElement();
-		GridBagLayout layout = (GridBagLayout)getLayout();
+		TextField text = (TextField) stringField.lastElement();
+		GridBagLayout layout = (GridBagLayout) getLayout();
 		GridBagConstraints constraints = layout.getConstraints(text);
 
 		Button button = new Button("Browse...");
@@ -162,10 +165,11 @@ public class GenericDialogPlus extends GenericDialog {
 
 	public void addFileField(String label, String defaultPath, int columns) {
 		addStringField(label, defaultPath, columns);
-		if (isHeadless()) return;
+		if (isHeadless())
+			return;
 
-		TextField text = (TextField)stringField.lastElement();
-		GridBagLayout layout = (GridBagLayout)getLayout();
+		TextField text = (TextField) stringField.lastElement();
+		GridBagLayout layout = (GridBagLayout) getLayout();
 		GridBagConstraints constraints = layout.getConstraints(text);
 
 		Button button = new Button("Browse...");
@@ -184,11 +188,15 @@ public class GenericDialogPlus extends GenericDialog {
 
 	/**
 	 * Add button to the dialog
-	 * @param label button label
-	 * @param listener listener to handle the action when pressing the button
+	 * 
+	 * @param label
+	 *            button label
+	 * @param listener
+	 *            listener to handle the action when pressing the button
 	 */
 	public void addButton(String label, ActionListener listener) {
-		if (isHeadless()) return;
+		if (isHeadless())
+			return;
 
 		Button button = new Button(label);
 
@@ -197,50 +205,58 @@ public class GenericDialogPlus extends GenericDialog {
 
 		addComponent(button);
 	}
-	
-	public void addComponent(Component component) {
-		if (isHeadless()) return;
 
-		GridBagLayout layout = (GridBagLayout)getLayout();
+	public void addComponent(Component component) {
+		if (isHeadless())
+			return;
+
+		GridBagLayout layout = (GridBagLayout) getLayout();
 		layout.setConstraints(component, getConstraints());
 		add(component);
 	}
 
 	public void addComponent(Component component, int fill, double weightx) {
-		if (isHeadless()) return;
+		if (isHeadless())
+			return;
 
-		GridBagLayout layout = (GridBagLayout)getLayout();
+		GridBagLayout layout = (GridBagLayout) getLayout();
 		GridBagConstraints constraints = getConstraints();
 		constraints.fill = fill;
 		constraints.weightx = weightx;
 		layout.setConstraints(component, constraints);
 		add(component);
 	}
-	
+
 	/**
 	 * Adds an image to the generic dialog
 	 * 
-	 * @param path - the path to the image in the jar, e.g. /images/fiji.png (the first / has to be there!)
+	 * @param path
+	 *            - the path to the image in the jar, e.g. /images/fiji.png (the
+	 *            first / has to be there!)
 	 * @return true if the image was found and added, otherwise false
 	 */
 	public boolean addImage(final String path) {
-		if (isHeadless()) return true;
+		if (isHeadless())
+			return true;
 
 		return addImage(getClass().getResource(path));
 	}
-	
+
 	/**
 	 * Adds an image to the generic dialog
 	 * 
-	 * @param imgURL - the {@link URL} pointing to the resource
+	 * @param imgURL
+	 *            - the {@link URL} pointing to the resource
 	 * @return true if the image was found and added, otherwise false
 	 */
 	public boolean addImage(final URL imgURL) {
-		if (isHeadless()) return true;
+		if (isHeadless())
+			return true;
 
 		final ImageIcon image = createImageIcon(imgURL);
-		
-		if (image == null) return false;
+
+		if (image == null)
+			return false;
 		addImage(image);
 		return true;
 	}
@@ -248,14 +264,16 @@ public class GenericDialogPlus extends GenericDialog {
 	/**
 	 * Adds an image to the generic dialog
 	 * 
-	 * @param image - the {@link ImageIcon} to display
+	 * @param image
+	 *            - the {@link ImageIcon} to display
 	 * @return label - the {@link JLabel} that contains the image for updating:
 	 * 
-	 * image.setImage(otherImageIcon.getImage());
-	 * label.update(label.getGraphics());
+	 *         image.setImage(otherImageIcon.getImage());
+	 *         label.update(label.getGraphics());
 	 */
 	public JLabel addImage(final ImageIcon image) {
-		if (isHeadless()) return null;
+		if (isHeadless())
+			return null;
 
 		final Panel panel = new Panel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -263,21 +281,24 @@ public class GenericDialogPlus extends GenericDialog {
 		label.setOpaque(true);
 		panel.add(label);
 		addPanel(panel);
-		
+
 		return label;
 	}
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
 	public static ImageIcon createImageIcon(final URL imgURL) {
-		if (isHeadless()) return null;
+		if (isHeadless())
+			return null;
 
-		if (imgURL != null) return new ImageIcon(imgURL);
+		if (imgURL != null)
+			return new ImageIcon(imgURL);
 		return null;
 	}
-	
-	// Work around too many private restrictions (add a new panel and remove it right away)
+
+	// Work around too many private restrictions (add a new panel and remove it
+	// right away)
 	protected GridBagConstraints getConstraints() {
-		GridBagLayout layout = (GridBagLayout)getLayout();
+		GridBagLayout layout = (GridBagLayout) getLayout();
 		Panel panel = new Panel();
 		addPanel(panel);
 		GridBagConstraints constraints = layout.getConstraints(panel);
@@ -328,11 +349,11 @@ public class GenericDialogPlus extends GenericDialog {
 		TextField text;
 		int fileSelectionMode;
 
-		public DirectoryListener (String title, TextField text) {
+		public DirectoryListener(String title, TextField text) {
 			this(title, text, JFileChooser.DIRECTORIES_ONLY);
 		}
 
-		public DirectoryListener (String title, TextField text, int fileSelectionMode) {
+		public DirectoryListener(String title, TextField text, int fileSelectionMode) {
 			this.title = title;
 			this.text = text;
 			this.fileSelectionMode = fileSelectionMode;
@@ -355,31 +376,25 @@ public class GenericDialogPlus extends GenericDialog {
 	}
 
 	static String stripSuffix(String s, String suffix) {
-		return !s.endsWith(suffix) ? s :
-			s.substring(0, s.length() - suffix.length());
+		return !s.endsWith(suffix) ? s : s.substring(0, s.length() - suffix.length());
 	}
 
 	@SuppressWarnings("unchecked")
-	static String getString(DropTargetDropEvent event)
-			throws IOException, UnsupportedFlavorException {
+	static String getString(DropTargetDropEvent event) throws IOException, UnsupportedFlavorException {
 		String text = null;
 		DataFlavor fileList = DataFlavor.javaFileListFlavor;
 
 		if (event.isDataFlavorSupported(fileList)) {
 			event.acceptDrop(DnDConstants.ACTION_COPY);
-			List<File> list = (List<File>)event.getTransferable().getTransferData(fileList);
+			List<File> list = (List<File>) event.getTransferable().getTransferData(fileList);
 			text = list.get(0).getAbsolutePath();
-		}
-		else if (event.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+		} else if (event.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 			event.acceptDrop(DnDConstants.ACTION_COPY);
-			text = (String)event.getTransferable()
-				.getTransferData(DataFlavor.stringFlavor);
+			text = (String) event.getTransferable().getTransferData(DataFlavor.stringFlavor);
 			if (text.startsWith("file://"))
 				text = text.substring(7);
-			text = stripSuffix(stripSuffix(text, "\n"),
-					"\r").replaceAll("%20", " ");
-		}
-		else {
+			text = stripSuffix(stripSuffix(text, "\n"), "\r").replaceAll("%20", " ");
+		} else {
 			event.rejectDrop();
 			return null;
 		}
@@ -400,23 +415,27 @@ public class GenericDialogPlus extends GenericDialog {
 		public void drop(DropTargetDropEvent event) {
 			try {
 				text.setText(getString(event));
-			} catch (Exception e) { e.printStackTrace(); }
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keyCode = e.getKeyCode();
-		if (keyCode == KeyEvent.VK_ESCAPE || (keyCode == KeyEvent.VK_W &&
-				(e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0))
+		if (keyCode == KeyEvent.VK_ESCAPE || (keyCode == KeyEvent.VK_W
+				&& (e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0))
 			// wasCanceled is private; workaround
 			windowClosing(null);
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {}
-	
+	public void keyReleased(KeyEvent e) {
+	}
+
 	@Override
-	public void keyTyped(KeyEvent e) {}
+	public void keyTyped(KeyEvent e) {
+	}
 
 }

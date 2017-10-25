@@ -30,14 +30,14 @@ package de.biomedical_imaging.ij.steger;
 public interface OverlapResolver {
 
 	/**
-	 * Given a set of lines and junctions, resolve any overlapping lines
-	 * as necessary.
+	 * Given a set of lines and junctions, resolve any overlapping lines as
+	 * necessary.
 	 */
 	Lines resolve(Lines lines, Junctions junctions);
 
 	/**
-	 * As {@link #resolve(Lines, Junctions)} with an option to output
-	 * resolution information.
+	 * As {@link #resolve(Lines, Junctions)} with an option to output resolution
+	 * information.
 	 */
 	Lines resolve(Lines lines, Junctions junctions, boolean verbose);
 }

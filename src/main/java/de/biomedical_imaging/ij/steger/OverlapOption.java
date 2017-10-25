@@ -21,7 +21,6 @@
  */
 package de.biomedical_imaging.ij.steger;
 
-
 /**
  * Algorithm options for {@link OverlapResolver} choices.
  *

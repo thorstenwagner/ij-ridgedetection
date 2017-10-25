@@ -22,23 +22,24 @@
 package de.biomedical_imaging.ij.steger;
 
 public class Correction {
-	  double w_est;       /* Total line width extracted from the image */
-	  double r_est;       /* Gradient ratio extracted from the image */
-	  double w;           /* True line width */
-	  double h;           /* True asymmetry */
-	  double correction;  /* Line position correction */
-	  double w_strong;    /* True width on the side with the stronger gradient */
-	  double w_weak;      /* True width on the side with the weaker gradient */
-	  boolean   is_valid;    /* Is this table entry valid? */
-	  
-	  public Correction(double w_est,double r_rest, double w, double h, double correction, double w_strong, double w_weak, boolean is_valid) {
-		  this.w_est = w_est;
-		  this.r_est = r_rest;
-		  this.w = w;
-		  this.h = h;
-		  this.correction = correction;
-		  this.w_strong = w_strong;
-		  this.w_weak = w_weak;
-		  this.is_valid = is_valid;
+	double w_est; /* Total line width extracted from the image */
+	double r_est; /* Gradient ratio extracted from the image */
+	double w; /* True line width */
+	double h; /* True asymmetry */
+	double correction; /* Line position correction */
+	double w_strong; /* True width on the side with the stronger gradient */
+	double w_weak; /* True width on the side with the weaker gradient */
+	boolean is_valid; /* Is this table entry valid? */
+
+	public Correction(double w_est, double r_rest, double w, double h, double correction, double w_strong,
+			double w_weak, boolean is_valid) {
+		this.w_est = w_est;
+		this.r_est = r_rest;
+		this.w = w;
+		this.h = h;
+		this.correction = correction;
+		this.w_strong = w_strong;
+		this.w_weak = w_weak;
+		this.is_valid = is_valid;
 	}
 }
