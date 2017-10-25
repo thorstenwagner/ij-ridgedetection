@@ -51,91 +51,168 @@ import ij.plugin.frame.RoiManager;
 import ij.process.FloatPolygon;
 import ij.process.ImageProcessor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Lines_.
+ */
 public class Lines_ implements ExtendedPlugInFilter, DialogListener {
+
+	/** The Constant lineWidthDefault. */
 	final static double lineWidthDefault = 3.5;
+
+	/** The line width. */
 	double lineWidth = lineWidthDefault;
 
+	/** The Constant contrastHighDefault. */
 	final static double contrastHighDefault = 230;
+
+	/** The contrast high. */
 	double contrastHigh = contrastHighDefault;
 
+	/** The Constant contrastLowDefault. */
 	final static double contrastLowDefault = 87;
+
+	/** The contrast low. */
 	double contrastLow = contrastLowDefault;
 
+	/** The Constant sigmaDefault. */
 	final static double sigmaDefault = 1.51;
+
+	/** The sigma. */
 	double sigma = sigmaDefault;
 
+	/** The Constant lowerThreshDefault. */
 	final static double lowerThreshDefault = 3.06;
+
+	/** The lower thresh. */
 	double lowerThresh = lowerThreshDefault;
 
+	/** The Constant upperThreshDefault. */
 	final static double upperThreshDefault = 7.99;
+
+	/** The upper thresh. */
 	double upperThresh = upperThreshDefault;
 
+	/** The Constant minLengthDefault. */
 	final static double minLengthDefault = 0;
+
+	/** The min length. */
 	double minLength = minLengthDefault;
 
+	/** The Constant maxLengthDefault. */
 	final static double maxLengthDefault = 0;
+
+	/** The max length. */
 	double maxLength = maxLengthDefault;
 
+	/** The Constant isDarkLineDefault. */
 	final static boolean isDarkLineDefault = false;
+
+	/** The is dark line. */
 	boolean isDarkLine = isDarkLineDefault;
 
+	/** The Constant doCorrectPositionDefault. */
 	final static boolean doCorrectPositionDefault = false;
+
+	/** The do correct position. */
 	boolean doCorrectPosition = doCorrectPositionDefault;
 
+	/** The Constant doEstimateWidthDefault. */
 	final static boolean doEstimateWidthDefault = false;
+
+	/** The do estimate width. */
 	boolean doEstimateWidth = doEstimateWidthDefault;
 
+	/** The Constant doExtendLineDefault. */
 	final static boolean doExtendLineDefault = true;
+
+	/** The do extend line. */
 	boolean doExtendLine = doExtendLineDefault;
 
+	/** The Constant showJunctionPointsDefault. */
 	final static boolean showJunctionPointsDefault = false;
+
+	/** The show junction points. */
 	boolean showJunctionPoints = showJunctionPointsDefault;
 
+	/** The Constant displayResultsDefault. */
 	final static boolean displayResultsDefault = true;
+
+	/** The display results. */
 	boolean displayResults = displayResultsDefault;
 
+	/** The Constant addToRoiManagerDefault. */
 	final static boolean addToRoiManagerDefault = true;
+
+	/** The add to roi manager. */
 	boolean addToRoiManager = addToRoiManagerDefault;
 
+	/** The Constant makeBinaryDefault. */
 	final static boolean makeBinaryDefault = false;
+
+	/** The make binary. */
 	boolean makeBinary = makeBinaryDefault;
 
+	/** The overlap option. */
 	OverlapOption overlapOption = OverlapOption.NONE;
 
+	/** The Constant showIDsDefault. */
 	final static boolean showIDsDefault = false;
+
+	/** The show I ds. */
 	boolean showIDs = showIDsDefault;
 
+	/** The Constant verboseDefault. */
 	final static boolean verboseDefault = false;
+
+	/** The verbose. */
 	boolean verbose = verboseDefault;
 
+	/** The is preview. */
 	boolean isPreview = false;
+
+	/** The contrast or line width changed once. */
 	boolean contrastOrLineWidthChangedOnce = false;
+
+	/** The do stack. */
 	boolean doStack = false;
 
+	/** The used options. */
 	private Options usedOptions = null;
+
+	/** The instance. */
 	private static Lines_ instance = null;
 
-	/** For each frame an ArrayList with the lines of a single frame **///
+	/** For each frame an ArrayList with the lines of a single frame *. *///
 	ArrayList<Lines> result;
 
-	/** For each frame an ArrayList with the junctions of a single frame **/
+	/** For each frame an ArrayList with the junctions of a single frame *. */
 	ArrayList<Junctions> resultJunction;
 
+	/** The imp. */
 	ImagePlus imp;
 
+	/**
+	 * Instantiates a new lines.
+	 */
 	public Lines_() {
 		instance = this;
 	}
 
 	/**
-	 * Access the results from an external plugin
-	 * 
+	 * Access the results from an external plugin.
+	 *
 	 * @return return instance of Lines_
 	 */
 	public static Lines_ getInstance() {
 		return instance;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.plugin.filter.PlugInFilter#setup(java.lang.String, ij.ImagePlus)
+	 */
 	@Override
 	public int setup(String arg, ImagePlus imp) {
 		if (arg.equals("final")) {
@@ -188,6 +265,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		return DOES_8G + DOES_STACKS + FINAL_PROCESSING + PARALLELIZE_STACKS;
 	}
 
+	/**
+	 * Sort lists.
+	 */
 	private void sortLists() {
 
 		Collections.sort(result, new Comparator<Lines>() {
@@ -215,6 +295,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.plugin.filter.ExtendedPlugInFilter#showDialog(ij.ImagePlus,
+	 * java.lang.String, ij.plugin.filter.PlugInFilterRunner)
+	 */
 	@Override
 	public int showDialog(ImagePlus imp, String command, PlugInFilterRunner pfr) {
 
@@ -288,6 +374,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		return labels;
 	}
 
+	/**
+	 * Read settings.
+	 */
 	private void readSettings() {
 		lineWidth = Prefs.get("RidgeDetection.lineWidth", lineWidthDefault);
 		contrastHigh = Prefs.get("RidgeDetection.contrastHigh", contrastHighDefault);
@@ -312,6 +401,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 	}
 
+	/**
+	 * Save settings.
+	 */
 	private void saveSettings() {
 		Prefs.set("RidgeDetection.lineWidth", lineWidth);
 		Prefs.set("RidgeDetection.contrastHigh", contrastHigh);
@@ -334,6 +426,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		Prefs.set("RidgeDetection.overlapOption", overlapOption.name());
 	}
 
+	/**
+	 * Adds the to roi manager.
+	 */
 	public void addToRoiManager() {
 		RoiManager rm = RoiManager.getInstance();
 		if (rm == null) {
@@ -376,6 +471,12 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 
 	}
 
+	/**
+	 * Creates the results table.
+	 *
+	 * @param showJunctions
+	 *            the show junctions
+	 */
 	private void createResultsTable(boolean showJunctions) {
 		ResultsTable rt = ResultsTable.getResultsTable();
 		ResultsTable rtSum = new ResultsTable();
@@ -438,6 +539,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		}
 	}
 
+	/**
+	 * Make binary.
+	 */
 	public void makeBinary() {
 		ImagePlus binary = IJ.createHyperStack(imp.getTitle() + " Detected segments", imp.getWidth(), imp.getHeight(),
 				imp.getNChannels(), imp.getStackSize() / imp.getNChannels(), 1, 8);
@@ -507,6 +611,9 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		binary.updateAndDraw();
 	}
 
+	/**
+	 * Display contours.
+	 */
 	private void displayContours() {
 		imp.setOverlay(null);
 		Overlay ovpoly = new Overlay();
@@ -627,11 +734,22 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.plugin.filter.ExtendedPlugInFilter#setNPasses(int)
+	 */
 	@Override
 	public void setNPasses(int nPasses) {
 		IJ.showProgress(nPasses, imp.getNSlices());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.gui.DialogListener#dialogItemChanged(ij.gui.GenericDialog,
+	 * java.awt.AWTEvent)
+	 */
 	@Override
 	public boolean dialogItemChanged(GenericDialog gd, AWTEvent e) {
 		imp.setOverlay(null);
@@ -722,6 +840,11 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ij.plugin.filter.PlugInFilter#run(ij.process.ImageProcessor)
+	 */
 	@Override
 	public void run(ImageProcessor ip) {
 
@@ -749,8 +872,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 
 	/**
-	 * Return the detected lines
-	 * 
+	 * Return the detected lines.
+	 *
 	 * @return ArrayList of lines for each frame.
 	 */
 	public ArrayList<Lines> getDetectedLines() {
@@ -758,8 +881,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 
 	/**
-	 * Return the detected junctions
-	 * 
+	 * Return the detected junctions.
+	 *
 	 * @return ArrayList of junctions for each frame.
 	 */
 	public ArrayList<Junctions> getDetectedJunctions() {
@@ -767,8 +890,8 @@ public class Lines_ implements ExtendedPlugInFilter, DialogListener {
 	}
 
 	/**
-	 * Returns the parameter which were used for the analysis
-	 * 
+	 * Returns the parameter which were used for the analysis.
+	 *
 	 * @return The used parameters
 	 */
 	public Options getParameters() {
