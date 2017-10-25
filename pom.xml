@@ -10,7 +10,7 @@
 
 	<groupId>de.biomedical-imaging.imagej</groupId>
 	<artifactId>ij_ridge_detect</artifactId>
-	<version>1.3.2-SNAPSHOT</version>
+	<version>1.4.0</version>
 
 	<name>Ridge Detection Plugin for ImageJ</name>
 	<url>https://github.com/thorstenwagner/ij-ridgedetection</url>
@@ -49,7 +49,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/thorstenwagner/ij-ridgedetection</connection>
 		<developerConnection>scm:git:git@github.com:thorstenwagner/ij-ridgedetection</developerConnection>
-		<tag>HEAD</tag>
+		<tag>ij_ridge_detect-1.4.0</tag>
 		<url>https://github.com/thorstenwagner/ij-ridgedetection</url>
 	</scm>
 
