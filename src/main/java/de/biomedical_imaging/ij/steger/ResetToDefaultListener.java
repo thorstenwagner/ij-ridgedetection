@@ -29,15 +29,13 @@ import java.awt.event.ActionListener;
 
 import ij.IJ;
 
-// TODO: Auto-generated Javadoc
 /**
  * The listener interface for receiving resetToDefault events. The class that is
  * interested in processing a resetToDefault event implements this interface,
  * and the object created with that class is registered with a component using
- * the component's <code>addResetToDefaultListener<code> method. When the
+ * the component's `addResetToDefaultListener` method. When the
  * resetToDefault event occurs, that object's appropriate method is invoked.
  *
- * @see ResetToDefaultEvent
  */
 public class ResetToDefaultListener implements ActionListener {
 

@@ -25,7 +25,7 @@ package de.biomedical_imaging.ij.steger;
 /**
  * Algorithm options for {@link OverlapResolver} choices.
  *
- * @author Mark Hiner <hinerm@gmail.com>
+ * @author Mark Hiner (hinerm@gmail.com)
  */
 public enum OverlapOption {
 

@@ -22,22 +22,37 @@
 
 package de.biomedical_imaging.ij.steger;
 
+// TODO: Auto-generated Javadoc
 /**
  * Algorithm for resolving overlap between lines.
  *
- * @author Mark Hiner <hinerm@gmail.com>
+ * @author Mark Hiner (hinerm@gmail.com)
  */
 public interface OverlapResolver {
 
 	/**
 	 * Given a set of lines and junctions, resolve any overlapping lines as
 	 * necessary.
+	 *
+	 * @param lines
+	 *            the lines
+	 * @param junctions
+	 *            the junctions
+	 * @return the lines
 	 */
 	Lines resolve(Lines lines, Junctions junctions);
 
 	/**
 	 * As {@link #resolve(Lines, Junctions)} with an option to output resolution
 	 * information.
+	 *
+	 * @param lines
+	 *            the lines
+	 * @param junctions
+	 *            the junctions
+	 * @param verbose
+	 *            the verbose
+	 * @return the lines
 	 */
 	Lines resolve(Lines lines, Junctions junctions, boolean verbose);
 }

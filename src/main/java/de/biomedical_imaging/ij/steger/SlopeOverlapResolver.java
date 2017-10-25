@@ -39,7 +39,7 @@ import ij.IJ;
  * matching slope (which is really just trying to preserve straightness -
  * implying that a straight passover is more likely than two overlapping turns).
  *
- * @author Mark Hiner <hinerm@gmail.com>
+ * @author Mark Hiner (hinerm@gmail.com)
  */
 public class SlopeOverlapResolver extends AbstractOverlapResolver {
 

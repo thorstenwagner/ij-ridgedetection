@@ -73,7 +73,7 @@ public class LineDetector {
 	 * @param ip
 	 *            The image where the lines should be detected
 	 * @param sigma
-	 *            A value which depends on the line width: sigma >=
+	 *            A value which depends on the line width: sigma \>=
 	 *            width/(2*sqrt(3))
 	 * @param upperThresh
 	 *            Upper hysteresis thresholds used in the linking algorithm (Depends
