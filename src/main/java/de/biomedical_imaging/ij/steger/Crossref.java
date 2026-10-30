@@ -64,6 +64,11 @@ public class Crossref implements Comparable<Crossref> {
 			return -1;
 		if (this.value < arg0.value)
 			return 1;
-		return 0;
+		// Tie-break on position so the ordering is a total order. Without this, equal-response
+		// pixels (common on low-background images) have no defined order; any difference in the
+		// pre-sort sequence then changes which starting points are chosen, making detection
+		// non-reproducible on identical input.
+		if (this.x != arg0.x) return Short.compare(this.x, arg0.x);
+		return Short.compare(this.y, arg0.y);
 	}
 }

@@ -24,8 +24,7 @@ package de.biomedical_imaging.ij.steger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,12 +71,12 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 		if (verbose)
 			IJ.log("### Overlap detection using Slope heuristic");
 
-		final Set<Line> enclosedLines = new HashSet<Line>();
+		final Set<Line> enclosedLines = new java.util.LinkedHashSet<Line>();
 		final List<List<Line>> nWayIntersections = new ArrayList<List<Line>>();
 		findOverlap(enclosedLines, nWayIntersections, junctions, verbose);
 
-		final Map<Line, List<Line>> startIntersections = new HashMap<Line, List<Line>>();
-		final Map<Line, List<Line>> endIntersections = new HashMap<Line, List<Line>>();
+		final Map<Line, List<Line>> startIntersections = new java.util.LinkedHashMap<Line, List<Line>>();
+		final Map<Line, List<Line>> endIntersections = new java.util.LinkedHashMap<Line, List<Line>>();
 
 		buildIntersectionMaps(originalLines, enclosedLines, startIntersections, endIntersections, verbose);
 
@@ -91,7 +90,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 
 		// perform the actual merges. This will also populate the lineMap
 		// with mappings from original to merged lines.
-		final Map<Line, Line> lineMap = new HashMap<Line, Line>();
+		final Map<Line, Line> lineMap = new java.util.LinkedHashMap<Line, Line>();
 		final Lines resolvedLines = buildResolvedList(originalLines, lineMerges, lineMap, verbose);
 
 		// use lineMap to update references in original junction points
@@ -125,8 +124,8 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	private void findOverlap(final Set<Line> enclosed, final List<List<Line>> nWay, final Junctions junctions,
 			final boolean verbose) {
 		// Remember if a Junction is located at the start or end point of a Line
-		Map<Line, Junction> startMatches = new HashMap<Line, Junction>();
-		Map<Line, Junction> endMatches = new HashMap<Line, Junction>();
+		Map<Line, Junction> startMatches = new java.util.LinkedHashMap<Line, Junction>();
+		Map<Line, Junction> endMatches = new java.util.LinkedHashMap<Line, Junction>();
 
 		// These enclosed lines will be treated as areas of overlap
 		for (final Junction j : junctions) {
@@ -158,7 +157,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 		// tSections will contain lines that intersect at the same point as 2+ other
 		// lines
 		// none of which are enclosed
-		final Set<Line> tSections = new HashSet<Line>(startMatches.keySet());
+		final Set<Line> tSections = new java.util.LinkedHashSet<Line>(startMatches.keySet());
 		tSections.addAll(endMatches.keySet());
 		tSections.removeAll(enclosed);
 		final List<List<Line>> lineSets = new ArrayList<List<Line>>();
@@ -516,7 +515,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 */
 	private Lines buildResolvedList(final Lines originalLines, final List<List<Line>> lineMerges,
 			final Map<Line, Line> lineMap, final boolean verbose) {
-		final Set<Line> finalLines = new HashSet<Line>(originalLines);
+		final Set<Line> finalLines = new java.util.LinkedHashSet<Line>(originalLines);
 
 		for (final List<Line> toMerge : lineMerges) {
 			// remove the individual, unmerged lines
@@ -600,7 +599,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 * @return the sets the
 	 */
 	private Set<Junction> updateJunctions(final Junctions junctions, final Map<Line, Line> lineMap) {
-		final Set<Junction> updated = new HashSet<Junction>();
+		final Set<Junction> updated = new java.util.LinkedHashSet<Junction>();
 
 		for (final Junction junction : junctions) {
 			Line mergedLine = null;
@@ -632,7 +631,7 @@ public class SlopeOverlapResolver extends AbstractOverlapResolver {
 	 *            the updated junctions
 	 */
 	private void pruneJunctions(final Junctions junctions, final Set<Junction> updatedJunctions) {
-		final Map<String, Junction> jMap = new HashMap<String, Junction>();
+		final Map<String, Junction> jMap = new java.util.LinkedHashMap<String, Junction>();
 		for (final Junction j : updatedJunctions) {
 			String key = null;
 			// Remove Junctions with references to the same Line

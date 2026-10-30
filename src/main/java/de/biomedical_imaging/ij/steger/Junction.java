@@ -59,7 +59,15 @@ public class Junction implements Comparable<Junction> {
 	 */
 	@Override
 	public int compareTo(Junction o) {
-		return (((this.cont1 - o.cont1) != 0) ? this.cont1 - o.cont1 : this.pos - o.pos);
+		 // Total order. Comparing only (cont1, pos) left junctions sharing both unordered, so the
+		// line-splitting loop (grouping by cont1, splitting at pos) could split differently between
+		// runs. Tie-break on cont2, then x, then y. Also use Integer/Float.compare instead of
+		// subtraction to avoid integer overflow.
+		if (this.cont1 != o.cont1) return Integer.compare(this.cont1, o.cont1);
+		if (this.pos   != o.pos)   return Integer.compare(this.pos,   o.pos);
+		if (this.cont2 != o.cont2) return Integer.compare(this.cont2, o.cont2);
+		if (this.x     != o.x)     return Float.compare(this.x, o.x);
+		return Float.compare(this.y, o.y);
 	}
 
 	/**

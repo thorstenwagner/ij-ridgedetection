@@ -133,6 +133,12 @@ public class LineDetector {
 	public Lines detectLines(ImageProcessor ip, double sigma, double upperThresh, double lowerThresh, double minLength,
 			double maxLength, boolean isDarkLine, boolean doCorrectPosition, boolean doEstimateWidth,
 			boolean doExtendLine, OverlapOption overlapOption) {
+
+		// Reset the static Line id counter at the start of every detection, so line IDs start
+        // from 0 and are reproducible across repeated calls in one JVM. Several steps iterate
+        // HashSet<Integer> of these IDs, whose order depends on the integer values.
+        Line.resetCounter();
+		
 		this.isDarkLine = isDarkLine;
 		this.doCorrectPosition = doCorrectPosition;
 		this.doEstimateWidth = doEstimateWidth;
@@ -334,7 +340,9 @@ public class LineDetector {
 					// Update junctions
 
 					// Add additional junction points for the split point
-					Set<Integer> lineIds = new HashSet<Integer>(); // All IDs which are connected at this junction point
+					// LinkedHashSet for deterministic iteration order. This set is iterated to create
+					// junctions; HashSet<Integer> iterates by value hash, giving non-reproducible results.
+					Set<Integer> lineIds = new java.util.LinkedHashSet<Integer>(); // All IDs which are connected at this junction point
 					for (Junction junc : junctionsWithTheSamePosition) {
 						lineIds.add(junc.getLine1().getID());
 						lineIds.add(junc.getLine2().getID());
@@ -493,7 +501,10 @@ public class LineDetector {
 				} else {
 					// In manchen Fällen gibt es keine Hauptlinie... (bug im Algorithmus, ich bin
 					// aber nicht fähig ihn zu finden=.
-					HashSet<Integer> uniqueIDs = new HashSet<Integer>();
+					// LinkedHashSet for deterministic iteration (see note above). Here it is only
+					// used for .contains(), but using LinkedHashSet keeps the intent consistent and guards
+					// against any future iteration over it.
+					java.util.HashSet<Integer> uniqueIDs = new java.util.LinkedHashSet<Integer>();
 					ArrayList<Line> uniqueLines = new ArrayList<Line>();
 					ArrayList<Integer> uniqueLineIndex = new ArrayList<Integer>();
 					ArrayList<Integer> uniqueLinePos = new ArrayList<Integer>();
